@@ -1,0 +1,10 @@
+dist/
+node_modules/
+resources/apache/
+resources/mysql/
+resources/nginx/
+resources/php/
+resources/nodejs/
+resources/python/
+htdocs/phpmyadmin/
+package-lock.json

@@ -1,0 +1,83 @@
+{
+  "name": "fhyserver",
+  "version": "1.0.0",
+  "description": "-",
+  "keywords": [],
+  "author": "FhyLabs Group",
+  "license": "MIT",
+  "main": "main.js",
+  "scripts": {
+    "build:css": "tailwindcss -i ./templates/css/tailwind.css -o ./templates/css/styles.css",
+    "watch:css": "tailwindcss -i ./templates/css/tailwind.css -o ./templates/css/styles.css --watch",
+    "start": "npm run build:css && electron .",
+    "dev": "concurrently \"npm run watch:css\" \"electron .\"",
+    "pack": "electron-builder --dir",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "com.fhylabs.fhyserve",
+    "productName": "FhyServer",
+    "copyright": "Copyright © 2025 FhyLabs",
+	"icon": "templates/images/icon.png",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!resources/**",
+      "!htdocs/**",
+      "!www/**"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/apache",
+        "to": "apache"
+      },
+      {
+        "from": "resources/php",
+        "to": "php"
+      },
+      {
+        "from": "resources/mysql",
+        "to": "mysql"
+      },
+      {
+        "from": "resources/nginx",
+        "to": "nginx"
+      },
+      {
+        "from": "htdocs",
+        "to": "htdocs"
+      },
+      {
+        "from": "www",
+        "to": "www"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "zip",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "dependencies": {
+    "mysql2": "^3.14.1",
+    "tree-kill": "^1.2.2"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.2",
+    "electron": "^36.5.0",
+    "electron-builder": "^26.0.12",
+    "postcss": "^8.4.49",
+    "postcss-cli": "^11.0.0",
+    "tailwindcss": "^3.4.17"
+  }
+}
