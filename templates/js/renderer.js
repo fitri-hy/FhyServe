@@ -123,12 +123,12 @@ nodeToggle.addEventListener('change', e => {
 window.nodejsAPI.onStatus(status => {
   nodeStatusText.textContent = status;
   if (status === 'RUNNING') {
-    nodeStatusText.classList.add('text-green-500');
-    nodeStatusText.classList.remove('text-rose-500');
+    nodeStatusText.classList.add('text-green-500', 'dark:text-green-600');
+    nodeStatusText.classList.remove('text-rose-500', 'dark:text-rose-600');
     nodeToggle.checked = true;
   } else {
-    nodeStatusText.classList.add('text-rose-500');
-    nodeStatusText.classList.remove('text-green-500');
+    nodeStatusText.classList.add('text-rose-500', 'dark:text-rose-600');
+    nodeStatusText.classList.remove('text-green-500', 'dark:text-green-600');
     nodeToggle.checked = false;
   }
 });
