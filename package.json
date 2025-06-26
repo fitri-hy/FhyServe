@@ -18,7 +18,7 @@
     "appId": "com.fhylabs.fhyserve",
     "productName": "FhyServer",
     "copyright": "Copyright © 2025 FhyLabs",
-	"icon": "templates/images/icon.png",
+    "icon": "templates/images/icon.png",
     "directories": {
       "output": "dist"
     },
@@ -26,16 +26,13 @@
       "**/*",
       "!resources/**",
       "!htdocs/**",
-      "!www/**"
+      "!www/**",
+      "!node-server/**"
     ],
     "extraResources": [
       {
         "from": "resources/apache",
         "to": "apache"
-      },
-      {
-        "from": "resources/php",
-        "to": "php"
       },
       {
         "from": "resources/mysql",
@@ -46,19 +43,34 @@
         "to": "nginx"
       },
       {
+        "from": "resources/nodejs",
+        "to": "nodejs"
+      },
+      {
+        "from": "resources/php",
+        "to": "php"
+      },
+      {
+        "from": "resources/php-fpm",
+        "to": "php-fpm"
+      },
+      {
         "from": "htdocs",
         "to": "htdocs"
       },
       {
         "from": "www",
         "to": "www"
+      },
+      {
+        "from": "node-server",
+        "to": "node-server"
       }
     ],
     "win": {
       "target": [
         "nsis",
-        "zip",
-        "portable"
+        "zip"
       ]
     },
     "nsis": {
@@ -68,6 +80,8 @@
     }
   },
   "dependencies": {
+    "chokidar": "^4.0.3",
+    "http-proxy": "^1.18.1",
     "mysql2": "^3.14.1",
     "tree-kill": "^1.2.2"
   },

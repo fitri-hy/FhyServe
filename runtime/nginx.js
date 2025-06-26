@@ -6,8 +6,10 @@ const { exec, spawn } = require('child_process');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 
 const PORT = 8080;
+const PHP_FPM_PORT = 1111;
 
 let nginxProcess = null;
+let phpFpmProcess = null;
 let mainWindow = null;
 
 const basePath = getBasePath();
@@ -16,6 +18,7 @@ const nginxCwd = isDevelopment()
   : path.join(basePath, 'resources', 'nginx');
 const nginxPath = path.join(nginxCwd, 'nginx.exe');
 const nginxConfPath = path.join(nginxCwd, 'conf', 'nginx.conf');
+const phpFpmPath = path.join(basePath, 'resources', 'php-fpm', 'php-cgi.exe');
 
 function setNginxMain(win) {
   mainWindow = win;
@@ -43,11 +46,25 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function startPhpFpm() {
+  if (phpFpmProcess) return;
+
+  phpFpmProcess = spawn(phpFpmPath, ['-b', `127.0.0.1:${PHP_FPM_PORT}`], {
+    cwd: path.dirname(phpFpmPath),
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+
+  phpFpmProcess.stdout?.on('data', data => logToRenderer(`[php-fpm] ${data.toString()}`));
+  phpFpmProcess.stderr?.on('data', data => logToRenderer(`[php-fpm] ${data.toString()}`));
+
+  phpFpmProcess.on('close', () => {
+    phpFpmProcess = null;
+  });
+}
+
 function updateNginxConfig(port = PORT) {
   try {
-    if (!fs.existsSync(nginxConfPath)) {
-      return;
-    }
+    if (!fs.existsSync(nginxConfPath)) return;
 
     let content = fs.readFileSync(nginxConfPath, 'utf8');
 
@@ -55,41 +72,50 @@ function updateNginxConfig(port = PORT) {
       ? path.join(basePath, 'www').replace(/\\/g, '/')
       : path.join(basePath, 'resources', 'www').replace(/\\/g, '/');
 
-    const serverBlockRegex = new RegExp(`server\\s*\\{[^}]*listen\\s+${port};[^}]*\\}`, 'm');
-    if (serverBlockRegex.test(content)) {
+    const desiredServerBlock = `
+server {
+    listen ${port};
+    server_name localhost;
+
+    root ${rootPath};
+    index index.php index.html index.htm;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location ~ \\.php$ {
+        fastcgi_pass 127.0.0.1:${PHP_FPM_PORT};
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+    }
+}`.trim();
+
+    function normalize(str) {
+      return str.replace(/\s+/g, '').toLowerCase();
+    }
+
+    if (normalize(content).includes(normalize(desiredServerBlock))) {
       return;
     }
 
-    const newServerBlock = `
-    server {
-        listen ${port};
-        server_name localhost;
-
-        root ${rootPath};
-        index index.php index.html index.htm;
-
-        location / {
-            try_files $uri $uri/ =404;
-        }
-    }
-`;
-
-    const httpBlockRegex = /http\s*\{([\s\S]*?)\n\}/m;
+    const httpBlockRegex = /(http\s*\{)([\s\S]*?)(\n\})/m;
     const match = content.match(httpBlockRegex);
     if (!match) {
       logToRenderer('No valid http block found in nginx.conf');
       return;
     }
+    const before = match[1];
+    const inside = match[2];
+    const after = match[3];
 
-    const httpBlockContent = match[1];
-    const newHttpBlockContent = httpBlockContent + '\n' + newServerBlock + '\n';
-    const newContent = content.replace(httpBlockRegex, `http {\n${newHttpBlockContent}}`);
+    const newHttpContent = inside.trimEnd() + '\n\n    ' + desiredServerBlock.replace(/\n/g, '\n    ') + '\n';
 
-    fs.writeFileSync(nginxConfPath, newContent, 'utf8');
-    logToRenderer(`New server added for port.`);
+    const updatedContent = content.replace(httpBlockRegex, `${before}\n${newHttpContent}${after}`);
 
+    fs.writeFileSync(nginxConfPath, updatedContent, 'utf8');
   } catch (err) {
-    logToRenderer(`Failed to add server: ${err.message}`);
+    logToRenderer(`Failed to update server: ${err.message}`);
   }
 }
 
@@ -125,6 +151,7 @@ async function startNginx(port = PORT) {
   }
 
   updateNginxConfig(port);
+  startPhpFpm();
 
   nginxProcess = spawn(nginxPath, ['-c', nginxConfPath], {
     cwd: nginxCwd,
@@ -154,6 +181,11 @@ async function startNginx(port = PORT) {
 
 async function stopNginx() {
   logToRenderer('Stopping...');
+  
+  if (phpFpmProcess) {
+    phpFpmProcess.kill('SIGTERM');
+    phpFpmProcess = null;
+  }
 
   return new Promise((resolve) => {
     exec('tasklist /FI "IMAGENAME eq nginx.exe" /FO CSV /NH', (err, stdout, stderr) => {
@@ -179,11 +211,6 @@ async function stopNginx() {
       let killedCount = 0;
       for (const pid of pids) {
         kill(parseInt(pid), 'SIGTERM', (killErr) => {
-          if (killErr) {
-            
-          } else {
-            
-          }
           killedCount++;
           if (killedCount === pids.length) {
             resolve(true);

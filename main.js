@@ -2,9 +2,10 @@ const { app } = require('electron');
 const { createWindow } = require('./screen/indexWindow');
 const { setupIPC } = require('./utils/ipc');
 const { createMainMenu } = require('./screen/menu/mainMenu');
-const { setApacheMain } = require('./runtime/apache');
-const { setMysqlMain } = require('./runtime/mysql');
-const { setNginxMain } = require('./runtime/nginx');
+const { setApacheMain, stopApache } = require('./runtime/apache');
+const { setMysqlMain, stopMysql } = require('./runtime/mysql');
+const { setNginxMain, stopNginx } = require('./runtime/nginx');
+const { setNodeMain, stopNodeServer } = require('./runtime/node');
 
 let mainWindow;
 
@@ -13,6 +14,7 @@ app.whenReady().then(() => {
   setApacheMain(mainWindow);
   setMysqlMain(mainWindow);
   setNginxMain(mainWindow);
+  setNodeMain(mainWindow);
   setupIPC();
   createMainMenu();
 
@@ -22,6 +24,22 @@ app.whenReady().then(() => {
       createMainMenu();
     }
   });
+});
+
+app.on('before-quit', async (event) => {
+  event.preventDefault();
+
+  try {
+    await stopApache();
+    await stopMysql();
+    await stopNginx();
+    await stopNodeServer();
+
+    app.exit(0);
+  } catch (err) {
+    console.error('Failed to stop services:', err);
+    app.exit(1);
+  }
 });
 
 app.on('window-all-closed', () => {

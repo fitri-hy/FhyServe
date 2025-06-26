@@ -1,5 +1,13 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+
+let projectPorts = {};
+
+ipcRenderer.on('nodejs-project-ports', (event, mapping) => {
+  projectPorts = mapping;
+  console.log('Updated project ports:', projectPorts);
+});
+
 contextBridge.exposeInMainWorld('themeAPI', {
   setDarkMode: (isDark) => ipcRenderer.send('dark-mode-changed', isDark),
 });
@@ -25,6 +33,18 @@ contextBridge.exposeInMainWorld('nginxAPI', {
   onStatus: (callback) => ipcRenderer.on('nginx-status', (_event, status) => callback(status)),
 });
 
+// Node
+contextBridge.exposeInMainWorld('nodejsAPI', {
+  start: () => ipcRenderer.send('nodejs-start'),
+  stop: () => ipcRenderer.send('nodejs-stop'),
+  onStatus: (callback) => {
+    ipcRenderer.on('nodejs-status-main', (event, status) => {
+      callback(status);
+    });
+  }
+});
+
+// Log
 contextBridge.exposeInMainWorld('serviceAPI', {
   onLog: (callback) => ipcRenderer.on('service-log', (_event, log) => callback(log)),
 });

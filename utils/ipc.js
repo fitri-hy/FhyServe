@@ -2,6 +2,7 @@ const { ipcMain, nativeTheme } = require('electron');
 const { startApache, stopApache } = require('../runtime/apache');
 const { startMysql, stopMysql } = require('../runtime/mysql');
 const { startNginx, stopNginx } = require('../runtime/nginx');
+const { startNodeServer, stopNodeServer } = require('../runtime/node');
 
 function setupIPC() {
   // Dark Mode
@@ -34,6 +35,15 @@ function setupIPC() {
 
   ipcMain.on('nginx-stop', () => {
     stopNginx();
+  });
+  
+  // Node
+  ipcMain.on('nodejs-start', () => {
+    startNodeServer();
+  });
+
+  ipcMain.on('nodejs-stop', () => {
+    stopNodeServer();
   });
 }
 

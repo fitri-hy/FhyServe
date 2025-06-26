@@ -106,3 +106,28 @@ window.nginxAPI.onStatus((status) => {
     nginxToggle.checked = false;
   }
 });
+
+// Node
+const nodeStatusText = document.querySelector('#nodejs-status');
+const nodeToggle = document.querySelector('#nodejsToggle');
+
+nodeToggle.addEventListener('change', e => {
+  if (e.target.checked) {
+    window.nodejsAPI.start();
+  } else {
+    window.nodejsAPI.stop();
+  }
+});
+
+window.nodejsAPI.onStatus(status => {
+  nodeStatusText.textContent = status;
+  if (status === 'RUNNING') {
+    nodeStatusText.classList.add('text-green-500');
+    nodeStatusText.classList.remove('text-rose-500');
+    nodeToggle.checked = true;
+  } else {
+    nodeStatusText.classList.add('text-rose-500');
+    nodeStatusText.classList.remove('text-green-500');
+    nodeToggle.checked = false;
+  }
+});

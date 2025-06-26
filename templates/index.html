@@ -106,13 +106,13 @@
 						<h2 class="font-bold">
 							NodeJS
 						</h2>
-						<p class="text-xs text-rose-500 dark:text-rose-600">
+						<p id="nodejs-status" class="text-xs text-rose-500 dark:text-rose-600">
 							STOPPED
 						</p>
 					</div>
 				</div>
 				<label class="relative inline-flex items-center cursor-pointer">
-					<input type="checkbox" class="sr-only peer">
+					<input id="nodejsToggle" type="checkbox" class="sr-only peer">
 					<div class="w-11 h-6 bg-gray-200 dark:bg-neutral-800 rounded-full peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-700 transition"></div>
 					<div class="absolute left-0.5 top-0.5 w-5 h-5 rounded-full shadow transition bg-emerald-400 hover:bg-emerald-500 dark:bg-emerald-600 dark:hover:bg-emerald-500 peer-checked:bg-white hover:peer-checked:bg-gray-100 peer-checked:dark:bg-white dark:hover:peer-checked:bg-gray-100 peer-checked:translate-x-full"></div>
 				</label>
@@ -146,8 +146,10 @@
 		
 	</section>
 	
-	<section class="w-full h-screen py-4 pr-4 overflow-y-auto">
-	<pre id="logging" class="font-mono w-full h-full text-gray-600 dark:text-gray-300 text-xs bg-white dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 p-3 rounded whitespace-pre-wrap break-words"><code></code></pre>
+	<section class="w-full h-screen py-4 pr-4">
+		<div class="w-full h-full overflow-y-auto bg-white dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 rounded">
+			<pre id="logging" class="font-mono text-gray-600 dark:text-gray-300 text-xs p-3 whitespace-pre-wrap break-words"><code></code></pre>
+		<div>
 	</section>
 	
 	<script src="./js/renderer.js"></script>
