@@ -55,6 +55,10 @@
         "to": "php-fpm"
       },
       {
+        "from": "resources/python",
+        "to": "python"
+      },
+      {
         "from": "htdocs",
         "to": "htdocs"
       },

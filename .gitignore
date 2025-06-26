@@ -1,6 +1,7 @@
 dist/
 node_modules/
 resources/apache/
+resources/git/
 resources/mysql/
 resources/nginx/
 resources/nodejs/

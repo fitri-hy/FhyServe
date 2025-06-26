@@ -7,25 +7,36 @@ let cmdProcess = null;
 let mainWindow = null;
 
 const basePath = getBasePath();
-const mysqlCwd = path.join(basePath, 'resources', 'mysql');
-const mysqlBinPath = path.join(mysqlCwd, 'bin');
+
+const customPaths = [
+  path.join(basePath, 'resources', 'mysql', 'bin'),
+  path.join(basePath, 'resources', 'php'),
+  path.join(basePath, 'resources', 'nodejs'),
+  path.join(basePath, 'resources', 'python'),
+  path.join(basePath, 'resources', 'nginx'),
+  path.join(basePath, 'resources', 'git', 'cmd')
+];
+
+const system32Path = path.join(process.env.windir || 'C:\\Windows', 'System32');
+
+const pathSeparator = process.platform === 'win32' ? ';' : ':';
+const isolatedPath = [...customPaths, system32Path].join(pathSeparator);
 
 function setCmdMain(window) {
   mainWindow = window;
 }
 
 function startCmd() {
-  if (cmdProcess) {
-    return;
-  }
+  if (cmdProcess) return;
 
-  const originalPath = process.env.PATH || '';
-  const pathSeparator = process.platform === 'win32' ? ';' : ':';
-  const newPath = mysqlBinPath + pathSeparator + originalPath;
+  const env = {
+    ...process.env,
+    PATH: isolatedPath,
+  };
 
-  const env = { ...process.env, PATH: newPath };
+  const shell = process.platform === 'win32' ? 'cmd.exe' : 'bash';
 
-  cmdProcess = spawn(process.platform === 'win32' ? 'cmd.exe' : 'bash', [], {
+  cmdProcess = spawn(shell, [], {
     shell: true,
     windowsHide: true,
     env,
@@ -34,57 +45,39 @@ function startCmd() {
 
   cmdProcess.stdout.on('data', (data) => {
     const msg = data.toString();
-    if (mainWindow) {
-      mainWindow.webContents.send('cmd-output', msg);
-    }
+    mainWindow?.webContents.send('cmd-output', msg);
   });
 
   cmdProcess.stderr.on('data', (data) => {
     const msg = data.toString();
-    if (mainWindow) {
-      mainWindow.webContents.send('cmd-output', msg);
-    }
+    mainWindow?.webContents.send('cmd-output', msg);
   });
 
-  cmdProcess.on('close', (code) => {
+  cmdProcess.on('close', () => {
     cmdProcess = null;
-    if (mainWindow) {
-      mainWindow.webContents.send('cmd-status', 'STOPPED');
-    }
+    mainWindow?.webContents.send('cmd-status', 'STOPPED');
   });
 
-  if (mainWindow) {
-    mainWindow.webContents.send('cmd-status', 'RUNNING');
-  }
+  mainWindow?.webContents.send('cmd-status', 'RUNNING');
 }
 
 function stopCmd() {
-  if (!cmdProcess) {
-    return;
-  }
+  if (!cmdProcess) return;
 
   kill(cmdProcess.pid, 'SIGTERM', (err) => {
-    if (err) {
-      console.error('Failed to kill process:', err);
-    } else {
-      //console.log('Process killed successfully');
-    }
+    if (err) console.error('Failed to kill process:', err);
   });
 
   cmdProcess = null;
-
-  if (mainWindow && !mainWindow.isDestroyed()) {
+  if (!mainWindow?.isDestroyed()) {
     mainWindow.webContents.send('cmd-status', 'STOPPED');
   }
 }
 
 function sendCommand(command, isSQL = false) {
-  if (!cmdProcess) {
-    return;
-  }
+  if (!cmdProcess) return;
 
   let cmd = command.trim();
-
   if (isSQL && !cmd.endsWith(';')) {
     cmd += ';';
   }
