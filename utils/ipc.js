@@ -3,6 +3,7 @@ const { startApache, stopApache } = require('../runtime/apache');
 const { startMysql, stopMysql } = require('../runtime/mysql');
 const { startNginx, stopNginx } = require('../runtime/nginx');
 const { startNodeServer, stopNodeServer } = require('../runtime/node');
+const { startCmd, stopCmd, sendCommand, startMysqlTerminal } = require('../runtime/cmd');
 
 function setupIPC() {
   // Dark Mode
@@ -44,6 +45,19 @@ function setupIPC() {
 
   ipcMain.on('nodejs-stop', () => {
     stopNodeServer();
+  });
+  
+  // CMD
+  ipcMain.on('cmd-start', () => {
+    startCmd();
+  });
+
+  ipcMain.on('cmd-stop', () => {
+    stopCmd();
+  });
+
+  ipcMain.on('cmd-send', (event, command) => {
+    sendCommand(command);
   });
 }
 

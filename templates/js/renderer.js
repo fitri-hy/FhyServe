@@ -28,12 +28,13 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
 window.serviceAPI.onLog(({ service, message }) => {
   const prefix = `[${service.toUpperCase()}] `;
   logElement.textContent += '\n' + prefix + message.trim();
-  logElement.scrollTop = logElement.scrollHeight;
+  logginWrapper.scrollTop = logginWrapper.scrollHeight;
 });
 
 // Apache
 const statusText = document.getElementById('apache-status');
 const toggle = document.getElementById('apacheToggle');
+const logginWrapper = document.getElementById('logging-wrapper');
 const logElement = document.getElementById('logging');
 
 toggle.addEventListener('change', (e) => {
@@ -129,5 +130,46 @@ window.nodejsAPI.onStatus(status => {
     nodeStatusText.classList.add('text-rose-500');
     nodeStatusText.classList.remove('text-green-500');
     nodeToggle.checked = false;
+  }
+});
+
+// CMD
+const cmdToggle = document.querySelector('#cmdToggle');
+const cmdStatusText = document.querySelector('#cmd-status');
+const cmdWrapper = document.querySelector('#cmd-wrapper');
+const cmdOutput = document.querySelector('#cmd-main');
+const cmdInput = document.querySelector('#cmd-input');
+
+cmdToggle.addEventListener('change', e => {
+  if (e.target.checked) {
+    window.cmdAPI.start();
+  } else {
+    window.cmdAPI.stop();
+  }
+});
+
+window.cmdAPI.onStatus(status => {
+  cmdStatusText.textContent = status;
+  if (status === 'RUNNING') {
+    cmdStatusText.classList.add('text-green-500');
+    cmdStatusText.classList.remove('text-rose-500');
+    cmdToggle.checked = true;
+  } else {
+    cmdStatusText.classList.add('text-rose-500');
+    cmdStatusText.classList.remove('text-green-500');
+    cmdToggle.checked = false;
+  }
+});
+
+window.cmdAPI.onOutput(data => {
+  cmdOutput.textContent += data;
+  cmdWrapper.scrollTop = cmdWrapper.scrollHeight;
+});
+
+cmdInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && cmdToggle.checked) {
+    const command = cmdInput.value;
+    window.cmdAPI.sendCommand(command);
+    cmdInput.value = '';
   }
 });

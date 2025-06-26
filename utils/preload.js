@@ -44,6 +44,15 @@ contextBridge.exposeInMainWorld('nodejsAPI', {
   }
 });
 
+// CMD
+contextBridge.exposeInMainWorld('cmdAPI', {
+  start: () => ipcRenderer.send('cmd-start'),
+  stop: () => ipcRenderer.send('cmd-stop'),
+  sendCommand: (cmd) => ipcRenderer.send('cmd-send', cmd),
+  onOutput: (callback) => ipcRenderer.on('cmd-output', (_e, data) => callback(data)),
+  onStatus: (callback) => ipcRenderer.on('cmd-status', (_e, status) => callback(status)),
+});
+
 // Log
 contextBridge.exposeInMainWorld('serviceAPI', {
   onLog: (callback) => ipcRenderer.on('service-log', (_event, log) => callback(log)),

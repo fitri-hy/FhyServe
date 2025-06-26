@@ -2,7 +2,7 @@
 
 # 🚀 FhyServe
 
-*"Full Server Control, No Installation"*
+*"Full Server Control, No Environment!"*
 
 **FhyServe** is a portable **multi-server runtime** platform designed to simplify local web application development without the need for global installation. Allows you to run multiple environments.
 

@@ -6,6 +6,7 @@ const { setApacheMain, stopApache } = require('./runtime/apache');
 const { setMysqlMain, stopMysql } = require('./runtime/mysql');
 const { setNginxMain, stopNginx } = require('./runtime/nginx');
 const { setNodeMain, stopNodeServer } = require('./runtime/node');
+const { setCmdMain, stopCmd } = require('./runtime/cmd');
 
 let mainWindow;
 
@@ -15,6 +16,7 @@ app.whenReady().then(() => {
   setMysqlMain(mainWindow);
   setNginxMain(mainWindow);
   setNodeMain(mainWindow);
+  setCmdMain(mainWindow);
   setupIPC();
   createMainMenu();
 
@@ -34,6 +36,7 @@ app.on('before-quit', async (event) => {
     await stopMysql();
     await stopNginx();
     await stopNodeServer();
+    await stopCmd();
 
     app.exit(0);
   } catch (err) {
