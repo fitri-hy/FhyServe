@@ -10,7 +10,7 @@
 
 ## ⚙️ Included Available
 
-- 🐘 **PHP** 
+- 🐘 **PHP & PHP-FPM** 
 - 🧰 **Apache**
 - 🚀 **NGINX**
 - 🟢 **Node.js**
@@ -22,7 +22,7 @@
 
 ## 🧰 Development Preparation
 
-**1. Download Supporting Components**
+**1. Download (ZIP/GZ) Supporting Components**
 
 Please download and extract the following files to the appropriate folder:
 
@@ -30,9 +30,11 @@ Please download and extract the following files to the appropriate folder:
 |----------------|------------------|
 | **NGINX**      | [nginx-1.28.0](https://nginx.org/en/download.html/) |
 | **PHP**        | [php-8.3.22-Win32-vs16-x64](https://windows.php.net/downloads/releases/) |
+| **PHP-FPM**     |[php-8.3.22-nts-Win32-vs16-x64](https://windows.php.net/download/) |
 | **phpMyAdmin** | [phpMyAdmin-5.2.2-all-languages](https://www.phpmyadmin.net/downloads/) |
 | **MySQL**      | [mysql-8.4.5-winx64](https://dev.mysql.com/downloads/mysql/) |
 | **Apache**     | [Apache Lounge Build](https://www.apachelounge.com/download/) |
+| **NodeJS**     | [node-v22.17.0-win-x64](https://nodejs.org/en/download) |
 
 ```
 FhyServe/
