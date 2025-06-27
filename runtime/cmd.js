@@ -1,7 +1,7 @@
 const path = require('path');
 const { spawn } = require('child_process');
 const kill = require('tree-kill');
-const { getBasePath } = require('../utils/pathResource');
+const { getBasePath, apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder } = require('../utils/pathResource');
 
 let cmdProcess = null;
 let mainWindow = null;
@@ -79,6 +79,31 @@ function sendCommand(command, isSQL = false) {
   if (!cmdProcess) return;
 
   let cmd = command.trim();
+  let targetPath = null;
+  
+  switch (cmd) {
+    case 'go apache_web':
+      targetPath = apacheOpenFolder();
+      break;
+    case 'go nginx_web':
+      targetPath = nginxOpenFolder();
+      break;
+    case 'go node_web':
+      targetPath = nodeOpenFolder();
+      break;
+    case 'go python_web':
+      targetPath = pythonOpenFolder();
+      break;
+  }
+
+  if (targetPath) {
+    const cdCommand = process.platform === 'win32'
+      ? `cd /d "${targetPath}"`
+      : `cd "${targetPath}"`;
+    cmdProcess.stdin.write(cdCommand + '\n');
+    return;
+  }
+  
   if (isSQL && !cmd.endsWith(';')) {
     cmd += ';';
   }

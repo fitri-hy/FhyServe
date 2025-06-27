@@ -233,15 +233,41 @@
 	</section>
 	
 	<section class="flex flex-col w-full h-screen py-4 pr-4">
-		<div class="flex-none flex gap-2 items-center bg-white dark:bg-neutral-950 p-2 text-xs border-t border-l border-r border-gray-100 dark:border-neutral-800 rounded-t">
-			<div class="flex gap-1 items-center">
-				<div class="rounded-full h-3 w-3 bg-emerald-500 "></div>
-				<div class="rounded-full h-3 w-3 bg-amber-500 "></div>
-				<div class="rounded-full h-3 w-3 bg-rose-500 "></div>
+		<div class="flex-none flex justify-between gap-4 items-center bg-white dark:bg-neutral-950 p-2 text-xs border-t border-l border-r border-gray-100 dark:border-neutral-800 rounded-t">
+			<div class="flex items-center gap-2">
+				<div class="flex gap-1 items-center">
+					<div class="rounded-full h-3 w-3 bg-emerald-500 "></div>
+					<div class="rounded-full h-3 w-3 bg-amber-500 "></div>
+					<div class="rounded-full h-3 w-3 bg-rose-500 "></div>
+				</div>
+				<h2 class="font-semibold">
+					CMD
+				</h2>
 			</div>
-			<h2 class="font-semibold">
-				CMD
-			</h2>
+			<div class="relative">
+				<button data-dropdown="menu-cmd-info" class="dropdown-toggle text-emerald-500 dark:text-emerald-600 hover:text-emerald-400 dark:hover:text-emerald-500">
+					<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10m-10 5.75a.75.75 0 0 0 .75-.75v-6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75M12 7a1 1 0 1 1 0 2a1 1 0 0 1 0-2" clip-rule="evenodd"/></svg>
+				</button>
+				<div id="menu-cmd-info" class="dropdown-menu hidden absolute flex flex-col gap-1 text-xs p-2 top-6 right-0 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded shadow-md w-96 z-40">
+					<h2 class="font-bold text-lg text-center pb-2 border-b border-gray-200 dark:border-neutral-800 mb-2">
+						Custom Commands
+					</h2>
+					<ul class="list-disc pl-5 prose prose-sm dark:prose-invert">
+						<li>
+							<span class="font-semibold"><code class="text-emerald-600">go apache_web</code></span> go to Apache root directory. 
+						</li>
+						<li>
+							<span class="font-semibold"><code class="text-emerald-600">go nginx_web</code></span> go to Nginx root directory. 
+						</li>
+						<li>
+							<span class="font-semibold"><code class="text-emerald-600">go node_web</code></span> go to NodeJS root directory. 
+						</li>
+						<li>
+							<span class="font-semibold"><code class="text-emerald-600">go python_web</code></span> go to Python root directory. 
+						</li>
+					</ul>
+				</div>
+			</div>
 		</div>
 		<div id="cmd-wrapper" class="w-full h-full overflow-y-auto bg-white dark:bg-neutral-950 p-2 text-xs border-t border-l border-r border-gray-100 dark:border-neutral-800 rounded-t">
 			<span id="cmd-main" class="cmd-output font-mono text-green-600 dark:text-green-500 text-xs whitespace-pre-wrap break-words"></span>
