@@ -9,6 +9,7 @@ let mainWindow = null;
 const basePath = getBasePath();
 
 const customPaths = [
+  path.join(basePath, 'resources', 'apache', 'bin'),
   path.join(basePath, 'resources', 'mysql', 'bin'),
   path.join(basePath, 'resources', 'php'),
   path.join(basePath, 'resources', 'nodejs'),
