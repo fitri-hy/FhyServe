@@ -33,6 +33,10 @@
         "to": "apache"
       },
       {
+        "from": "resources/git",
+        "to": "git"
+      },
+      {
         "from": "resources/mysql",
         "to": "mysql"
       },
