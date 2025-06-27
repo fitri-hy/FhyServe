@@ -5,7 +5,7 @@ const kill = require('tree-kill');
 const { spawn } = require('child_process');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 
-const PORT = 9000;
+const PORT = 8000;
 
 let apacheProcess;
 let mainWindow = null;
@@ -17,16 +17,16 @@ const apacheCwd = isDevelopment()
 const apachePath = path.join(apacheCwd, 'bin', 'httpd.exe');
 
 const htdocsPath = isDevelopment()
-  ? path.join(basePath, 'htdocs')
-  : path.join(basePath, 'resources', 'htdocs');
+  ? path.join(basePath, 'public_html', 'apache_web')
+  : path.join(basePath, 'resources', 'public_html', 'apache_web');
 
 const phpPath  = isDevelopment()
   ? path.join(basePath, 'resources', 'php')
   : path.join(basePath, 'resources', 'php');
 
 const phpMyAdminConfigPath = isDevelopment()
-  ? path.join(basePath, 'htdocs', 'phpmyadmin', 'config.inc.php')
-  : path.join(basePath, 'htdocs', 'phpmyadmin', 'config.inc.php');
+  ? path.join(basePath, 'public_html', 'apache_web', 'phpmyadmin', 'config.inc.php')
+  : path.join(basePath, 'public_html', 'apache_web', 'phpmyadmin', 'config.inc.php');
 
 function setApacheMain(win) {
   mainWindow = win;

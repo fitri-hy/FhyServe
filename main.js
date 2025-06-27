@@ -1,31 +1,36 @@
-const { app } = require('electron');
+const { app, BrowserWindow } = require('electron');
 const { createWindow } = require('./screen/indexWindow');
 const { setupIPC } = require('./utils/ipc');
-const { createMainMenu } = require('./screen/menu/mainMenu');
+const { createMainMenu, checkForUpdates } = require('./screen/menu/mainMenu');
 const { setApacheMain, stopApache } = require('./runtime/apache');
 const { setMysqlMain, stopMysql } = require('./runtime/mysql');
 const { setNginxMain, stopNginx } = require('./runtime/nginx');
 const { setNodeMain, stopNodeServer } = require('./runtime/node');
+const { setPythonMain, stopPython } = require('./runtime/python');
 const { setCmdMain, stopCmd } = require('./runtime/cmd');
 
 let mainWindow;
 
 app.whenReady().then(() => {
   mainWindow = createWindow();
+
   setApacheMain(mainWindow);
   setMysqlMain(mainWindow);
   setNginxMain(mainWindow);
   setNodeMain(mainWindow);
+  setPythonMain(mainWindow);
   setCmdMain(mainWindow);
-  setupIPC();
-  createMainMenu();
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      mainWindow = createWindow();
-      createMainMenu();
-    }
-  });
+  setupIPC();
+  createMainMenu(mainWindow);
+  checkForUpdates(mainWindow, true);
+});
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    mainWindow = createWindow();
+    createMainMenu(mainWindow);
+  }
 });
 
 app.on('before-quit', async (event) => {
@@ -36,6 +41,7 @@ app.on('before-quit', async (event) => {
     await stopMysql();
     await stopNginx();
     await stopNodeServer();
+    await stopPython();
     await stopCmd();
 
     app.exit(0);

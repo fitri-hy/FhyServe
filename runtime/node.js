@@ -15,8 +15,8 @@ const nodeCwd = isDevelopment()
   ? path.join(basePath, 'resources', 'nodejs')
   : path.join(basePath, 'resources', 'nodejs');
 const serverCwd = isDevelopment()
-  ? path.join(basePath, 'node-server', 'index.js')
-  : path.join(basePath, 'resources', 'node-server', 'index.js');
+  ? path.join(basePath, 'public_html', 'node_web', 'index.js')
+  : path.join(basePath, 'resources', 'public_html', 'node_web', 'index.js');
 const nodeExec = process.platform === 'win32'
   ? path.join(nodeCwd, 'node.exe')
   : 'node';
@@ -77,8 +77,8 @@ async function restartProject(projectName) {
       if (proj === 'main') continue;
 	  
       const scriptPath = isDevelopment()
-	    ? path.join(basePath, 'node-server', proj, 'index.js')
-	    : path.join(basePath, 'resources', 'node-server', proj, 'index.js');
+	    ? path.join(basePath, 'public_html', 'node_web', proj, 'index.js')
+	    : path.join(basePath, 'resources', 'public_html', 'node_web', proj, 'index.js');
 		
       const port = extractPortFromScript(scriptPath);
       if (port) projectPorts[proj] = port;
@@ -93,8 +93,8 @@ async function restartProject(projectName) {
   } else {
 	  
     const scriptPath = isDevelopment()
-	  ? path.join(basePath, 'node-server', projectName, 'index.js')
-	  : path.join(basePath, 'resources', 'node-server', projectName, 'index.js');
+	  ? path.join(basePath, 'public_html', 'node_web', projectName, 'index.js')
+	  : path.join(basePath, 'resources', 'public_html', 'node_web', projectName, 'index.js');
 	  
     if (!fs.existsSync(scriptPath)) return;
 
@@ -314,8 +314,8 @@ async function startNodeServer() {
     if (proj === 'main') continue;
 	
     const scriptPath = isDevelopment()
-	    ? path.join(basePath, 'node-server', proj, 'index.js')
-	    : path.join(basePath, 'resources', 'node-server', proj, 'index.js');
+	    ? path.join(basePath, 'public_html', 'node_web', proj, 'index.js')
+	    : path.join(basePath, 'resources', 'public_html', 'node_web', proj, 'index.js');
 		
     const port = extractPortFromScript(scriptPath);
     if (port) projectPorts[proj] = port;
@@ -328,8 +328,8 @@ async function startNodeServer() {
     if (proj === 'main') continue;
 	
     const scriptPath = isDevelopment()
-	    ? path.join(basePath, 'node-server', proj, 'index.js')
-	    : path.join(basePath, 'resources', 'node-server', proj, 'index.js');
+	    ? path.join(basePath, 'public_html', 'node_web', proj, 'index.js')
+	    : path.join(basePath, 'resources', 'public_html', 'node_web', proj, 'index.js');
 		
     const port = extractPortFromScript(scriptPath);
     if (!port) {

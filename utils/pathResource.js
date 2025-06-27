@@ -6,12 +6,41 @@ function isDevelopment() {
 
 function getBasePath() {
   if (isDevelopment()) {
-    // __dirname di utils/ jadi naik satu folder ke root projek
     return path.resolve(__dirname, '..');
   } else {
-    // Saat build/installer, ambil folder executable
     return path.dirname(process.execPath);
   }
 }
 
-module.exports = { isDevelopment, getBasePath };
+function apacheOpenFolder() {
+  const basePath = getBasePath();
+  return isDevelopment()
+    ? path.join(basePath, 'public_html', 'apache_web')
+    : path.join(basePath, 'resources', 'public_html', 'apache_web');
+}
+
+function nginxOpenFolder() {
+  const basePath = getBasePath();
+  return isDevelopment()
+    ? path.join(basePath, 'public_html', 'nginx_web')
+    : path.join(basePath, 'resources', 'public_html', 'nginx_web');
+}
+
+function nodeOpenFolder() {
+  const basePath = getBasePath();
+  return isDevelopment()
+    ? path.join(basePath, 'public_html', 'node_web')
+    : path.join(basePath, 'resources', 'public_html', 'node_web');
+}
+
+function pythonOpenFolder() {
+  const basePath = getBasePath();
+  return isDevelopment()
+    ? path.join(basePath, 'public_html', 'python_web')
+    : path.join(basePath, 'resources', 'public_html', 'python_web');
+}
+
+module.exports = { 
+  isDevelopment, getBasePath, 
+  apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder
+};

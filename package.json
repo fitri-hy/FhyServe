@@ -84,8 +84,11 @@
     }
   },
   "dependencies": {
+    "@tailwindcss/typography": "^0.5.16",
+    "axios": "^1.10.0",
     "chokidar": "^4.0.3",
     "http-proxy": "^1.18.1",
+    "marked": "^15.0.12",
     "mysql2": "^3.14.1",
     "tree-kill": "^1.2.2"
   },

@@ -3,6 +3,7 @@ const path = require('path');
 
 function createWindow() {
   const win = new BrowserWindow({
+    title: 'FhyServe',
     width: 800,
     height: 600,
     minWidth: 650,

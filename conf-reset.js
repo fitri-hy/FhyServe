@@ -6,7 +6,7 @@ const replacements = {
   'nginx-nginx.conf': '.\\resources\\nginx\\conf\\nginx.conf',
   'phpfpm-php.ini': '.\\resources\\php-fpm\\php.ini',
   'php-php.ini': '.\\resources\\php\\php.ini',
-  'phpmyadmin-config.inc.php': '.\\htdocs\\phpmyadmin\\config.inc.php'
+  'phpmyadmin-config.inc.php': '.\\public_html\\apache_web\\phpmyadmin\\config.inc.php'
 };
 
 const sourceDir = path.resolve(__dirname, 'conf-restore');

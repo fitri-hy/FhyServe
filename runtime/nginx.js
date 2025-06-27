@@ -69,8 +69,8 @@ function updateNginxConfig(port = PORT) {
     let content = fs.readFileSync(nginxConfPath, 'utf8');
 
     const rootPath = isDevelopment()
-      ? path.join(basePath, 'www').replace(/\\/g, '/')
-      : path.join(basePath, 'resources', 'www').replace(/\\/g, '/');
+      ? path.join(basePath, 'public_html', 'nginx_web').replace(/\\/g, '/')
+      : path.join(basePath, 'resources', 'public_html', 'nginx_web').replace(/\\/g, '/');
 
     const desiredServerBlock = `
 server {

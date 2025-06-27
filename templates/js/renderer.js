@@ -31,6 +31,30 @@ window.serviceAPI.onLog(({ service, message }) => {
   logginWrapper.scrollTop = logginWrapper.scrollHeight;
 });
 
+// Dropdown
+document.querySelectorAll('.dropdown-toggle').forEach(button => {
+  button.addEventListener('click', () => {
+    const dropdownId = button.getAttribute('data-dropdown');
+    const dropdown = document.getElementById(dropdownId);
+    if (!dropdown) return;
+
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+      if (menu !== dropdown) {
+        menu.classList.add('hidden');
+      }
+    });
+    dropdown.classList.toggle('hidden');
+  });
+});
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.dropdown-toggle') && !e.target.closest('.dropdown-menu')) {
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+      menu.classList.add('hidden');
+    });
+  }
+});
+
 // Apache
 const statusText = document.getElementById('apache-status');
 const toggle = document.getElementById('apacheToggle');
@@ -55,6 +79,14 @@ window.apacheAPI.onStatus((status) => {
     statusText.classList.add('text-rose-500', 'dark:text-rose-600');
     statusText.classList.remove('text-green-500', 'dark:text-green-600');
     toggle.checked = false;
+  }
+});
+
+const openFolderApache = document.getElementById('open-apache-folder');
+openFolderApache.addEventListener('click', async () => {
+  const result = await window.apacheAPI.openApacheFolder();
+  if (!result.success) {
+    alert('Failed to open folder: ' + result.message);
   }
 });
 
@@ -108,6 +140,14 @@ window.nginxAPI.onStatus((status) => {
   }
 });
 
+const openFolderNginx = document.getElementById('open-nginx-folder');
+openFolderNginx.addEventListener('click', async () => {
+  const result = await window.nginxAPI.openNginxFolder();
+  if (!result.success) {
+    alert('Failed to open folder: ' + result.message);
+  }
+});
+
 // Node
 const nodeStatusText = document.querySelector('#nodejs-status');
 const nodeToggle = document.querySelector('#nodejsToggle');
@@ -130,6 +170,49 @@ window.nodejsAPI.onStatus(status => {
     nodeStatusText.classList.add('text-rose-500', 'dark:text-rose-600');
     nodeStatusText.classList.remove('text-green-500', 'dark:text-green-600');
     nodeToggle.checked = false;
+  }
+});
+
+const openFolderNode = document.getElementById('open-node-folder');
+openFolderNode.addEventListener('click', async () => {
+  const result = await window.nodejsAPI.openNodeFolder();
+  if (!result.success) {
+    alert('Failed to open folder: ' + result.message);
+  }
+});
+
+// Python
+const pythonStatusText = document.querySelector('#python-status');
+const pythonToggle = document.querySelector('#pythonToggle');
+
+pythonToggle.addEventListener('change', (e) => {
+  if (e.target.checked) {
+    window.pythonAPI.start();
+  } else {
+    window.pythonAPI.stop();
+  }
+});
+
+window.pythonAPI.onStatus(({ project, status }) => {
+  if (project === 'main') {
+    pythonStatusText.textContent = status;
+    if (status === 'RUNNING') {
+      pythonStatusText.classList.add('text-green-500', 'dark:text-green-600');
+      pythonStatusText.classList.remove('text-rose-500', 'dark:text-rose-600');
+      pythonToggle.checked = true;
+    } else {
+      pythonStatusText.classList.add('text-rose-500', 'dark:text-rose-600');
+      pythonStatusText.classList.remove('text-green-500', 'dark:text-green-600');
+      pythonToggle.checked = false;
+    }
+  }
+});
+
+const openFolderPython = document.getElementById('open-python-folder');
+openFolderPython.addEventListener('click', async () => {
+  const result = await window.pythonAPI.openPythonFolder();
+  if (!result.success) {
+    alert('Failed to open folder: ' + result.message);
   }
 });
 
