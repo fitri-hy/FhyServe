@@ -1338,6 +1338,10 @@ video {
   left: 0.25rem;
 }
 
+.right-0 {
+  right: 0px;
+}
+
 .top-0\.5 {
   top: 0.125rem;
 }
@@ -1348,10 +1352,6 @@ video {
 
 .top-6 {
   top: 1.5rem;
-}
-
-.right-0 {
-  right: 0px;
 }
 
 .z-10 {
@@ -1366,12 +1366,12 @@ video {
   margin-bottom: 0.25rem;
 }
 
-.mt-4 {
-  margin-top: 1rem;
-}
-
 .mb-2 {
   margin-bottom: 0.5rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
 }
 
 .flex {
@@ -1438,6 +1438,10 @@ video {
   width: 16rem;
 }
 
+.w-96 {
+  width: 24rem;
+}
+
 .w-auto {
   width: auto;
 }
@@ -1446,20 +1450,8 @@ video {
   width: 100%;
 }
 
-.w-96 {
-  width: 24rem;
-}
-
-.w-80 {
-  width: 20rem;
-}
-
 .max-w-none {
   max-width: none;
-}
-
-.max-w-sm {
-  max-width: 24rem;
 }
 
 .flex-none {
@@ -1542,6 +1534,10 @@ video {
   border-width: 1px;
 }
 
+.border-b {
+  border-bottom-width: 1px;
+}
+
 .border-l {
   border-left-width: 1px;
 }
@@ -1556,10 +1552,6 @@ video {
 
 .border-t {
   border-top-width: 1px;
-}
-
-.border-b {
-  border-bottom-width: 1px;
 }
 
 .border-gray-100 {
@@ -1669,24 +1661,12 @@ video {
   padding-left: 1rem;
 }
 
-.pr-4 {
-  padding-right: 1rem;
-}
-
 .pl-5 {
   padding-left: 1.25rem;
 }
 
-.pl-3 {
-  padding-left: 0.75rem;
-}
-
-.pl-0 {
-  padding-left: 0px;
-}
-
-.pb-3 {
-  padding-bottom: 0.75rem;
+.pr-4 {
+  padding-right: 1rem;
 }
 
 .text-left {
@@ -1737,6 +1717,11 @@ video {
   color: rgb(16 185 129 / var(--tw-text-opacity, 1));
 }
 
+.text-emerald-600 {
+  --tw-text-opacity: 1;
+  color: rgb(5 150 105 / var(--tw-text-opacity, 1));
+}
+
 .text-gray-600 {
   --tw-text-opacity: 1;
   color: rgb(75 85 99 / var(--tw-text-opacity, 1));
@@ -1770,16 +1755,6 @@ video {
 .text-yellow-500 {
   --tw-text-opacity: 1;
   color: rgb(234 179 8 / var(--tw-text-opacity, 1));
-}
-
-.text-amber-500 {
-  --tw-text-opacity: 1;
-  color: rgb(245 158 11 / var(--tw-text-opacity, 1));
-}
-
-.text-emerald-600 {
-  --tw-text-opacity: 1;
-  color: rgb(5 150 105 / var(--tw-text-opacity, 1));
 }
 
 .caret-black {
@@ -1933,11 +1908,6 @@ video {
 .dark\:border-neutral-900:is(.dark *) {
   --tw-border-opacity: 1;
   border-color: rgb(23 23 23 / var(--tw-border-opacity, 1));
-}
-
-.dark\:border-gray-800:is(.dark *) {
-  --tw-border-opacity: 1;
-  border-color: rgb(31 41 55 / var(--tw-border-opacity, 1));
 }
 
 .dark\:bg-emerald-600:is(.dark *) {

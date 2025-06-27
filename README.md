@@ -47,7 +47,7 @@ FhyServe/
 │   ├── git/			← Place extracted files
 │   ├── mysql/			← Place extracted files
 │   ├── nginx/			← Place extracted files
-│   ├── nidejs/         ← Place extracted files
+│   ├── nidejs/			← Place extracted files
 │   ├── php/			← Place extracted files
 │   ├── php-fpm/		← Place extracted files
 │   ├── python/			← Place extracted files
