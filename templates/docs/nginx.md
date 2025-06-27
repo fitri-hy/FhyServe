@@ -12,7 +12,7 @@
 http://localhost:8080/myproject
 ```
 
-**Example of index.html content:**
+**Example of `myproject/index.html` content:**
 
 ```
 <!DOCTYPE html>

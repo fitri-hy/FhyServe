@@ -12,7 +12,7 @@
 http://localhost:4000
 ```
 
-**Example of index.py content:**
+**Example of `myproject/index.py` content:**
 
 ```
 from http.server import BaseHTTPRequestHandler, HTTPServer

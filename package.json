@@ -1,8 +1,21 @@
 {
   "name": "fhyserver",
   "version": "1.0.0",
-  "description": "-",
-  "keywords": [],
+  "description": "FhyServe is a portable multi-server runtime platform designed to simplify local web application development without the need for global installation.",
+  "keywords": [
+    "server",
+    "localhost",
+    "development",
+    "multi-server",
+    "apache",
+    "nginx",
+    "php",
+    "nodejs",
+    "electron",
+    "fhyserver",
+    "runtime",
+    "web-server"
+  ],
   "author": "FhyLabs Group",
   "license": "MIT",
   "main": "main.js",
@@ -66,10 +79,17 @@
       }
     ],
     "win": {
-      "target": [
-        "nsis",
-        "zip"
-      ]
+      "target": [ "nsis", "zip" ]
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "category": "public.app-category.developer-tools",
+      "icon": "templates/images/icon.icns"
+    },
+    "linux": {
+      "target": ["AppImage", "deb", "tar.gz"],
+      "category": "Development",
+      "icon": "templates/images/icon.png"
     },
     "nsis": {
       "oneClick": false,
@@ -94,5 +114,13 @@
     "postcss": "^8.4.49",
     "postcss-cli": "^11.0.0",
     "tailwindcss": "^3.4.17"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fitri-hy/FhyServe.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fitri-hy/FhyServe/issues"
+  },
+  "homepage": "https://fhylabs.com"
 }

@@ -12,7 +12,7 @@
 http://localhost:2999
 ```
 
-**Example of index.js content:**
+**Example of `myproject/index.js` content:**
 
 ```
 const http = require('http');
