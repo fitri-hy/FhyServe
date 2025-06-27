@@ -25,9 +25,7 @@
     "files": [
       "**/*",
       "!resources/**",
-      "!htdocs/**",
-      "!www/**",
-      "!node-server/**"
+      "!public_html/**"
     ],
     "extraResources": [
       {
@@ -59,16 +57,8 @@
         "to": "python"
       },
       {
-        "from": "htdocs",
-        "to": "htdocs"
-      },
-      {
-        "from": "www",
-        "to": "www"
-      },
-      {
-        "from": "node-server",
-        "to": "node-server"
+        "from": "public_html",
+        "to": "public_html"
       }
     ],
     "win": {
