@@ -58,7 +58,7 @@ function getProjectNameFromPath(changedPath, baseDir) {
 function extractPortFromScript(scriptPath) {
   try {
     const content = fs.readFileSync(scriptPath, 'utf8');
-    const match = content.match(/const\s+port\s*=\s*(\d+);?/);
+    const match = content.match(/(?:const|let|var)\s+port\s*=\s*(\d+);?/i);
     if (match) return parseInt(match[1], 10);
   } catch (err) {
     logToRenderer(`Failed to read port from ${scriptPath}: ${err.message}`);
@@ -115,8 +115,8 @@ async function restartProject(projectName) {
 
 function watchSubProjects() {
   const nodeServerDir = isDevelopment()
-	? path.join(basePath, 'node-server')
-	: path.join(basePath, 'resources', 'node-server');
+	? path.join(basePath, 'public_html', 'node_web' )
+	: path.join(basePath, 'resources', 'public_html', 'node_web');
 
   if (watcher) {
     watcher.close();
@@ -188,8 +188,8 @@ function watchSubProjects() {
 
 function scanSubProjects() {
   const nodeServerDir = isDevelopment()
-	? path.join(basePath, 'node-server')
-	: path.join(basePath, 'resources', 'node-server');
+	? path.join(basePath, 'public_html', 'node_web' )
+	: path.join(basePath, 'resources', 'public_html', 'node_web',);
   if (!fs.existsSync(nodeServerDir)) return [];
 
   return fs.readdirSync(nodeServerDir, { withFileTypes: true })

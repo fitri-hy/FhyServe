@@ -3,10 +3,12 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 const kill = require('tree-kill');
 const http = require('http');
+const chokidar = require('chokidar');
 const { getBasePath, isDevelopment } = require('../utils/pathResource');
 
 let pythonProcesses = {};
 let mainWindow = null;
+let watcher = null;
 
 const basePath = getBasePath();
 const pythonExec = path.join(basePath, 'resources', 'python', 'python.exe');
@@ -38,7 +40,7 @@ function delay(ms) {
 function extractPort(scriptPath) {
   try {
     const content = fs.readFileSync(scriptPath, 'utf8');
-    const match = content.match(/port\s*=\s*(\d+)/);
+    const match = content.match(/port\s*=\s*(\d+)/i);
     return match ? parseInt(match[1], 10) : null;
   } catch (e) {
     logToRenderer(`Failed to read port from ${scriptPath}: ${e.message}`);
@@ -139,6 +141,110 @@ function scanSubProjects() {
   });
 }
 
+function getProjectNameFromPath(changedPath, baseDir) {
+  const relative = path.relative(baseDir, changedPath);
+  const parts = relative.split(path.sep);
+  if (parts.length === 0) return null;
+  return parts[0];
+}
+
+async function restartPythonProject(projectName) {
+  if (projectName === 'main') {
+    const mainScript = path.join(htdocsPath, 'index.py');
+    if (!fs.existsSync(mainScript)) return;
+
+    const port = extractPort(mainScript);
+    if (!port) {
+      logToRenderer(`[MAIN] Port not found in index.py, skipping restart.`);
+      return;
+    }
+
+    logToRenderer(`[MAIN] Restarting main due to file changes...`);
+    await startPythonProject('main', mainScript, port);
+  } else {
+    const scriptPath = path.join(htdocsPath, projectName, 'index.py');
+    if (!fs.existsSync(scriptPath)) return;
+
+    const port = extractPort(scriptPath);
+    if (!port) {
+      logToRenderer(`[${projectName.toUpperCase()}] Port not found in index.py, skipping restart.`);
+      return;
+    }
+
+    logToRenderer(`[${projectName.toUpperCase()}] Restarting due to file changes...`);
+    await startPythonProject(projectName, scriptPath, port);
+  }
+}
+
+function watchPythonProjects() {
+  if (watcher) {
+    watcher.close();
+  }
+
+  watcher = chokidar.watch(htdocsPath, {
+    ignored: /(^|[\/\\])\../,
+    persistent: true,
+    depth: 5,
+  });
+
+  const changedProjects = new Set();
+  let restartTimeout = null;
+
+  const scheduleRestart = () => {
+    if (restartTimeout) clearTimeout(restartTimeout);
+    restartTimeout = setTimeout(async () => {
+      for (const proj of changedProjects) {
+        await restartPythonProject(proj);
+      }
+      changedProjects.clear();
+    }, 1000);
+  };
+
+  watcher
+    .on('add', pathFile => {
+      const proj = getProjectNameFromPath(pathFile, htdocsPath);
+      if (proj) {
+        changedProjects.add(proj);
+        scheduleRestart();
+      }
+    })
+    .on('change', pathFile => {
+      const proj = getProjectNameFromPath(pathFile, htdocsPath);
+      if (proj) {
+        changedProjects.add(proj);
+        scheduleRestart();
+      }
+    })
+    .on('unlink', pathFile => {
+      const proj = getProjectNameFromPath(pathFile, htdocsPath);
+      if (proj) {
+        changedProjects.add(proj);
+        scheduleRestart();
+      }
+    })
+    .on('addDir', pathDir => {
+      const proj = getProjectNameFromPath(pathDir, htdocsPath);
+      if (proj) {
+        changedProjects.add(proj);
+        scheduleRestart();
+      }
+    })
+    .on('unlinkDir', pathDir => {
+      const proj = getProjectNameFromPath(pathDir, htdocsPath);
+      if (proj) {
+        changedProjects.add(proj);
+        scheduleRestart();
+      }
+    })
+    .on('error', err => {
+      logToRenderer(`[WATCHER] Watcher error: ${err.message}`);
+    });
+
+  watcher.on('ready', () => {
+    logToRenderer('[WATCHER] Initial scan complete. Monitoring python project changes...');
+  });
+}
+
 async function startPython() {
   const mainScript = path.join(htdocsPath, 'index.py');
   if (fs.existsSync(mainScript)) {
@@ -162,9 +268,17 @@ async function startPython() {
       logToRenderer(`Port not found for project ${proj}, skipping start.`);
     }
   }
+
+  watchPythonProjects();
 }
 
 async function stopPython() {
+  if (watcher) {
+    await watcher.close();
+    watcher = null;
+    logToRenderer('[WATCHER] Watcher stopped.');
+  }
+
   const runningProjects = Object.keys(pythonProcesses);
   for (const proj of runningProjects) {
     await stopPythonProject(proj);
