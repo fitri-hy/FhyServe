@@ -1,4 +1,4 @@
-<img src="./templates/images/sss.jpg"/>
+<img src="./templates/images/ssss.jpg"/>
 
 # 🚀 FhyServe
 
@@ -19,6 +19,8 @@
 - 🗂 **phpMyAdmin**
 - 🐙 **Git**
 - 💻 **CMD**
+- ⏰ **Cron Job**
+- 📡 **Client API**
 
 ---
 
