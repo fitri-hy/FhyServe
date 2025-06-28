@@ -8,7 +8,7 @@ const { setNginxMain, stopNginx } = require('./runtime/nginx');
 const { setNodeMain, stopNodeServer } = require('./runtime/node');
 const { setPythonMain, stopPython } = require('./runtime/python');
 const { setCmdMain, stopCmd } = require('./runtime/cmd');
-const { setCronJobMain } = require('./runtime/cronjob');
+const { setCronJobMain, stopAllCronJobs } = require('./runtime/cronjob');
 
 let mainWindow;
 
@@ -45,6 +45,7 @@ app.on('before-quit', async (event) => {
     await stopNodeServer();
     await stopPython();
     await stopCmd();
+    await stopAllCronJobs();
 
     app.exit(0);
   } catch (err) {

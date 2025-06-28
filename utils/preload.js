@@ -87,3 +87,8 @@ contextBridge.exposeInMainWorld('cronAPI', {
   startAll: () => ipcRenderer.send('cronjob-start-all'),
   stopAll: () => ipcRenderer.send('cronjob-stop-all'),
 });
+
+// Monitoring
+contextBridge.exposeInMainWorld('monitoringAPI', {
+  getServiceStats: () => ipcRenderer.invoke('get-service-stats')
+});

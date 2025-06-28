@@ -8,7 +8,7 @@ const { startNodeServer, stopNodeServer } = require('../runtime/node');
 const { startPython, stopPython } = require('../runtime/python');
 const { startCmd, stopCmd, sendCommand, startMysqlTerminal } = require('../runtime/cmd');
 const { createCronJob, readCronJobs, updateCronJob, deleteCronJob, startCronJob, stopCronJob, readCronJobs: getAllJobs } = require('../runtime/cronjob');
-
+const { getServiceStats } = require('../runtime/monitor');
 const { apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder, portOpenFolder } = require('./pathResource');
 
 function setupIPC() {
@@ -146,6 +146,11 @@ function setupIPC() {
   ipcMain.on('cronjob-stop-all', () => {
     const jobs = getAllJobs();
     jobs.forEach(job => stopCronJob(job.id));
+  });
+  
+  // Monitoring
+  ipcMain.handle('get-service-stats', async () => {
+    return await getServiceStats();
   });
 }
 

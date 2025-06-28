@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const net = require('net');
 const kill = require('tree-kill');
+const pidusage = require('pidusage');
 const { spawn, spawnSync, execSync } = require('child_process');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 const mysqlLib = require('mysql2/promise');
@@ -246,4 +247,32 @@ async function stopMysql() {
   });
 }
 
-module.exports = { startMysql, stopMysql, setMysqlMain };
+// Monitoring
+async function getMysqlStats() {
+  if (!mysqlProcess || !mysqlProcess.pid) {
+    return {
+      name: 'MySQL',
+      status: 'STOPPED',
+    };
+  }
+
+  try {
+    const usage = await pidusage(mysqlProcess.pid);
+    return {
+      name: 'MySQL',
+      pid: mysqlProcess.pid,
+      cpu: usage.cpu.toFixed(1) + '%',
+      memory: (usage.memory / 1024 / 1024).toFixed(1) + ' MB',
+      port: PORT,
+      status: 'RUNNING',
+    };
+  } catch (err) {
+    return {
+      name: 'MySQL',
+      status: 'ERROR',
+      error: err.message,
+    };
+  }
+}
+
+module.exports = { startMysql, stopMysql, setMysqlMain, getMysqlStats };

@@ -3,6 +3,7 @@ const fs = require('fs');
 const http = require('http');
 const { spawn } = require('child_process');
 const kill = require('tree-kill');
+const pidusage = require('pidusage');
 const chokidar = require('chokidar');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 const { getPORT } = require('../utils/port');
@@ -364,4 +365,40 @@ async function stopNodeServer() {
   processes = {};
 }
 
-module.exports = { startNodeServer, stopNodeServer, setNodeMain };
+// Monitoring
+async function getNodeStats() {
+  if (!processes || Object.keys(processes).length === 0) {
+    return {
+      name: 'NodeJS',
+      status: 'STOPPED',
+    };
+  }
+
+  const firstProject = Object.values(processes)[0];
+  if (!firstProject || !firstProject.proc) {
+    return {
+      name: 'NodeJS',
+      status: 'STOPPED',
+    };
+  }
+
+  try {
+    const usage = await pidusage(firstProject.proc.pid);
+    return {
+      name: 'NodeJS',
+      pid: firstProject.proc.pid,
+      cpu: usage.cpu.toFixed(1) + '%',
+      memory: (usage.memory / 1024 / 1024).toFixed(1) + ' MB',
+      port: firstProject.port || '-',
+      status: 'RUNNING'
+    };
+  } catch (err) {
+    return {
+      name: 'NodeJS',
+      status: 'ERROR',
+      error: err.message
+    };
+  }
+}
+
+module.exports = { startNodeServer, stopNodeServer, setNodeMain, getNodeStats };

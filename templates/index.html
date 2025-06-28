@@ -249,6 +249,7 @@
 			<button class="tab-btn font-bold w-full text-xs bg-emerald-500 dark:bg-emerald-600 text-white p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab1">MAIN</button>
 			<button class="tab-btn font-bold w-full text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab2">CRONJOB</button>
 			<button class="tab-btn font-bold w-full text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab3">API Client</button>
+			<button class="tab-btn font-bold w-full text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab4">Monitoring</button>
 		</div>
 
 		<div id="tab1" class="tab-content flex flex-col w-full h-[calc(100vh-74px)] pr-4">
@@ -293,12 +294,12 @@
 				<h2 class="font-semibold">LOGGING</h2>
 			</div>
 			<div id="logging-wrapper" class="h-[30vh] overflow-y-auto bg-white dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 rounded-b">
-				<pre id="logging" class="pb-2 px-3 font-mono text-gray-600 dark:text-gray-300 text-xs whitespace-pre-wrap break-words"><code></code></pre>
+				<pre id="logging" class="pb-2 px-3 font-mono text-xs whitespace-pre-wrap break-words"><code></code></pre>
 			</div>
 		</div>
 
 		<div id="tab2" class="tab-content hidden flex flex-col w-full h-[calc(100vh-74px)] pr-4">
-			<div class="bg-white dark:bg-neutral-950 p-4 h-full rounded border border-gray-200 dark:border-neutral-800 flex flex-col">
+			<div class="bg-white dark:bg-neutral-950 p-4 h-full rounded border border-gray-100 dark:border-neutral-800 flex flex-col">
 				<form id="cron-form" class="flex flex-wrap md:flex-nowrap items-end gap-4 mb-4">
 					<div class="w-full md:max-w-xs text-sm">
 						<label class="block font-medium mb-1">Schedule</label>
@@ -321,7 +322,7 @@
 					<div class="col-span-7">Task</div>
 					<div class="col-span-2 text-center">Action</div>
 				</div>
-				<div id="cron-list" class="flex-1 overflow-y-auto bg-white dark:bg-neutral-900 border-t border-gray-200 dark:border-neutral-800 rounded-b text-xs px-2 space-y-2">
+				<div id="cron-list" class="flex-1 overflow-y-auto bg-gray-50 dark:bg-neutral-900 border-t border-gray-200 dark:border-neutral-800 rounded-b text-xs px-2 space-y-2">
 				</div>
 			</div>
 		</div>
@@ -350,9 +351,35 @@
 				</div>
 			</div>
 		</div>
+		
+		<div id="tab4" class="tab-content hidden flex flex-col w-full h-[calc(100vh-74px)] pr-4">
+			<div class="bg-white rounded dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 p-4 flex flex-col h-full">
+				<div class="w-full h-full mb-4">
+					<canvas id="serviceChart" class="w-full h-full bg-white dark:bg-neutral-900 rounded"></canvas>
+				</div>
+
+				<div class="flex-none overflow-y-auto rounded">
+					<table class="min-w-full">
+						<thead class="bg-emerald-500 dark:bg-emerald-600 text-white sticky top-0 z-10">
+							<tr>
+								<th class="px-4 py-2 text-left text-sm font-semibold">SERVICE</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold">STATUS</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold">PID</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold">CPU</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold">RAM</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold">PORT</th>
+							</tr>
+						</thead>
+						<tbody id="monitor-list" class="bg-gray-50 dark:bg-neutral-900 divide-y divide-gray-100 dark:divide-neutral-700 text-xs">
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
 
 	</section>
 	
+	<script src="./js/chart.js"></script>
 	<script src="./js/renderer.js"></script>
 	<script src="./js/app.js"></script>
 </body>

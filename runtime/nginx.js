@@ -2,6 +2,8 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const kill = require('tree-kill');
+const pidusage = require('pidusage');
+const find = require('find-process');
 const { exec, spawn } = require('child_process');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 const { getPORT } = require('../utils/port');
@@ -223,4 +225,32 @@ async function stopNginx() {
   });
 }
 
-module.exports = { startNginx, stopNginx, setNginxMain };
+// Monitoring
+async function getNginxStats() {
+  if (!nginxProcess) {
+    return {
+      name: 'Nginx',
+      status: 'STOPPED',
+    };
+  }
+
+  try {
+    const usage = await pidusage(nginxProcess.pid);
+    return {
+      name: 'Nginx',
+      pid: nginxProcess.pid,
+      cpu: usage.cpu.toFixed(1) + '%',
+      memory: (usage.memory / 1024 / 1024).toFixed(1) + ' MB',
+      port: PORT,
+      status: 'RUNNING',
+    };
+  } catch (err) {
+    return {
+      name: 'Nginx',
+      status: 'ERROR',
+      error: err.message,
+    };
+  }
+}
+
+module.exports = { startNginx, stopNginx, setNginxMain, getNginxStats  };

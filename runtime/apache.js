@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const kill = require('tree-kill');
+const pidusage = require('pidusage');
 const { spawn } = require('child_process');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 const { getPORT } = require('../utils/port');
@@ -267,4 +268,32 @@ async function stopApache() {
   });
 }
 
-module.exports = { startApache, stopApache, setApacheMain };
+// Monitoring
+async function getApacheStats() {
+  if (!apacheProcess) {
+    return {
+      name: 'Apache',
+      status: 'STOPPED',
+    };
+  }
+
+  try {
+    const usage = await pidusage(apacheProcess.pid);
+    return {
+      name: 'Apache',
+      pid: apacheProcess.pid,
+      cpu: usage.cpu.toFixed(1) + '%',
+      memory: (usage.memory / 1024 / 1024).toFixed(1) + ' MB',
+      port: PORT,
+      status: 'RUNNING'
+    };
+  } catch (err) {
+    return {
+      name: 'Apache',
+      status: 'ERROR',
+      error: err.message
+    };
+  }
+}
+
+module.exports = { startApache, stopApache, setApacheMain, getApacheStats };

@@ -3,6 +3,7 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 const kill = require('tree-kill');
 const http = require('http');
+const pidusage = require('pidusage');
 const chokidar = require('chokidar');
 const { getBasePath, isDevelopment } = require('../utils/pathResource');
 const { getPORT } = require('../utils/port');
@@ -12,6 +13,7 @@ const BASE_PORT = getPORT('PYHTON_PORT');
 const CHOKIDAR = getWATCHER('WATCHER');
 
 let pythonProcesses = {};
+let pythonPorts = {};
 let mainWindow = null;
 let watcher = null;
 
@@ -98,6 +100,7 @@ async function startPythonProject(projectName, scriptPath, port) {
 
   proc.on('close', () => {
     delete pythonProcesses[projectName];
+	delete pythonPorts[projectName];
     updateStatus(projectName, 'STOPPED');
     logToRenderer(`[${projectName.toUpperCase()}] Has stopped.`);
   });
@@ -107,6 +110,7 @@ async function startPythonProject(projectName, scriptPath, port) {
   const ready = await waitForPythonReady(port);
   if (ready) {
     updateStatus(projectName, 'RUNNING');
+	pythonPorts[projectName] = port;
     logToRenderer(`[${projectName.toUpperCase()}] Is running.`);
   } else {
     updateStatus(projectName, 'ERROR');
@@ -292,4 +296,44 @@ async function stopPython() {
   }
 }
 
-module.exports = { startPython, stopPython, setPythonMain };
+// Monitoring
+async function getPythonStats() {
+  const names = Object.keys(pythonProcesses);
+  if (names.length === 0) {
+    return {
+      name: 'Python',
+      status: 'STOPPED',
+    };
+  }
+
+  const projectName = names[0];
+  const proc = pythonProcesses[projectName];
+  const port = pythonPorts[projectName] || '-';
+
+  if (!proc || !proc.pid) {
+    return {
+      name: 'Python',
+      status: 'STOPPED',
+    };
+  }
+
+  try {
+    const usage = await pidusage(proc.pid);
+    return {
+      name: 'Python',
+      pid: proc.pid,
+      cpu: usage.cpu.toFixed(1) + '%',
+      memory: (usage.memory / 1024 / 1024).toFixed(1) + ' MB',
+      port,
+      status: 'RUNNING'
+    };
+  } catch (err) {
+    return {
+      name: 'Python',
+      status: 'ERROR',
+      error: err.message
+    };
+  }
+}
+
+module.exports = { startPython, stopPython, setPythonMain, getPythonStats };

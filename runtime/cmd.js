@@ -1,6 +1,7 @@
 const path = require('path');
 const { spawn } = require('child_process');
 const kill = require('tree-kill');
+const pidusage = require('pidusage');
 const { getBasePath, apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder } = require('../utils/pathResource');
 const { getENV } = require('../utils/env');
 
@@ -129,9 +130,38 @@ function sendCommand(command, isSQL = false) {
   cmdProcess.stdin.write(cmd + '\n');
 }
 
+// Monitoring
+async function getCmdStats() {
+  if (!cmdProcess) {
+    return {
+      name: 'CMD',
+      status: 'STOPPED',
+    };
+  }
+
+  try {
+    const stats = await pidusage(cmdProcess.pid);
+    return {
+      name: 'CMD',
+      pid: cmdProcess.pid,
+      cpu: stats.cpu.toFixed(1) + '%',
+      memory: (stats.memory / 1024 / 1024).toFixed(1) + ' MB',
+      port: '-',
+      status: 'RUNNING',
+    };
+  } catch (err) {
+    return {
+      name: 'CMD',
+      status: 'ERROR',
+      error: err.message,
+    };
+  }
+}
+
 module.exports = {
   setCmdMain,
   startCmd,
   stopCmd,
   sendCommand,
+  getCmdStats,
 };

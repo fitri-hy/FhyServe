@@ -366,3 +366,126 @@ cronToggle.addEventListener('change', async () => {
 });
 
 loadCronjobs();
+
+// Monitoring
+const ctx = document.getElementById('serviceChart').getContext('2d');
+const maxDataPoints = 30;
+const serviceData = {};
+
+const chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: [],
+    datasets: [],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false,
+    layout: {
+      padding: { top: 10, bottom: 10 }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 100,
+        ticks: {
+          maxTicksLimit: 5
+        },
+        title: {
+          display: true,
+          text: 'CPU (%) & RAM (MB)'
+        },
+      },
+      x: {
+        display: false
+      }
+    },
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {}
+    },
+    interaction: {}
+  }
+});
+
+async function refreshServiceStats() {
+  try {
+    const stats = await window.monitoringAPI.getServiceStats();
+    const container = document.getElementById('monitor-list');
+    container.innerHTML = '';
+
+    stats.forEach(service => {
+	  const statusClass = service.status === 'RUNNING'
+        ? 'text-emerald-500'
+        : 'text-rose-500';
+	  container.innerHTML += `
+		<tr>
+		  <td class="px-4 py-2 font-bold">${service.name}</td>
+		  <td class="px-4 py-2 font-semibold ${statusClass}">${service.status}</td>
+		  <td class="px-4 py-2">${service.pid || '-'}</td>
+		  <td class="px-4 py-2">${service.cpu || '-'}</td>
+		  <td class="px-4 py-2">${service.memory || '-'}</td>
+		  <td class="px-4 py-2">${service.port || '-'}</td>
+		</tr>`;
+
+      if (!serviceData[service.name]) {
+        serviceData[service.name] = { cpu: [], ram: [] };
+      }
+
+      let cpuValue = 0;
+      if (service.cpu) {
+        cpuValue = parseFloat(service.cpu.replace('%', '')) || 0;
+      }
+
+      let ramValue = 0;
+      if (service.memory) {
+        ramValue = parseFloat(service.memory.replace(' MB', '')) || 0;
+      }
+
+      const cpuArr = serviceData[service.name].cpu;
+      cpuArr.push(cpuValue);
+      if (cpuArr.length > maxDataPoints) cpuArr.shift();
+
+      const ramArr = serviceData[service.name].ram;
+      ramArr.push(ramValue);
+      if (ramArr.length > maxDataPoints) ramArr.shift();
+    });
+
+    const labels = Array(serviceData[stats[0]?.name]?.cpu.length || 0).fill('');
+    chart.data.labels = labels;
+
+    chart.data.datasets = [];
+    Object.entries(serviceData).forEach(([serviceName, data], i) => {
+      chart.data.datasets.push({
+        label: `${serviceName} CPU %`,
+        data: data.cpu,
+        borderColor: `hsl(${(i * 50) % 360}, 70%, 50%)`,
+        backgroundColor: 'transparent',
+        yAxisID: 'y',
+        tension: 0.3,
+        borderWidth: 2,
+      });
+
+      chart.data.datasets.push({
+        label: `${serviceName} RAM MB`,
+        data: data.ram,
+        borderColor: `hsl(${(i * 50 + 180) % 360}, 70%, 50%)`,
+        backgroundColor: 'transparent',
+        borderDash: [5, 5],
+        yAxisID: 'y',
+        tension: 0.3,
+        borderWidth: 2,
+      });
+    });
+
+    chart.update();
+  } catch (err) {
+    console.error('Error refreshing service stats:', err);
+  }
+}
+
+setInterval(refreshServiceStats, 5000);
+refreshServiceStats();
