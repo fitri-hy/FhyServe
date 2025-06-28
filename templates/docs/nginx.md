@@ -2,7 +2,7 @@
 
 - Launch **FhyServe**.
 - In the **Nginx** section, click the **Settings** icon.
-- Click **Open Folder**.
+- Click **Root Directory**.
 - Create a New Folder for your project (for example, myproject).
 - Inside the folder, create an **index.html** file or other necessary project files.
 - **Start** the Nginx server by clicking Start.
