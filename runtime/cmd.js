@@ -94,6 +94,14 @@ function sendCommand(command, isSQL = false) {
     case 'go python_web':
       targetPath = pythonOpenFolder();
       break;
+	case 'go default':
+      const cdCommand = process.platform === 'win32'
+        ? `cd /d "${basePath}"`
+        : `cd "${basePath}"`;
+      const runCommand = 'node conf-reset.js';
+      cmdProcess.stdin.write(cdCommand + '\n');
+      cmdProcess.stdin.write(runCommand + '\n');
+      return;
   }
 
   if (targetPath) {

@@ -5,8 +5,9 @@ const { spawn } = require('child_process');
 const kill = require('tree-kill');
 const chokidar = require('chokidar');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
+const { getPORT } = require('../utils/port');
 
-const BASE_PORT = 2999;
+const BASE_PORT = getPORT('NODEJS_PORT');
 
 let watcher = null;
 

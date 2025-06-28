@@ -5,8 +5,10 @@ const kill = require('tree-kill');
 const { spawn, spawnSync, execSync } = require('child_process');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 const mysqlLib = require('mysql2/promise');
+const { getPORT } = require('../utils/port');
 
-const PORT = 3306;
+const PORT = getPORT('MYSQL_PORT');
+
 let mysqlProcess;
 let mainWindow = null;
 
@@ -174,7 +176,6 @@ async function startMysql(port = PORT) {
   if (mysqlProcess) return;
 
   if (!fs.existsSync(mysqldPath)) {
-    updateStatus('ERROR');
     return;
   }
 
@@ -183,7 +184,7 @@ async function startMysql(port = PORT) {
   try {
     await initializeDataDirWithRootPassword('root');
   } catch (err) {
-    updateStatus('ERROR');
+    updateStatus('STOPPED');
     return;
   }
 
@@ -209,7 +210,7 @@ async function startMysql(port = PORT) {
     logToRenderer('Is running.');
   } else {
     logToRenderer('Failed to respond. Please check configuration.');
-    updateStatus('ERROR');
+    updateStatus('STOPPED');
   }
 }
 

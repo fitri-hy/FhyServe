@@ -5,6 +5,9 @@ const kill = require('tree-kill');
 const http = require('http');
 const chokidar = require('chokidar');
 const { getBasePath, isDevelopment } = require('../utils/pathResource');
+const { getPORT } = require('../utils/port');
+
+const BASE_PORT = getPORT('PYHTON_PORT');
 
 let pythonProcesses = {};
 let mainWindow = null;
@@ -153,10 +156,10 @@ async function restartPythonProject(projectName) {
     const mainScript = path.join(htdocsPath, 'index.py');
     if (!fs.existsSync(mainScript)) return;
 
-    const port = extractPort(mainScript);
+    let port = extractPort(mainScript);
     if (!port) {
-      logToRenderer(`[MAIN] Port not found in index.py, skipping restart.`);
-      return;
+      logToRenderer(`[MAIN] Port not found in index.py, using default port ${BASE_PORT}.`);
+      port = BASE_PORT;
     }
 
     logToRenderer(`[MAIN] Restarting main due to file changes...`);
@@ -248,12 +251,12 @@ function watchPythonProjects() {
 async function startPython() {
   const mainScript = path.join(htdocsPath, 'index.py');
   if (fs.existsSync(mainScript)) {
-    const mainPort = extractPort(mainScript);
-    if (mainPort) {
-      await startPythonProject('main', mainScript, mainPort);
-    } else {
-      logToRenderer('Main script port not found, skipping main start.');
+    let mainPort = extractPort(mainScript);
+    if (!mainPort) {
+      logToRenderer(`Main script port not found, using default port ${BASE_PORT}.`);
+      mainPort = BASE_PORT;
     }
+    await startPythonProject('main', mainScript, mainPort);
   } else {
     logToRenderer('Main script index.py not found in root python_web.');
   }

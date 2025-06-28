@@ -40,7 +40,14 @@ function pythonOpenFolder() {
     : path.join(basePath, 'resources', 'public_html', 'python_web');
 }
 
+function portOpenFolder() {
+  const basePath = getBasePath();
+  return isDevelopment()
+    ? path.join(basePath, 'config')
+    : path.join(basePath, 'resources', 'config');
+}
+
 module.exports = { 
   isDevelopment, getBasePath, 
-  apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder
+  apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder, portOpenFolder
 };

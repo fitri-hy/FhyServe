@@ -68,6 +68,11 @@ contextBridge.exposeInMainWorld('serviceAPI', {
   onLog: (callback) => ipcRenderer.on('service-log', (_event, log) => callback(log)),
 });
 
+// Port
+contextBridge.exposeInMainWorld('portAPI', {
+  openPortFolder: () => ipcRenderer.invoke('open-port-folder'),
+});
+
 // Docs
 contextBridge.exposeInMainWorld('docAPI', {
   loadMarkdown: (section) => ipcRenderer.invoke('load-markdown', section)

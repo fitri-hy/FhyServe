@@ -13,34 +13,57 @@ const sourceDir = path.resolve(__dirname, 'conf-restore');
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-async function copyFileWithLoading(srcPath, destPath, srcFile) {
-  const destDir = path.dirname(destPath);
-  if (!fs.existsSync(destDir)) {
-    fs.mkdirSync(destDir, { recursive: true });
-    console.log(`Destination folder created: ${destDir}`);
-  }
-
-  process.stdout.write(`Reset files to default ${srcFile} `);
-
-  for (let i = 0; i < 3; i++) {
+async function showLoading(message, times = 3, interval = 300) {
+  process.stdout.write(message);
+  for (let i = 0; i < times; i++) {
     process.stdout.write('.');
-    await delay(300);
+    await delay(interval);
   }
+  process.stdout.write('\n');
+}
 
+async function deletePath(targetPath, type = 'file') {
   try {
-    fs.copyFileSync(srcPath, destPath);
-    console.log(' Success');
+    if (type === 'folder') {
+      fs.rmSync(targetPath, { recursive: true, force: true });
+    } else {
+      fs.unlinkSync(targetPath);
+    }
   } catch (err) {
-    console.log(` Failed: ${err.message}`);
+    // You can handle errors here if needed
   }
 }
 
+async function copyFile(srcPath, destPath) {
+  const destDir = path.dirname(destPath);
+  if (!fs.existsSync(destDir)) {
+    fs.mkdirSync(destDir, { recursive: true });
+  }
+  fs.copyFileSync(srcPath, destPath);
+}
+
 async function replaceFiles() {
+  console.log('Execute configuration reset.');
+
+  await showLoading('Processing please wait');
+
+  const mysqlDataFolder = path.resolve(__dirname, 'resources/mysql/data');
+  if (fs.existsSync(mysqlDataFolder)) {
+    await deletePath(mysqlDataFolder, 'folder');
+  }
+
+  const myIniFile = path.resolve(__dirname, 'resources/mysql/my.ini');
+  if (fs.existsSync(myIniFile)) {
+    await deletePath(myIniFile, 'file');
+  }
+
   for (const [srcFile, destFile] of Object.entries(replacements)) {
     const srcPath = path.resolve(sourceDir, srcFile);
     const destPath = path.resolve(__dirname, destFile);
-    await copyFileWithLoading(srcPath, destPath, srcFile);
+    await copyFile(srcPath, destPath);
   }
+
+  console.log('Config completed reset.');
 }
 
 replaceFiles();

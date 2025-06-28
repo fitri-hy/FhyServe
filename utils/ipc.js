@@ -7,7 +7,7 @@ const { startNginx, stopNginx } = require('../runtime/nginx');
 const { startNodeServer, stopNodeServer } = require('../runtime/node');
 const { startPython, stopPython } = require('../runtime/python');
 const { startCmd, stopCmd, sendCommand, startMysqlTerminal } = require('../runtime/cmd');
-const { apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder } = require('./pathResource');
+const { apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder, portOpenFolder } = require('./pathResource');
 
 function setupIPC() {
   // Dark Mode
@@ -108,17 +108,27 @@ function setupIPC() {
   ipcMain.on('cmd-send', (event, command) => {
     sendCommand(command);
   });
-}
+  
+  // Docs
+  ipcMain.handle('load-markdown', async (event, section) => {
+    const filePath = path.join(__dirname, '../templates/docs', `${section}.md`);
+    try {
+      const content = fs.readFileSync(filePath, 'utf-8');
+      return content;
+    } catch (err) {
+      return `# Error\n\nFile not found: ${section}.md`;
+    }
+  });
 
-// Docs
-ipcMain.handle('load-markdown', async (event, section) => {
-  const filePath = path.join(__dirname, '../templates/docs', `${section}.md`);
-  try {
-    const content = fs.readFileSync(filePath, 'utf-8');
-    return content;
-  } catch (err) {
-    return `# Error\n\nFile not found: ${section}.md`;
-  }
-});
+  // Port
+  ipcMain.handle('open-port-folder', async () => {
+    const folderPath = portOpenFolder();
+    const result = await shell.openPath(folderPath);
+    if (result) {
+      return { success: false, message: result };
+    }
+    return { success: true };
+  });
+}
 
 module.exports = { setupIPC };

@@ -37,10 +37,15 @@
     },
     "files": [
       "**/*",
+      "!config/**",
       "!resources/**",
       "!public_html/**"
     ],
     "extraResources": [
+      {
+        "from": "config",
+        "to": "config"
+      },
       {
         "from": "resources/apache",
         "to": "apache"

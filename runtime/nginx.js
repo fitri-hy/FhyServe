@@ -4,9 +4,10 @@ const http = require('http');
 const kill = require('tree-kill');
 const { exec, spawn } = require('child_process');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
+const { getPORT } = require('../utils/port');
 
-const PORT = 8080;
-const PHP_FPM_PORT = 1111;
+const PORT = getPORT('NGINX_PORT');
+const PHP_FPM_PORT = getPORT('PHP_FPM_PORT');
 
 let nginxProcess = null;
 let phpFpmProcess = null;
