@@ -1,5 +1,1 @@
-- [Apache Lounge](https://www.apachelounge.com/download/)
-- [PHP](https://windows.php.net/downloads/releases/)
-- [PHPMyAdmin](https://www.phpmyadmin.net/downloads/)
-- [MySQL](https://dev.mysql.com/downloads/mysql/)
-- [Nginx](https://nginx.org/en/download.html/)
+Replace resouce here..

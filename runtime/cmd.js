@@ -2,6 +2,9 @@ const path = require('path');
 const { spawn } = require('child_process');
 const kill = require('tree-kill');
 const { getBasePath, apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder } = require('../utils/pathResource');
+const { getENV } = require('../utils/env');
+
+const PATH_SYSTEM = getENV('PATH_SYSTEM');
 
 let cmdProcess = null;
 let mainWindow = null;
@@ -30,9 +33,16 @@ function setCmdMain(window) {
 function startCmd() {
   if (cmdProcess) return;
 
+  const systemPath = PATH_SYSTEM ? process.env.PATH || '' : '';
+  const winSystem32 = path.join(process.env.windir || 'C:\\Windows', 'System32');
+
+  const finalPath = PATH_SYSTEM
+    ? [...customPaths, process.env.PATH || ''].join(pathSeparator)
+    : [...customPaths, winSystem32].join(pathSeparator);
+
   const env = {
     ...process.env,
-    PATH: isolatedPath,
+    PATH: finalPath,
   };
 
   const shell = process.platform === 'win32' ? 'cmd.exe' : 'bash';
