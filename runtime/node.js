@@ -6,8 +6,10 @@ const kill = require('tree-kill');
 const chokidar = require('chokidar');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 const { getPORT } = require('../utils/port');
+const { getWATCHER } = require('../utils/watcher');
 
 const BASE_PORT = getPORT('NODEJS_PORT');
+const CHOKIDAR = getWATCHER('WATCHER');
 
 let watcher = null;
 
@@ -339,8 +341,9 @@ async function startNodeServer() {
     }
     await startProcess(proj, scriptPath, port, path.dirname(scriptPath));
   }
-
-  watchSubProjects();
+  if (CHOKIDAR) {
+    watchSubProjects();
+  }
 }
 
 async function stopNodeServer() {
