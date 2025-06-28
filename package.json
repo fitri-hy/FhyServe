@@ -1,6 +1,6 @@
 {
   "name": "fhyserver",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "FhyServe is a portable multi-server runtime platform designed to simplify local web application development without the need for global installation.",
   "keywords": [
     "server",
