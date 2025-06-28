@@ -265,3 +265,104 @@ openFolderPort.addEventListener('click', async () => {
     alert('Failed to open folder: ' + result.message);
   }
 });
+
+// Cron Job
+const form = document.getElementById('cron-form');
+const scheduleInput = document.getElementById('schedule');
+const taskInput = document.getElementById('task');
+const list = document.getElementById('cron-list');
+const cronToggle = document.getElementById('cronjobToggle');
+const cronStatus = document.getElementById('cronjob-status');
+
+cronToggle.checked = false;
+updateCronStatus(false);
+
+async function loadCronjobs() {
+  const jobs = await window.cronAPI.read();
+  list.innerHTML = '';
+
+  if (jobs.length === 0) {
+    const tr = document.createElement('div');
+    const td = document.createElement('div');
+    td.colSpan = 3;
+    td.textContent = 'There are no cronjobs registered yet.';
+    td.className = 'text-center py-2 col-span-12';
+    tr.appendChild(td);
+    list.appendChild(tr);
+    return;
+  }
+
+  jobs.forEach(job => {
+    const row = document.createElement('div');
+    row.className = 'grid grid-cols-12 items-center border-b border-gray-100 dark:border-neutral-800 py-1 text-xs';
+
+    const colSchedule = document.createElement('div');
+    colSchedule.className = 'col-span-3 px-2 truncate';
+    colSchedule.textContent = job.schedule;
+
+    const colTask = document.createElement('div');
+    colTask.className = 'col-span-7 px-2 truncate';
+    colTask.textContent = job.task;
+
+    const colAction = document.createElement('div');
+    colAction.className = 'col-span-2 px-2 text-center';
+
+    const btnDelete = document.createElement('button');
+    btnDelete.textContent = 'DELETE';
+    btnDelete.className = 'text-rose-500 hover:underline font-bold text-xs';
+    btnDelete.onclick = () => {
+      if (confirm('Are you sure you want to delete this task?')) {
+        window.cronAPI.delete(job.id);
+        setTimeout(loadCronjobs, 300);
+      }
+    };
+
+    colAction.appendChild(btnDelete);
+    row.appendChild(colSchedule);
+    row.appendChild(colTask);
+    row.appendChild(colAction);
+    list.appendChild(row);
+  });
+}
+
+function updateCronStatus(isRunning) {
+  if (isRunning) {
+    cronStatus.textContent = 'RUNNING';
+    cronStatus.classList.remove('text-rose-500', 'dark:text-rose-600');
+    cronStatus.classList.add('text-emerald-500', 'dark:text-emerald-600');
+  } else {
+    cronStatus.textContent = 'STOPPED';
+    cronStatus.classList.remove('text-emerald-500', 'dark:text-emerald-600');
+    cronStatus.classList.add('text-rose-500', 'dark:text-rose-600');
+  }
+}
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const schedule = scheduleInput.value.trim();
+  const task = taskInput.value.trim();
+
+  if (!schedule || !task) {
+    alert('Schedule and tasks must be filled');
+    return;
+  }
+
+  window.cronAPI.create({ schedule, task });
+
+  scheduleInput.value = '';
+  taskInput.value = '';
+  setTimeout(loadCronjobs, 300);
+});
+
+cronToggle.addEventListener('change', async () => {
+  if (cronToggle.checked) {
+    window.cronAPI.startAll();
+    updateCronStatus(true);
+  } else {
+    window.cronAPI.stopAll();
+    updateCronStatus(false);
+  }
+});
+
+loadCronjobs();

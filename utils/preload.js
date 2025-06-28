@@ -77,3 +77,13 @@ contextBridge.exposeInMainWorld('portAPI', {
 contextBridge.exposeInMainWorld('docAPI', {
   loadMarkdown: (section) => ipcRenderer.invoke('load-markdown', section)
 });
+
+// Cron Job
+contextBridge.exposeInMainWorld('cronAPI', {
+  create: (data) => ipcRenderer.send('cronjob-create', data),
+  read: () => ipcRenderer.invoke('cronjob-read'),
+  update: (id, data) => ipcRenderer.send('cronjob-update', id, data),
+  delete: (id) => ipcRenderer.send('cronjob-delete', id),
+  startAll: () => ipcRenderer.send('cronjob-start-all'),
+  stopAll: () => ipcRenderer.send('cronjob-stop-all'),
+});

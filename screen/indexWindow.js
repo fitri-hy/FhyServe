@@ -4,10 +4,10 @@ const path = require('path');
 function createWindow() {
   const win = new BrowserWindow({
     title: 'FhyServe',
-    width: 800,
-    height: 600,
-    minWidth: 650,
-    minHeight: 450,
+    width: 1000,
+    height: 800,
+    minWidth: 800,
+    minHeight: 600,
     resizable: true,
     fullscreenable: true,
     icon: path.join(__dirname, '../templates/images/icon.png'),

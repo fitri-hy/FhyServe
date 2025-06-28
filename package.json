@@ -84,15 +84,25 @@
       }
     ],
     "win": {
-      "target": [ "nsis", "zip" ]
+      "target": [
+        "nsis",
+        "zip"
+      ]
     },
     "mac": {
-      "target": ["dmg", "zip"],
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "category": "public.app-category.developer-tools",
       "icon": "templates/images/icon.icns"
     },
     "linux": {
-      "target": ["AppImage", "deb", "tar.gz"],
+      "target": [
+        "AppImage",
+        "deb",
+        "tar.gz"
+      ],
       "category": "Development",
       "icon": "templates/images/icon.png"
     },
@@ -109,7 +119,9 @@
     "http-proxy": "^1.18.1",
     "marked": "^15.0.12",
     "mysql2": "^3.14.1",
-    "tree-kill": "^1.2.2"
+    "node-cron": "^4.1.1",
+    "tree-kill": "^1.2.2",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",

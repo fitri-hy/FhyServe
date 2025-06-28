@@ -89,11 +89,6 @@
 		</div>
 		<!-- MySQL -->
 		<div class="relative w-full bg-white dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 p-3 rounded">
-			<!--
-			<button class="absolute top-1 left-1 z-10 transition-transform duration-500 hover:rotate-180 bg-white hover:bg-gray-100 dark:bg-neutral-950 dark:hover:bg-neutral-900 rounded-full p-[2px] text-emerald-500 dark:text-emerald-600 hover:text-emerald-400 dark:hover:text-emerald-500 hover:scale-105">
-				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M14.279 2.152C13.909 2 13.439 2 12.5 2s-1.408 0-1.779.152a2 2 0 0 0-1.09 1.083c-.094.223-.13.484-.145.863a1.62 1.62 0 0 1-.796 1.353a1.64 1.64 0 0 1-1.579.008c-.338-.178-.583-.276-.825-.308a2.03 2.03 0 0 0-1.49.396c-.318.242-.553.646-1.022 1.453c-.47.807-.704 1.21-.757 1.605c-.07.526.074 1.058.4 1.479c.148.192.357.353.68.555c.477.297.783.803.783 1.361s-.306 1.064-.782 1.36c-.324.203-.533.364-.682.556a2 2 0 0 0-.399 1.479c.053.394.287.798.757 1.605s.704 1.21 1.022 1.453c.424.323.96.465 1.49.396c.242-.032.487-.13.825-.308a1.64 1.64 0 0 1 1.58.008c.486.28.774.795.795 1.353c.015.38.051.64.145.863c.204.49.596.88 1.09 1.083c.37.152.84.152 1.779.152s1.409 0 1.779-.152a2 2 0 0 0 1.09-1.083c.094-.223.13-.483.145-.863c.02-.558.309-1.074.796-1.353a1.64 1.64 0 0 1 1.579-.008c.338.178.583.276.825.308c.53.07 1.066-.073 1.49-.396c.318-.242.553-.646 1.022-1.453c.47-.807.704-1.21.757-1.605a2 2 0 0 0-.4-1.479c-.148-.192-.357-.353-.68-.555c-.477-.297-.783-.803-.783-1.361s.306-1.064.782-1.36c.324-.203.533-.364.682-.556a2 2 0 0 0 .399-1.479c-.053-.394-.287-.798-.757-1.605s-.704-1.21-1.022-1.453a2.03 2.03 0 0 0-1.49-.396c-.242.032-.487.13-.825.308a1.64 1.64 0 0 1-1.58-.008a1.62 1.62 0 0 1-.795-1.353c-.015-.38-.051-.64-.145-.863a2 2 0 0 0-1.09-1.083M12.5 15c1.67 0 3.023-1.343 3.023-3S14.169 9 12.5 9s-3.023 1.343-3.023 3s1.354 3 3.023 3" clip-rule="evenodd"/></svg>
-			</button>
-			-->
 			<div class="flex justify-between gap-4 items-center">
 				<div class="flex items-center gap-2">
 					<img src="./images/icon/mysql.svg" class="h-10 w-10 object-cover flex dark:hidden" />
@@ -207,13 +202,26 @@
 				</label>
 			</div>
 		</div>
+		<!-- CronJob -->
+		<div class="relative w-full bg-white dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 p-3 rounded">
+			<div class="flex justify-between gap-4 items-center">
+				<div class="flex items-center gap-2">
+					<img src="./images/icon/cron.svg" class="h-10 w-10 object-cover flex dark:hidden" />
+					<img src="./images/icon/cron-dark.svg" class="h-10 w-10 object-cover hidden dark:flex" />
+					<div>
+						<h2 class="font-bold text-lg">CronJob</h2>
+						<p id="cronjob-status" class="text-xs text-rose-500 dark:text-rose-600">STOPPED</p>
+					</div>
+				</div>
+				<label class="relative inline-flex items-center cursor-pointer">
+					<input id="cronjobToggle" type="checkbox" class="sr-only peer" />
+					<div class="w-11 h-6 bg-gray-200 dark:bg-neutral-800 rounded-full peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-700 transition"></div>
+					<div class="absolute left-0.5 top-0.5 w-5 h-5 rounded-full shadow transition bg-emerald-400 hover:bg-emerald-500 dark:bg-emerald-600 dark:hover:bg-emerald-500 peer-checked:bg-white hover:peer-checked:bg-gray-100 peer-checked:dark:bg-white dark:hover:peer-checked:bg-gray-100 peer-checked:translate-x-full"></div>
+				</label>
+			</div>
+		</div>
 		<!-- CMD -->
 		<div class="relative w-full bg-white dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 p-3 rounded">
-			<!--
-			<button class="absolute top-1 left-1 z-10 transition-transform duration-500 hover:rotate-180 bg-white hover:bg-gray-100 dark:bg-neutral-950 dark:hover:bg-neutral-900 rounded-full p-[2px] text-emerald-500 dark:text-emerald-600 hover:text-emerald-400 dark:hover:text-emerald-500 hover:scale-105">
-				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M14.279 2.152C13.909 2 13.439 2 12.5 2s-1.408 0-1.779.152a2 2 0 0 0-1.09 1.083c-.094.223-.13.484-.145.863a1.62 1.62 0 0 1-.796 1.353a1.64 1.64 0 0 1-1.579.008c-.338-.178-.583-.276-.825-.308a2.03 2.03 0 0 0-1.49.396c-.318.242-.553.646-1.022 1.453c-.47.807-.704 1.21-.757 1.605c-.07.526.074 1.058.4 1.479c.148.192.357.353.68.555c.477.297.783.803.783 1.361s-.306 1.064-.782 1.36c-.324.203-.533.364-.682.556a2 2 0 0 0-.399 1.479c.053.394.287.798.757 1.605s.704 1.21 1.022 1.453c.424.323.96.465 1.49.396c.242-.032.487-.13.825-.308a1.64 1.64 0 0 1 1.58.008c.486.28.774.795.795 1.353c.015.38.051.64.145.863c.204.49.596.88 1.09 1.083c.37.152.84.152 1.779.152s1.409 0 1.779-.152a2 2 0 0 0 1.09-1.083c.094-.223.13-.483.145-.863c.02-.558.309-1.074.796-1.353a1.64 1.64 0 0 1 1.579-.008c.338.178.583.276.825.308c.53.07 1.066-.073 1.49-.396c.318-.242.553-.646 1.022-1.453c.47-.807.704-1.21.757-1.605a2 2 0 0 0-.4-1.479c-.148-.192-.357-.353-.68-.555c-.477-.297-.783-.803-.783-1.361s.306-1.064.782-1.36c.324-.203.533-.364.682-.556a2 2 0 0 0 .399-1.479c-.053-.394-.287-.798-.757-1.605s-.704-1.21-1.022-1.453a2.03 2.03 0 0 0-1.49-.396c-.242.032-.487.13-.825.308a1.64 1.64 0 0 1-1.58-.008a1.62 1.62 0 0 1-.795-1.353c-.015-.38-.051-.64-.145-.863a2 2 0 0 0-1.09-1.083M12.5 15c1.67 0 3.023-1.343 3.023-3S14.169 9 12.5 9s-3.023 1.343-3.023 3s1.354 3 3.023 3" clip-rule="evenodd"/></svg>
-			</button>
-			-->
 			<div class="flex justify-between gap-4 items-center">
 				<div class="flex items-center gap-2">
 					<img src="./images/icon/cmd.svg" class="h-10 w-10 object-cover flex dark:hidden" />
@@ -234,68 +242,118 @@
 				</label>
 			</div>
 		</div>
-		
 	</section>
 	
-	<section class="flex flex-col w-full h-screen py-4 pr-4">
-		<div class="flex-none flex justify-between gap-4 items-center bg-white dark:bg-neutral-950 p-2 text-xs border-t border-l border-r border-gray-100 dark:border-neutral-800 rounded-t">
-			<div class="flex items-center gap-2">
+	<section class="w-full overflow-hidden py-4">
+		<div class="flex flex-none items-center justify-center gap-2 mb-2 max-w-xl pr-4">
+			<button class="tab-btn font-bold w-full text-xs bg-emerald-500 dark:bg-emerald-600 text-white p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab1">MAIN</button>
+			<button class="tab-btn font-bold w-full text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab2">CRONJOB</button>
+			<button class="tab-btn font-bold w-full text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab3">API Client</button>
+		</div>
+
+		<div id="tab1" class="tab-content flex flex-col w-full h-[calc(100vh-74px)] pr-4">
+			<div class="flex justify-between items-center bg-white dark:bg-neutral-950 p-2 text-xs border border-gray-100 dark:border-neutral-800 rounded-t">
+				<div class="flex items-center gap-2">
+					<div class="flex gap-1 items-center">
+						<div class="h-3 w-3 rounded-full bg-emerald-500"></div>
+						<div class="h-3 w-3 rounded-full bg-amber-500"></div>
+						<div class="h-3 w-3 rounded-full bg-rose-500"></div>
+					</div>
+					<h2 class="font-semibold">CMD</h2>
+				</div>
+				<div class="relative">
+					<button data-dropdown="menu-cmd-info" class="dropdown-toggle text-emerald-500 hover:text-emerald-400 dark:text-emerald-600 dark:hover:text-emerald-500">
+						<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24">
+						<path fill="currentColor" fill-rule="evenodd" d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10m-10 5.75a.75.75 0 0 0 .75-.75v-6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75M12 7a1 1 0 1 1 0 2a1 1 0 0 1 0-2" clip-rule="evenodd"/>
+						</svg>
+					</button>
+					<div id="menu-cmd-info" class="dropdown-menu hidden absolute top-6 right-0 z-40 w-96 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded shadow-md p-2 text-xs">
+						<h2 class="text-lg font-bold text-center pb-2 border-b border-gray-200 dark:border-neutral-800 mb-2">Custom Commands</h2>
+						<ul class="list-disc pl-5 prose-sm dark:prose-invert">
+						<li><code class="text-emerald-600 font-semibold">go default</code> set default config (rerun app is required).</li>
+						<li><code class="text-emerald-600 font-semibold">go apache_web</code> go to Apache root directory.</li>
+						<li><code class="text-emerald-600 font-semibold">go nginx_web</code> go to Nginx root directory.</li>
+						<li><code class="text-emerald-600 font-semibold">go node_web</code> go to NodeJS root directory.</li>
+						<li><code class="text-emerald-600 font-semibold">go python_web</code> go to Python root directory.</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div id="cmd-wrapper" class="w-full h-full overflow-y-auto bg-white dark:bg-neutral-950 p-2 text-xs border-t border-l border-r border-gray-100 dark:border-neutral-800 rounded-t">
+				<span id="cmd-main" class="cmd-output font-mono text-green-600 dark:text-green-500 text-xs whitespace-pre-wrap break-words"></span>
+				<input type="text" id="cmd-input" class="w-auto text-xs outline-none caret-black dark:caret-white bg-transparent" />
+			</div>
+
+			<div class="mt-4 flex items-center gap-2 bg-white dark:bg-neutral-950 p-2 text-xs border border-gray-100 dark:border-neutral-800 rounded-t">
 				<div class="flex gap-1 items-center">
-					<div class="rounded-full h-3 w-3 bg-emerald-500 "></div>
-					<div class="rounded-full h-3 w-3 bg-amber-500 "></div>
-					<div class="rounded-full h-3 w-3 bg-rose-500 "></div>
+					<div class="h-3 w-3 rounded-full bg-emerald-500"></div>
+					<div class="h-3 w-3 rounded-full bg-amber-500"></div>
+					<div class="h-3 w-3 rounded-full bg-rose-500"></div>
 				</div>
-				<h2 class="font-semibold">
-					CMD
-				</h2>
+				<h2 class="font-semibold">LOGGING</h2>
 			</div>
-			<div class="relative">
-				<button data-dropdown="menu-cmd-info" class="dropdown-toggle text-emerald-500 dark:text-emerald-600 hover:text-emerald-400 dark:hover:text-emerald-500">
-					<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10m-10 5.75a.75.75 0 0 0 .75-.75v-6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75M12 7a1 1 0 1 1 0 2a1 1 0 0 1 0-2" clip-rule="evenodd"/></svg>
-				</button>
-				<div id="menu-cmd-info" class="dropdown-menu hidden absolute flex flex-col gap-1 text-xs p-2 top-6 right-0 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded shadow-md w-96 z-40">
-					<h2 class="font-bold text-lg text-center pb-2 border-b border-gray-200 dark:border-neutral-800 mb-2">
-						Custom Commands
-					</h2>
-					<ul class="list-disc pl-5 prose prose-sm dark:prose-invert">
-						<li>
-							<span class="font-semibold"><code class="text-emerald-600">go default</code></span> set default config (rerun app is required). 
-						</li>
-						<li>
-							<span class="font-semibold"><code class="text-emerald-600">go apache_web</code></span> go to Apache root directory. 
-						</li>
-						<li>
-							<span class="font-semibold"><code class="text-emerald-600">go nginx_web</code></span> go to Nginx root directory. 
-						</li>
-						<li>
-							<span class="font-semibold"><code class="text-emerald-600">go node_web</code></span> go to NodeJS root directory. 
-						</li>
-						<li>
-							<span class="font-semibold"><code class="text-emerald-600">go python_web</code></span> go to Python root directory. 
-						</li>
-					</ul>
+			<div id="logging-wrapper" class="h-[30vh] overflow-y-auto bg-white dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 rounded-b">
+				<pre id="logging" class="pb-2 px-3 font-mono text-gray-600 dark:text-gray-300 text-xs whitespace-pre-wrap break-words"><code></code></pre>
+			</div>
+		</div>
+
+		<div id="tab2" class="tab-content hidden flex flex-col w-full h-[calc(100vh-74px)] pr-4">
+			<div class="bg-white dark:bg-neutral-950 p-4 h-full rounded border border-gray-200 dark:border-neutral-800 flex flex-col">
+				<form id="cron-form" class="flex flex-wrap md:flex-nowrap items-end gap-4 mb-4">
+					<div class="w-full md:max-w-xs text-sm">
+						<label class="block font-medium mb-1">Schedule</label>
+						<input type="text" id="schedule" placeholder="* * * * *" required class="w-full bg-gray-50 dark:bg-neutral-900 p-2 rounded border border-gray-200 dark:border-neutral-800 focus:outline-none text-xs" />
+					</div>
+					<div class="w-full md:flex-1 text-sm">
+						<label class="block font-medium mb-1">Task (.php, .js, .mjs, .py)</label>
+						<input type="text" id="task" placeholder="public_html/apache_web/projek1/task.php" required class="w-full bg-gray-50 dark:bg-neutral-900 p-2 rounded border border-gray-200 dark:border-neutral-800 focus:outline-none text-xs" />
+					</div>
+					<div class="flex-none flex items-end justify-end">
+						<button type="submit" class="text-emerald-500 hover:text-emerald-600 transition-all hover:duration-300 hover:scale-105">
+							<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24">
+							<path fill="currentColor" fill-rule="evenodd" d="M12 22c-4.714 0-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12s0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22m0-13.75a.75.75 0 0 1 .75.75v2.25H15a.75.75 0 0 1 0 1.5h-2.25V15a.75.75 0 0 1-1.5 0v-2.25H9a.75.75 0 0 1 0-1.5h2.25V9a.75.75 0 0 1 .75-.75" clip-rule="evenodd" />
+							</svg>
+						</button>
+					</div>
+				</form>
+				<div class="grid grid-cols-12 text-sm font-semibold bg-emerald-500 dark:bg-emerald-600 text-white px-4 py-2 rounded-t">
+					<div class="col-span-3">Schedule</div>
+					<div class="col-span-7">Task</div>
+					<div class="col-span-2 text-center">Action</div>
+				</div>
+				<div id="cron-list" class="flex-1 overflow-y-auto bg-white dark:bg-neutral-900 border-t border-gray-200 dark:border-neutral-800 rounded-b text-xs px-2 space-y-2">
 				</div>
 			</div>
 		</div>
-		<div id="cmd-wrapper" class="w-full h-full overflow-y-auto bg-white dark:bg-neutral-950 p-2 text-xs border-t border-l border-r border-gray-100 dark:border-neutral-800 rounded-t">
-			<span id="cmd-main" class="cmd-output font-mono text-green-600 dark:text-green-500 text-xs whitespace-pre-wrap break-words"></span>
-			<input type="text" id="cmd-input" class="w-auto text-xs outline-none caret-black dark:caret-white bg-transparent" />
-		</div>
-		<div class="mt-4 flex-none flex gap-2 items-center bg-white dark:bg-neutral-950 p-2 text-xs border-t border-l border-r border-gray-100 dark:border-neutral-800 rounded-t">
-			<div class="flex gap-1 items-center">
-				<div class="rounded-full h-3 w-3 bg-emerald-500 "></div>
-				<div class="rounded-full h-3 w-3 bg-amber-500 "></div>
-				<div class="rounded-full h-3 w-3 bg-rose-500 "></div>
+		
+		<div id="tab3" class="tab-content hidden flex flex-col w-full h-[calc(100vh-74px)] pr-4 bg-white dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 p-4">
+			<div class="flex flex-col gap-4 flex-grow min-h-0">
+				<div class="flex items-center gap-2">
+					<select id="method" class="bg-gray-50 dark:bg-neutral-900 p-2 rounded border border-gray-200 dark:border-neutral-800 focus:outline-none text-xs">
+						<option>GET</option>
+						<option>POST</option>
+						<option>PUT</option>
+						<option>DELETE</option>
+					</select>
+					<input type="text" id="url" placeholder="https://example.com/endpoint" class="max-w-xl w-full bg-gray-50 dark:bg-neutral-900 p-2 rounded border border-gray-200 dark:border-neutral-800 focus:outline-none text-xs" />
+					<button onclick="sendRequest()" class="text-emerald-500 hover:text-emerald-600 transition-all hover:duration-300 hover:scale-105">
+						<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24"><path fill="currentColor" d="m4.497 20.835l16.51-7.363c1.324-.59 1.324-2.354 0-2.944L4.497 3.164c-1.495-.667-3.047.814-2.306 2.202l3.152 5.904c.245.459.245 1 0 1.458l-3.152 5.904c-.74 1.388.81 2.87 2.306 2.202"/></svg>
+					</button>
+				</div>
+				<div class="flex flex-col flex-grow min-h-0">
+					<h2 class="font-semibold mb-1">Body</h2>
+					<textarea id="body" placeholder="Request Body JSON (optional)" class="flex-grow resize-none w-full bg-gray-50 dark:bg-neutral-900 p-2 rounded border border-gray-200 dark:border-neutral-800 focus:outline-none text-xs overflow-auto min-h-[100px]"></textarea>
+					<div class="flex flex-col flex-grow min-h-0 mt-4">
+						<h2 class="font-semibold mb-1">Response</h2>
+						<pre class="flex-grow resize-none w-full bg-gray-50 dark:bg-neutral-900 p-2 rounded border border-gray-200 dark:border-neutral-800 focus:outline-none text-xs overflow-auto h-full"><code id="response"></code></pre>
+					</div>
+				</div>
 			</div>
-			<h2 class="font-semibold">
-				LOGGING
-			</h2>
 		</div>
-		<div id="logging-wrapper" class="flex-none w-full h-[30%] overflow-y-auto bg-white dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 rounded-b">
-			<pre id="logging" class="pb-2 font-mono text-gray-600 dark:text-gray-300 text-xs px-3 whitespace-pre-wrap break-words"><code></code></pre>
-		<div>
+
 	</section>
 	
 	<script src="./js/renderer.js"></script>
+	<script src="./js/app.js"></script>
 </body>
 </html>

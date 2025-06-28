@@ -7,6 +7,8 @@ const { startNginx, stopNginx } = require('../runtime/nginx');
 const { startNodeServer, stopNodeServer } = require('../runtime/node');
 const { startPython, stopPython } = require('../runtime/python');
 const { startCmd, stopCmd, sendCommand, startMysqlTerminal } = require('../runtime/cmd');
+const { createCronJob, readCronJobs, updateCronJob, deleteCronJob, startCronJob, stopCronJob, readCronJobs: getAllJobs } = require('../runtime/cronjob');
+
 const { apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder, portOpenFolder } = require('./pathResource');
 
 function setupIPC() {
@@ -128,6 +130,22 @@ function setupIPC() {
       return { success: false, message: result };
     }
     return { success: true };
+  });
+  
+  // Cron Job
+  ipcMain.on('cronjob-create', (e, data) => createCronJob(data));
+  ipcMain.handle('cronjob-read', () => readCronJobs());
+  ipcMain.on('cronjob-update', (e, id, updates) => updateCronJob(id, updates));
+  ipcMain.on('cronjob-delete', (e, id) => deleteCronJob(id));
+
+  ipcMain.on('cronjob-start-all', () => {
+    const jobs = getAllJobs();
+    jobs.forEach(job => startCronJob(job.id));
+  });
+
+  ipcMain.on('cronjob-stop-all', () => {
+    const jobs = getAllJobs();
+    jobs.forEach(job => stopCronJob(job.id));
   });
 }
 

@@ -8,6 +8,7 @@ const { setNginxMain, stopNginx } = require('./runtime/nginx');
 const { setNodeMain, stopNodeServer } = require('./runtime/node');
 const { setPythonMain, stopPython } = require('./runtime/python');
 const { setCmdMain, stopCmd } = require('./runtime/cmd');
+const { setCronJobMain } = require('./runtime/cronjob');
 
 let mainWindow;
 
@@ -20,6 +21,7 @@ app.whenReady().then(() => {
   setNodeMain(mainWindow);
   setPythonMain(mainWindow);
   setCmdMain(mainWindow);
+  setCronJobMain(mainWindow);
 
   setupIPC();
   createMainMenu(mainWindow);
