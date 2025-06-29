@@ -489,3 +489,85 @@ async function refreshServiceStats() {
 
 setInterval(refreshServiceStats, 5000);
 refreshServiceStats();
+
+// Auto Installer
+window.addEventListener('DOMContentLoaded', () => {
+  const installButton = document.getElementById('cms-install-btn');
+  const progressBar = document.getElementById('cms-progress-bar');
+  const statusText = document.getElementById('cms-status');
+  const cmsSelect = document.getElementById('cms-select');
+  const versionSelect = document.getElementById('cms-version');
+  const serverSelect = document.getElementById('cms-server');
+
+  progressBar.style.display = 'none';
+
+  function updateVersionOptions() {
+    const cms = cmsSelect.value.toLowerCase();
+
+    versionSelect.innerHTML = '';
+
+    if (cms === 'wordpress') {
+      versionSelect.innerHTML = `
+        <option value="latest" selected>Latest</option>
+        <option value="6.3.2">6.3.2</option>
+        <option value="6.2.5">6.2.5</option>
+        <option value="6.1.10">6.1.10</option>
+      `;
+      versionSelect.disabled = false;
+    } else if (cms === 'joomla') {
+      versionSelect.innerHTML = `
+        <option value="latest" selected>Latest (5.3.1)</option>
+        <option value="5.3.1">5.3.1</option>
+        <option value="5.3.0">5.3.0</option>
+        <option value="5.2.6">5.2.6</option>\
+      `;
+      versionSelect.disabled = false;
+    } else {
+      versionSelect.innerHTML = `<option value="latest" selected>Latest</option>`;
+      versionSelect.disabled = true;
+    }
+  }
+
+  updateVersionOptions();
+  cmsSelect.addEventListener('change', updateVersionOptions);
+
+  installButton.addEventListener('click', async () => {
+    const cmsName = cmsSelect.value;
+    const version = versionSelect.value || 'latest';
+    const target = serverSelect.value || 'apache';
+
+    progressBar.style.display = 'block';
+    installButton.disabled = true;
+    cmsSelect.disabled = true;
+    versionSelect.disabled = true;
+    serverSelect.disabled = true;
+
+    statusText.textContent = `Starting installation of ${cmsName} version ${version} to public_html/${target}_web...`;
+    progressBar.value = 0;
+
+    const onProgressHandler = (downloaded, total) => {
+      const percent = Math.round((downloaded / total) * 100);
+      progressBar.value = percent;
+      statusText.textContent = `Downloading: ${percent}%. Please wait ...`;
+    };
+
+    window.autoInstallerAPI.onProgress(onProgressHandler);
+
+    try {
+      const result = await window.autoInstallerAPI.installCMS(cmsName, version, target);
+      if (result.success) {
+        statusText.textContent = `${cmsName} version ${version} successfully installed to public_html/${target}_web !`;
+        progressBar.value = 100;
+      } else {
+        statusText.textContent = `Error: ${result.error}`;
+      }
+    } catch (error) {
+      statusText.textContent = `Unexpected error: ${error.message}`;
+    } finally {
+      installButton.disabled = false;
+      cmsSelect.disabled = false;
+      versionSelect.disabled = false;
+      serverSelect.disabled = false;
+    }
+  });
+});

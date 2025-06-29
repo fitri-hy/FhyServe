@@ -92,3 +92,9 @@ contextBridge.exposeInMainWorld('cronAPI', {
 contextBridge.exposeInMainWorld('monitoringAPI', {
   getServiceStats: () => ipcRenderer.invoke('get-service-stats')
 });
+
+// Auto Installer
+contextBridge.exposeInMainWorld('autoInstallerAPI', {
+  installCMS: (cmsName, version, target) => ipcRenderer.invoke('install-cms', cmsName, version, target),
+  onProgress: (callback) => ipcRenderer.on('install-progress', (event, downloaded, total) => callback(downloaded, total)),
+});

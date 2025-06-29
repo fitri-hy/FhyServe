@@ -10,6 +10,7 @@ const { startCmd, stopCmd, sendCommand, startMysqlTerminal } = require('../runti
 const { createCronJob, readCronJobs, updateCronJob, deleteCronJob, startCronJob, stopCronJob, readCronJobs: getAllJobs } = require('../runtime/cronjob');
 const { getServiceStats } = require('../runtime/monitor');
 const { apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder, portOpenFolder } = require('./pathResource');
+const { installCMS } = require('../runtime/autoInstaller');
 
 function setupIPC() {
   // Dark Mode
@@ -151,6 +152,16 @@ function setupIPC() {
   // Monitoring
   ipcMain.handle('get-service-stats', async () => {
     return await getServiceStats();
+  });
+  
+  // Auto Installer
+  ipcMain.handle('install-cms', async (event, cmsName, version, target) => {
+    try {
+      await installCMS(cmsName, version, (downloaded, total) => { event.sender.send('install-progress', downloaded, total); }, target);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
   });
 }
 

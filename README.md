@@ -22,6 +22,11 @@
 - ⏰ **Cron Job**
 - 📡 **Client API**
 
+#### [ADD] New Release 1.0.2 (Comming soon)
+
+- 🧱 **CMS Auto Installer**
+- 📊 **Monitoring**
+
 ---
 
 ## 🧰 Development Preparation
