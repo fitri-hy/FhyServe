@@ -7,6 +7,7 @@ const { setMysqlMain, stopMysql } = require('./runtime/mysql');
 const { setNginxMain, stopNginx } = require('./runtime/nginx');
 const { setNodeMain, stopNodeServer } = require('./runtime/node');
 const { setPythonMain, stopPython } = require('./runtime/python');
+const { setGoMain, stopGoServer } = require('./runtime/go');
 const { setCmdMain, stopCmd } = require('./runtime/cmd');
 const { setCronJobMain, stopAllCronJobs } = require('./runtime/cronjob');
 
@@ -20,6 +21,7 @@ app.whenReady().then(() => {
   setNginxMain(mainWindow);
   setNodeMain(mainWindow);
   setPythonMain(mainWindow);
+  setGoMain(mainWindow);
   setCmdMain(mainWindow);
   setCronJobMain(mainWindow);
 
@@ -44,6 +46,7 @@ app.on('before-quit', async (event) => {
     await stopNginx();
     await stopNodeServer();
     await stopPython();
+    await stopAllCronJobs();
     await stopCmd();
     await stopAllCronJobs();
 

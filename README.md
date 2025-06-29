@@ -27,6 +27,7 @@
 - 🧱 **Pack CMS & Framework Auto Installer**
 - 📊 **Monitoring**
 - 📦 **Composer**
+- 🐭 **Golang**
 
 ---
 
@@ -48,19 +49,21 @@ Please download and extract the following files to the appropriate folder:
 | **Python**     | [python-3.13.5-embed-amd64](https://www.python.org/downloads/windows/) |
 | **Git**        | [MinGit-2.50.0-64-bit](https://github.com/git-for-windows/git/releases/tag/v2.50.0.windows.1) |
 | **Composer**     | [composer-setup](https://getcomposer.org/download/) |
+| **Go**     | [go1.24.4.windows-amd64.zip](https://go.dev/dl/) |
 
 ```
 FhyServe/
 ├── resource/
 │   ├── apache/			← Place extracted files
+│   ├── composer/		← Place extracted files
 │   ├── git/			← Place extracted files
+│   ├── go/				← Place extracted files
 │   ├── mysql/			← Place extracted files
 │   ├── nginx/			← Place extracted files
 │   ├── nidejs/			← Place extracted files
 │   ├── php/			← Place extracted files
 │   ├── php-fpm/		← Place extracted files
 │   ├── python/			← Place extracted files
-│   └── composer/		← Place extracted files
 └── htdocs/
     └── phpmyadmin/		← Place extracted files
 ```

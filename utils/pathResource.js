@@ -40,6 +40,13 @@ function pythonOpenFolder() {
     : path.join(basePath, 'resources', 'public_html', 'python_web');
 }
 
+function goOpenFolder() {
+  const basePath = getBasePath();
+  return isDevelopment()
+    ? path.join(basePath, 'public_html', 'go_web')
+    : path.join(basePath, 'resources', 'public_html', 'go_web');
+}
+
 function portOpenFolder() {
   const basePath = getBasePath();
   return isDevelopment()
@@ -49,5 +56,5 @@ function portOpenFolder() {
 
 module.exports = { 
   isDevelopment, getBasePath, 
-  apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder, portOpenFolder
+  apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder, goOpenFolder, portOpenFolder
 };

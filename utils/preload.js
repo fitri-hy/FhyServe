@@ -54,6 +54,14 @@ contextBridge.exposeInMainWorld('pythonAPI', {
   openPythonFolder: () => ipcRenderer.invoke('open-python-folder'),
 });
 
+// Golang
+contextBridge.exposeInMainWorld('golangAPI', {
+  start: () => ipcRenderer.send('golang-start'),
+  stop: () => ipcRenderer.send('golang-stop'),
+  onStatus: (callback) => ipcRenderer.on('golang-status', (event, data) => callback(data)),
+  openGoFolder: () => ipcRenderer.invoke('open-go-folder'),
+});
+
 // CMD
 contextBridge.exposeInMainWorld('cmdAPI', {
   start: () => ipcRenderer.send('cmd-start'),

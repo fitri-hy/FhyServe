@@ -216,6 +216,41 @@ openFolderPython.addEventListener('click', async () => {
   }
 });
 
+// Golang
+const goStatusText = document.querySelector('#golang-status');
+const goToggle = document.querySelector('#golangToggle');
+const openFolderGo = document.getElementById('open-go-folder');
+
+goToggle.addEventListener('change', e => {
+  if (e.target.checked) {
+    window.golangAPI.start();
+  } else {
+    window.golangAPI.stop();
+  }
+});
+
+window.golangAPI.onStatus(({ project, status }) => {
+  if (project !== 'main') return;
+
+  goStatusText.textContent = status;
+  if (status === 'RUNNING') {
+    goStatusText.classList.add('text-green-500', 'dark:text-green-600');
+    goStatusText.classList.remove('text-rose-500', 'dark:text-rose-600');
+    goToggle.checked = true;
+  } else {
+    goStatusText.classList.add('text-rose-500', 'dark:text-rose-600');
+    goStatusText.classList.remove('text-green-500', 'dark:text-green-600');
+    goToggle.checked = false;
+  }
+});
+
+openFolderGo.addEventListener('click', async () => {
+  const result = await window.golangAPI.openGoFolder();
+  if (!result.success) {
+    alert('Failed to open folder: ' + result.message);
+  }
+});
+
 // CMD
 const cmdToggle = document.querySelector('#cmdToggle');
 const cmdStatusText = document.querySelector('#cmd-status');

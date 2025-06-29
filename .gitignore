@@ -1,13 +1,14 @@
 dist/
 node_modules/
 resources/apache/
+resources/composer/
 resources/git/
+resources/go/
 resources/mysql/
 resources/nginx/
 resources/nodejs/
 resources/php/
 resources/php-fpm/
 resources/python/
-resources/composer/
 public_html/apache_web/phpmyadmin/
 package-lock.json

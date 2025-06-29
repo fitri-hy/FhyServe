@@ -6,10 +6,11 @@ const { startMysql, stopMysql } = require('../runtime/mysql');
 const { startNginx, stopNginx } = require('../runtime/nginx');
 const { startNodeServer, stopNodeServer } = require('../runtime/node');
 const { startPython, stopPython } = require('../runtime/python');
+const { startGoServer, stopGoServer } = require('../runtime/go');
 const { startCmd, stopCmd, sendCommand, startMysqlTerminal } = require('../runtime/cmd');
 const { createCronJob, readCronJobs, updateCronJob, deleteCronJob, startCronJob, stopCronJob, readCronJobs: getAllJobs } = require('../runtime/cronjob');
 const { getServiceStats } = require('../runtime/monitor');
-const { apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder, portOpenFolder } = require('./pathResource');
+const { apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder, goOpenFolder, portOpenFolder } = require('./pathResource');
 const { installCMS } = require('../runtime/autoInstaller');
 
 function setupIPC() {
@@ -92,6 +93,24 @@ function setupIPC() {
   
   ipcMain.handle('open-python-folder', async () => {
     const folderPath = pythonOpenFolder();
+    const result = await shell.openPath(folderPath);
+    if (result) {
+      return { success: false, message: result };
+    }
+    return { success: true };
+  });
+  
+  // Golang
+  ipcMain.on('golang-start', () => {
+    startGoServer();
+  });
+
+  ipcMain.on('golang-stop', () => {
+    stopGoServer();
+  });
+
+  ipcMain.handle('open-go-folder', async () => {
+    const folderPath = goOpenFolder();
     const result = await shell.openPath(folderPath);
     if (result) {
       return { success: false, message: result };

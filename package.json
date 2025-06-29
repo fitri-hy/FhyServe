@@ -51,8 +51,16 @@
         "to": "apache"
       },
       {
+        "from": "resources/composer",
+        "to": "composer"
+      },
+      {
         "from": "resources/git",
         "to": "git"
+      },
+      {
+        "from": "resources/go",
+        "to": "go"
       },
       {
         "from": "resources/mysql",
@@ -77,10 +85,6 @@
       {
         "from": "resources/python",
         "to": "python"
-      },
-      {
-        "from": "resources/composer",
-        "to": "composer"
       },
       {
         "from": "public_html",
