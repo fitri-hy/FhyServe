@@ -60,7 +60,7 @@ FhyServe/
 │   ├── php/			← Place extracted files
 │   ├── php-fpm/		← Place extracted files
 │   ├── python/			← Place extracted files
-│   └── composer/			← Place extracted files
+│   └── composer/		← Place extracted files
 └── htdocs/
     └── phpmyadmin/		← Place extracted files
 ```
