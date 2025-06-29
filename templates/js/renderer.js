@@ -522,6 +522,54 @@ window.addEventListener('DOMContentLoaded', () => {
         <option value="5.2.6">5.2.6</option>\
       `;
       versionSelect.disabled = false;
+    } else if (cms === 'laravel') {
+      versionSelect.innerHTML = `
+        <option value="latest" selected>Latest (11)</option>
+        <option value="11">11</option>
+        <option value="10">10</option>
+        <option value="9">9</option>
+      `;
+      versionSelect.disabled = false;
+    } else if (cms === 'codeigniter') {
+      versionSelect.innerHTML = `
+        <option value="latest" selected>Latest (4.5.1)</option>
+        <option value="4.5.1">4.5.1</option>
+        <option value="4.5.0">4.5.0</option>
+        <option value="4.4.6">4.4.6</option>
+      `;
+      versionSelect.disabled = false;
+    } else if (cms === 'symfony') {
+      versionSelect.innerHTML = `
+        <option value="latest" selected>Latest (7.3.1)</option>
+        <option value="7.3.1">7.3.1</option>
+        <option value="7.2.8">7.2.8</option>
+        <option value="6.4.23">6.4.23</option>
+      `;
+      versionSelect.disabled = false;
+    } else if (cms === 'slim') {
+      versionSelect.innerHTML = `
+        <option value="latest" selected>Latest (4.5.0)</option>
+        <option value="4.5.0">4.5.0</option>
+        <option value="4.4.0">4.4.0</option>
+        <option value="4.3.0">4.3.0</option>
+      `;
+      versionSelect.disabled = false;
+    } else if (cms === 'yii') {
+      versionSelect.innerHTML = `
+        <option value="latest" selected>Latest (2.0.53)</option>
+        <option value="2.0.53">2.0.53</option>
+        <option value="2.0.52">2.0.52</option>
+        <option value="2.0.51">2.0.51</option>
+      `;
+      versionSelect.disabled = false;
+    } else if (cms === 'cakephp') {
+      versionSelect.innerHTML = `
+        <option value="latest" selected>Latest (5.1.2)</option>
+        <option value="5.1.2">5.1.2</option>
+        <option value="5.1.1">5.1.1</option>
+        <option value="5.1.0">5.1.0</option>
+      `;
+      versionSelect.disabled = false;
     } else {
       versionSelect.innerHTML = `<option value="latest" selected>Latest</option>`;
       versionSelect.disabled = true;

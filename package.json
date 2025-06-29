@@ -79,6 +79,10 @@
         "to": "python"
       },
       {
+        "from": "resources/composer",
+        "to": "composer"
+      },
+      {
         "from": "public_html",
         "to": "public_html"
       }

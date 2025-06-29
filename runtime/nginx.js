@@ -22,6 +22,7 @@ const nginxCwd = isDevelopment()
 const nginxPath = path.join(nginxCwd, 'nginx.exe');
 const nginxConfPath = path.join(nginxCwd, 'conf', 'nginx.conf');
 const phpFpmPath = path.join(basePath, 'resources', 'php-fpm', 'php-cgi.exe');
+const phpFpmIniPath = path.join(basePath, 'resources', 'php-fpm', 'php.ini');
 
 function setNginxMain(win) {
   mainWindow = win;
@@ -39,6 +40,37 @@ function logToRenderer(message) {
   }
 }
 
+function enablePhpExtension(phpIniPath, extensionName) {
+  try {
+    let iniContent = fs.readFileSync(phpIniPath, 'utf8');
+
+    iniContent = iniContent.replace(
+      /^\s*;?\s*extension_dir\s*=.*$/m,
+      `extension_dir = "${path.join(basePath, 'resources', 'php-fpm', 'ext').replace(/\\/g, '/')}"`,
+    );
+
+    const extRegex = new RegExp(`^;*\\s*extension\\s*=\\s*${extensionName}\\s*$`, 'm');
+
+    if (extRegex.test(iniContent)) {
+      iniContent = iniContent.replace(extRegex, `extension=${extensionName}`);
+    } else if (!new RegExp(`^\\s*extension\\s*=\\s*${extensionName}\\s*$`, 'm').test(iniContent)) {
+      iniContent += `\nextension=${extensionName}\n`;
+    }
+
+    fs.writeFileSync(phpIniPath, iniContent, 'utf8');
+  } catch (err) {
+    logToRenderer(`ERROR enabling extension ${extensionName}: ${err.message}`);
+  }
+}
+
+function updatePhpFpmIni() {
+  const extensions = ['mysqli', 'openssl', 'pdo_mysql', 'curl', 'fileinfo', 'zip', 'intl', 'mbstring'];
+
+  extensions.forEach(ext => {
+    enablePhpExtension(phpFpmIniPath, ext);
+  });
+}
+
 function updateStatus(status) {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('nginx-status', status);
@@ -51,6 +83,8 @@ function delay(ms) {
 
 function startPhpFpm() {
   if (phpFpmProcess) return;
+  
+  updatePhpFpmIni();
 
   phpFpmProcess = spawn(phpFpmPath, ['-b', `127.0.0.1:${PHP_FPM_PORT}`], {
     cwd: path.dirname(phpFpmPath),

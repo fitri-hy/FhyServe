@@ -135,18 +135,24 @@ function enableMysqliExtension(phpIniPath) {
       `extension_dir = "${path.join(phpPath, 'ext').replace(/\\/g, '/')}"`,
     );
 
-    const mysqliRegex = /^;*\s*extension\s*=\s*mysqli\s*$/m;
-    if (mysqliRegex.test(iniContent)) {
-      iniContent = iniContent.replace(mysqliRegex, 'extension=mysqli');
-    } else if (!/^\s*extension\s*=\s*mysqli\s*$/m.test(iniContent)) {
-      iniContent += '\nextension=mysqli\n';
-    }
+    const extensions = ['mysqli', 'openssl', 'pdo_mysql', 'curl', 'fileinfo', 'zip', 'intl', 'mbstring'];
+
+    extensions.forEach(ext => {
+      const regex = new RegExp(`^;*\\s*extension\\s*=\\s*${ext}\\s*$`, 'm');
+
+      if (regex.test(iniContent)) {
+        iniContent = iniContent.replace(regex, `extension=${ext}`);
+      } else if (!new RegExp(`^\\s*extension\\s*=\\s*${ext}\\s*$`, 'm').test(iniContent)) {
+        iniContent += `\nextension=${ext}\n`;
+      }
+    });
 
     fs.writeFileSync(phpIniPath, iniContent, 'utf8');
   } catch (err) {
     logToRenderer(`ERROR enabling mysqli extension: ${err.message}`);
   }
 }
+
 
 function updateApacheConfig(port = PORT) {
   try {

@@ -19,7 +19,8 @@ const customPaths = [
   path.join(basePath, 'resources', 'nodejs'),
   path.join(basePath, 'resources', 'python'),
   path.join(basePath, 'resources', 'nginx'),
-  path.join(basePath, 'resources', 'git', 'cmd')
+  path.join(basePath, 'resources', 'git', 'cmd'),
+  path.join(basePath, 'resources', 'composer', 'bin')
 ];
 
 const system32Path = path.join(process.env.windir || 'C:\\Windows', 'System32');

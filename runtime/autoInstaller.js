@@ -33,7 +33,7 @@ async function downloadAndExtract(url, extractPath, onProgress, cmsName) {
         const directory = unzipper.Parse();
 
         directory.on('entry', (entry) => {
-          const filePathParts = cmsName.toLowerCase() === 'wordpress'
+          const filePathParts = ['wordpress', 'laravel', 'codeigniter', 'symfony', 'slim', 'yii', 'cakephp' ].includes(cmsName.toLowerCase())
             ? entry.path.split('/').slice(1)
             : entry.path.split('/');
 
@@ -74,30 +74,93 @@ async function installCMS(cmsName, version = 'latest', onProgress, target = 'apa
   let extractFolder = path.join(baseInstallPath, cmsName.toLowerCase());
 
   switch (cmsName.toLowerCase()) {
-    case 'wordpress':
-      url = version === 'latest'
-        ? 'https://wordpress.org/latest.zip'
-        : `https://wordpress.org/wordpress-${version}.zip`;
-      break;
+	  case 'wordpress':
+		url = version === 'latest'
+		  ? 'https://wordpress.org/latest.zip'
+		  : `https://wordpress.org/wordpress-${version}.zip`;
+		break;
 
-    case 'joomla':
-      const joomlaVersions = {
-        '5.3.1': 'https://update.joomla.org/releases/5.3.1/Joomla_5.3.1-Stable-Full_Package.zip',
-        '5.3.0': 'https://update.joomla.org/releases/5.3.0/Joomla_5.3.0-Stable-Full_Package.zip',
-        '5.2.6': 'https://update.joomla.org/releases/5.2.6/Joomla_5.2.6-Stable-Full_Package.zip',
-      };
-      if (version === 'latest') {
-        url = joomlaVersions['5.3.1'];
-      } else if (joomlaVersions[version]) {
-        url = joomlaVersions[version];
-      } else {
-        throw new Error(`Joomla version ${version} is not supported`);
-      }
-      break;
+	  case 'joomla':
+		const joomlaVersions = {
+		  '5.3.1': 'https://update.joomla.org/releases/5.3.1/Joomla_5.3.1-Stable-Full_Package.zip',
+		  '5.3.0': 'https://update.joomla.org/releases/5.3.0/Joomla_5.3.0-Stable-Full_Package.zip',
+		  '5.2.6': 'https://update.joomla.org/releases/5.2.6/Joomla_5.2.6-Stable-Full_Package.zip',
+		};
+		url = version === 'latest'
+		  ? joomlaVersions['5.3.1']
+		  : joomlaVersions[version] || (() => { throw new Error(`Joomla version ${version} is not supported`); })();
+		break;
 
-    default:
-      throw new Error('CMS is not supported: ' + cmsName);
+	  case 'laravel':
+		const laravelVersions = {
+		  '11': 'https://codeload.github.com/laravel/laravel/zip/refs/tags/v11.0.0',
+		  '10': 'https://codeload.github.com/laravel/laravel/zip/refs/tags/v10.0.0',
+		  '9':  'https://codeload.github.com/laravel/laravel/zip/refs/tags/v9.0.0',
+		};
+		url = version === 'latest'
+		  ? laravelVersions['11']
+		  : laravelVersions[version] || (() => { throw new Error(`Laravel version ${version} is not supported`); })();
+		break;
+
+	  case 'codeigniter':
+		const codeigniterVersions = {
+		  '4.5.1': 'https://codeload.github.com/codeigniter4/CodeIgniter4/zip/refs/tags/v4.5.1',
+		  '4.5.0': 'https://codeload.github.com/codeigniter4/CodeIgniter4/zip/refs/tags/v4.5.0',
+		  '4.4.6': 'https://codeload.github.com/codeigniter4/CodeIgniter4/zip/refs/tags/v4.4.6',
+		};
+		url = version === 'latest'
+		  ? codeigniterVersions['4.5.1']
+		  : codeigniterVersions[version] || (() => { throw new Error(`CodeIgniter version ${version} is not supported`); })();
+		break;
+
+	  case 'symfony':
+		const symfonyVersions = {
+		  '7.3.1': 'https://codeload.github.com/symfony/symfony/zip/refs/tags/v7.3.1',
+		  '7.2.8': 'https://codeload.github.com/symfony/symfony/zip/refs/tags/v7.2.8',
+		  '6.4.23': 'https://codeload.github.com/symfony/symfony/zip/refs/tags/v6.4.23',
+		};
+		url = version === 'latest'
+		  ? symfonyVersions['7.3.1']
+		  : symfonyVersions[version] || (() => { throw new Error(`Symfony version ${version} is not supported`); })();
+		break;
+
+	  case 'slim':
+		const slimVersions = {
+		  '4.5.0': 'https://codeload.github.com/slimphp/Slim-Skeleton/zip/refs/tags/4.5.0',
+		  '4.4.0': 'https://codeload.github.com/slimphp/Slim-Skeleton/zip/refs/tags/4.4.0',
+		  '4.3.0': 'https://codeload.github.com/slimphp/Slim-Skeleton/zip/refs/tags/4.3.0',
+		};
+		url = version === 'latest'
+		  ? slimVersions['4.5.0']
+		  : slimVersions[version] || (() => { throw new Error(`Slim version ${version} is not supported`); })();
+		break;
+
+	  case 'yii':
+		const yiiVersions = {
+		  '2.0.53': 'https://codeload.github.com/yiisoft/yii2-app-basic/zip/refs/tags/2.0.53',
+		  '2.0.52': 'https://codeload.github.com/yiisoft/yii2-app-basic/zip/refs/tags/2.0.52',
+		  '2.0.51': 'https://codeload.github.com/yiisoft/yii2-app-basic/zip/refs/tags/2.0.51',
+		};
+		url = version === 'latest'
+		  ? yiiVersions['2.0.53']
+		  : yiiVersions[version] || (() => { throw new Error(`Yii version ${version} is not supported`); })();
+		break;
+
+	  case 'cakephp':
+		const cakephpVersions = {
+		  '5.1.2': 'https://codeload.github.com/cakephp/app/zip/refs/tags/5.1.2',
+		  '5.1.1': 'https://codeload.github.com/cakephp/app/zip/refs/tags/5.1.1',
+		  '5.1.0': 'https://codeload.github.com/cakephp/app/zip/refs/tags/5.1.0',
+		};
+		url = version === 'latest'
+		  ? cakephpVersions['5.1.2']
+		  : cakephpVersions[version] || (() => { throw new Error(`CakePHP version ${version} is not supported`); })();
+		break;
+
+	  default:
+		throw new Error('Pack is not supported: ' + cmsName);
   }
+
 
   if (fs.existsSync(extractFolder)) {
     let i = 1;

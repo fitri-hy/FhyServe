@@ -8,5 +8,6 @@ resources/nodejs/
 resources/php/
 resources/php-fpm/
 resources/python/
+resources/composer/
 public_html/apache_web/phpmyadmin/
 package-lock.json

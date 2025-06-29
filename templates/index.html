@@ -249,7 +249,7 @@
 			<button class="tab-btn font-bold w-full text-xs bg-emerald-500 dark:bg-emerald-600 text-white p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab1">MAIN</button>
 			<button class="tab-btn font-bold w-full text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab2">CRONJOB</button>
 			<button class="tab-btn font-bold w-full text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab3">API Client</button>
-			<button class="tab-btn font-bold w-full text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab4">CMS Installer</button>
+			<button class="tab-btn font-bold w-full text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab4">Pack Installer</button>
 			<button class="tab-btn font-bold w-full text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab5">Monitoring</button>
 		</div>
 
@@ -364,10 +364,16 @@
 						</select>
 					</div>
 					<div class="w-full flex flex-col gap-1">
-						<label for="cms-select" class="font-semibold text-sm">Choose a CMS:</label>
+						<label for="cms-select" class="font-semibold text-sm">Choose a Packing:</label>
 						<select id="cms-select" class="w-full bg-gray-50 dark:bg-neutral-900 p-2 rounded border border-gray-200 dark:border-neutral-800 focus:outline-none text-xs">
 							<option value="wordpress" selected>WordPress</option>
 							<option value="joomla">Joomla</option>
+							<option value="laravel">Laravel</option>
+							<option value="codeigniter">CodeIgniter</option>
+							<option value="symfony">Symfony</option>
+							<option value="slim">Slim</option>
+							<option value="yii">Yii</option>
+							<option value="cakephp">CakePHP</option>
 						</select>
 					</div>
 					<div class="w-full flex flex-col gap-1">
@@ -377,7 +383,7 @@
 					</div>
 					<div class="w-full flex items-center">
 						<button id="cms-install-btn" class="px-4 py-2 rounded bg-emerald-500 dark:bg-emerald-600 hover:bg-emerald-400 dark:hover:bg-emerald-500 text-white hover:scale-105 hover:duration-300 transition-all">
-							Install CMS
+							Install
 						</button>
 					</div>
 					<div class="w-full flex flex-col items-center">
