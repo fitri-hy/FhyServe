@@ -1,4 +1,4 @@
-<img src="./templates/images/ssss.jpg"/>
+<img src="./templates/images/s.jpg"/>
 
 # 🚀 FhyServe
 

@@ -1552,8 +1552,8 @@ video {
   min-width: 100%;
 }
 
-.max-w-lg {
-  max-width: 32rem;
+.max-w-\[300px\] {
+  max-width: 300px;
 }
 
 .max-w-none {
@@ -1562,18 +1562,6 @@ video {
 
 .max-w-xl {
   max-width: 36rem;
-}
-
-.max-w-\[200\] {
-  max-width: 200;
-}
-
-.max-w-\[200px\] {
-  max-width: 200px;
-}
-
-.max-w-\[300px\] {
-  max-width: 300px;
 }
 
 .flex-1 {
