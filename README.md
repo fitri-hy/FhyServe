@@ -1,4 +1,4 @@
-<img src="./templates/images/ss.jpg"/>
+<img src="./templates/images/sss.jpg"/>
 
 # 🚀 FhyServe
 
@@ -21,9 +21,6 @@
 - 💻 **CMD**
 - ⏰ **Cron Job**
 - 📡 **Client API**
-
-#### [ADD] New Release 1.0.2 (Comming soon)
-
 - 🧱 **Pack CMS & Framework Auto Installer**
 - 📊 **Monitoring**
 - 📦 **Composer**

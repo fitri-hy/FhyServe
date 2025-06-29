@@ -1,6 +1,14 @@
 const { app, dialog, shell, Menu } = require('electron');
 const axios = require('axios');
 const { createDocsWindow } = require('../docsWindow');
+const { stopApache } = require('../../runtime/apache');
+const { stopMysql } = require('../../runtime/mysql');
+const { stopNginx } = require('../../runtime/nginx');
+const { stopNodeServer } = require('../../runtime/node');
+const { stopPython } = require('../../runtime/python');
+const { stopGoServer } = require('../../runtime/go');
+const { stopCmd } = require('../../runtime/cmd');
+const { stopAllCronJobs } = require('../../runtime/cronjob');
 
 async function checkForUpdates(win, silent = false) {
   const releasesUrl = 'https://api.github.com/repos/fitri-hy/FhyServe/releases/latest';
@@ -48,6 +56,29 @@ async function checkForUpdates(win, silent = false) {
   }
 }
 
+async function stopAllServices() {
+  await Promise.all([
+    stopApache(),
+    stopMysql(),
+    stopNginx(),
+    stopNodeServer(),
+    stopPython(),
+    stopGoServer(),
+    stopCmd(),
+    stopAllCronJobs()
+  ]);
+}
+
+async function restartApp() {
+  try {
+    await stopAllServices();
+  } catch (err) {
+    console.error('Failed to stop some services:', err);
+  }
+  app.relaunch();
+  app.exit(0);
+}
+
 function createMainMenu(win) {
   const template = [
     {
@@ -58,10 +89,13 @@ function createMainMenu(win) {
           accelerator: process.platform === 'darwin' ? 'Cmd+Ctrl+F' : 'F11',
           click: () => win.setFullScreen(!win.isFullScreen()),
         },
-        { label: 'Reload', 
+        {
+          label: 'Restart',
           accelerator: process.platform === 'darwin' ? 'Cmd+R' : 'Ctrl+R',
-		  click: () => win.reload() 
-		},
+          click: () => {
+            restartApp();
+          }
+        },
 		//{
 		//  label: 'Developer Tools',
 		//  accelerator: process.platform === 'darwin' ? 'Cmd+Alt+I' : 'Ctrl+Shift+I',

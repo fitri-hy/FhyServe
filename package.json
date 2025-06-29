@@ -1,6 +1,6 @@
 {
   "name": "fhyserver",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "FhyServe is a portable multi-server runtime platform designed to simplify local web application development without the need for global installation.",
   "keywords": [
     "server",
@@ -11,6 +11,8 @@
     "nginx",
     "php",
     "nodejs",
+    "go",
+    "composer",
     "electron",
     "fhyserver",
     "runtime",

@@ -5,6 +5,7 @@ const { getMysqlStats } = require('./mysql');
 const { getNginxStats } = require('./nginx');
 const { getNodeStats } = require('./node');
 const { getPythonStats } = require('./python');
+const { getGoStats } = require('./go');
 
 async function getServiceStats() {
   const result = [];
@@ -49,6 +50,13 @@ async function getServiceStats() {
     result.push(python);
   } catch (err) {
     result.push({ name: 'Python', status: 'ERROR', error: err.message });
+  }
+
+  try {
+    const go = await getGoStats();
+    result.push(go);
+  } catch (err) {
+    result.push({ name: 'Go', status: 'ERROR', error: err.message });
   }
 
   return result;

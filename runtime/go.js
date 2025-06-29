@@ -3,6 +3,8 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 const kill = require('tree-kill');
 const http = require('http');
+const find = require('find-process');
+const pidusage = require('pidusage');
 const chokidar = require('chokidar');
 const { getBasePath, isDevelopment } = require('../utils/pathResource');
 const { getPORT } = require('../utils/port');
@@ -231,8 +233,45 @@ async function stopGoServer() {
   processes = {};
 }
 
+// Monitoring
+async function getGoStats() {
+  if (!processes || Object.keys(processes).length === 0) {
+    return {
+      name: 'Go',
+      status: 'STOPPED',
+    };
+  }
+
+  const firstProject = Object.values(processes)[0];
+  if (!firstProject || !firstProject.proc) {
+    return {
+      name: 'Go',
+      status: 'STOPPED',
+    };
+  }
+
+  try {
+    const usage = await pidusage(firstProject.proc.pid);
+    return {
+      name: 'Go',
+      pid: firstProject.proc.pid,
+      cpu: usage.cpu.toFixed(1) + '%',
+      memory: (usage.memory / 1024 / 1024).toFixed(1) + ' MB',
+      port: firstProject.port || '-',
+      status: 'RUNNING'
+    };
+  } catch (err) {
+    return {
+      name: 'Go',
+      status: 'ERROR',
+      error: err.message
+    };
+  }
+}
+
 module.exports = {
   startGoServer,
   stopGoServer,
   setGoMain,
+  getGoStats,
 };
