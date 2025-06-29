@@ -1,5 +1,20 @@
 <img src="./templates/images/sss.jpg"/>
 
+<div align="center">
+
+[![Latest Release](https://img.shields.io/github/v/release/fitri-hy/FhyServe?style=flat&logo=github&color=2bbc8a)](https://github.com/fitri-hy/FhyServe/releases/latest)
+[![Stars](https://img.shields.io/github/stars/fitri-hy/FhyServe?style=flat&logo=github&color=ffd700)](https://github.com/fitri-hy/FhyServe/stargazers)
+[![Forks](https://img.shields.io/github/forks/fitri-hy/FhyServe?style=flat&logo=github&color=blueviolet)](https://github.com/fitri-hy/FhyServe/network/members)
+[![Downloads ](https://img.shields.io/github/downloads/fitri-hy/FhyServe/total?style=flat&color=orange)](https://github.com/fitri-hy/FhyServe/releases)
+[![Contributors](https://img.shields.io/github/contributors/fitri-hy/FhyServe.svg?style=flat&color=informational)](https://github.com/fitri-hy/FhyServe/graphs/contributors)
+[![Issues](https://img.shields.io/github/issues/fitri-hy/FhyServe.svg?style=flat&color=critical)](https://github.com/fitri-hy/FhyServe/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/fitri-hy/FhyServe.svg?style=flat&color=blue)](https://github.com/fitri-hy/FhyServe/pulls)
+[![Last Commit](https://img.shields.io/github/last-commit/fitri-hy/FhyServe?style=flat&logo=github&color=4c1)](https://github.com/fitri-hy/FhyServe/commits/main)
+[![Electron](https://img.shields.io/badge/framework-Electron-47848F?style=flat&logo=electron&logoColor=white)](https://www.electronjs.org/)
+[![Node.js](https://img.shields.io/badge/runtime-Node.js-339933?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
+
+</div>
+
 # 🚀 FhyServe
 
 *"Full Server Control, No Environment!"*
