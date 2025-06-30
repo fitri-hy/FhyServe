@@ -654,3 +654,26 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+// Resource Download
+const loadingEl = document.getElementById('loading');
+const loadingMessage = document.getElementById('loading-message');
+
+window.resourceDlAPI.onResourceProgress((progress) => {
+  switch(progress.status) {
+    case 'download_start':
+    case 'download_progress':
+    case 'extracting':
+      loadingEl.classList.remove('hidden');
+      loadingMessage.textContent = progress.message;
+      break;
+    case 'download_complete':
+      loadingMessage.textContent = progress.message;
+      break;
+    case 'done':
+    case 'skip':
+      loadingEl.classList.add('hidden');
+      loadingMessage.textContent = '';
+      break;
+  }
+});

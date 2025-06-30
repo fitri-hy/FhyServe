@@ -106,3 +106,8 @@ contextBridge.exposeInMainWorld('autoInstallerAPI', {
   installCMS: (cmsName, version, target) => ipcRenderer.invoke('install-cms', cmsName, version, target),
   onProgress: (callback) => ipcRenderer.on('install-progress', (event, downloaded, total) => callback(downloaded, total)),
 });
+
+// Resource Download
+contextBridge.exposeInMainWorld('resourceDlAPI', {
+  onResourceProgress: (callback) => ipcRenderer.on('resource-progress', (event, data) => callback(data))
+});

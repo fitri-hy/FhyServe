@@ -38,6 +38,34 @@
 			--scrollbar-thumb: #555;
 		  }
 		}
+		
+		@keyframes spin-slow {
+			0% {
+				transform: rotate(0deg);
+			}
+			100% {
+				transform: rotate(360deg);
+			}
+		}
+	  
+		.animate-spin-slow {
+			animation: spin-slow 1.75s linear infinite;
+		}
+
+		@keyframes fadeInUp {
+			0% {
+				opacity: 0;
+				transform: translateY(10px);
+			}
+			100% {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+		
+		.animate-fade-in-up {
+			animation: fadeInUp 0.8s ease forwards;
+		}
 	</style>
 </head>
 <body class="flex bg-gray-50 gap-4 dark:bg-neutral-900 text-gray-700 dark:text-gray-100">
@@ -451,6 +479,30 @@
 		</div>
 
 	</section>
+	
+	<div id="loading" class="hidden fixed inset-0 bg-white bg-opacity-20 flex flex-col items-center justify-center z-50 backdrop-blur-sm">
+	  <div class="relative flex items-center justify-center mb-6">
+		<svg class="animate-spin-slow h-20 w-20" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+		  <defs>
+			<linearGradient id="spinner-gradient" x1="0" y1="0" x2="1" y2="1">
+			  <stop offset="0%" stop-color="#3b82f6" />
+			  <stop offset="100%" stop-color="#2563eb" />
+			</linearGradient>
+		  </defs>
+		  <circle
+			cx="25"
+			cy="25"
+			r="20"
+			stroke="url(#spinner-gradient)"
+			stroke-width="5"
+			stroke-linecap="round"
+			stroke-dasharray="90 150"
+			stroke-dashoffset="0"
+		  ></circle>
+		</svg>
+	  </div>
+	  <p id="loading-message" class="text-emerald-500 text-xl font-semibold tracking-wide text-center max-w-lg opacity-0 animate-fade-in-up"></p>
+	</div>
 	
 	<script src="./js/chart.js"></script>
 	<script src="./js/renderer.js"></script>

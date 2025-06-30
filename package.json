@@ -124,6 +124,8 @@
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.16",
+    "abort-controller": "^3.0.0",
+    "adm-zip": "^0.5.16",
     "axios": "^1.10.0",
     "chokidar": "^4.0.3",
     "find-process": "^1.4.10",

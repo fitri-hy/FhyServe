@@ -10,11 +10,33 @@ const { setPythonMain, stopPython } = require('./runtime/python');
 const { setGoMain, stopGoServer } = require('./runtime/go');
 const { setCmdMain, stopCmd } = require('./runtime/cmd');
 const { setCronJobMain, stopAllCronJobs } = require('./runtime/cronjob');
+const { AbortController } = require('abort-controller');
+const { ensureResources } = require('./runtime/resourceDownload');
 
 let mainWindow;
+let isAppClosing = false;
+let resourceAbortController = null;
 
 app.whenReady().then(() => {
   mainWindow = createWindow();
+  resourceAbortController = new AbortController();
+
+  ensureResources((progress) => {
+    if (isAppClosing) return;
+    if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) {
+      try {
+        mainWindow.webContents.send('resource-progress', progress);
+      } catch (e) {
+        console.warn('Failed to send resource-progress:', e.message);
+      }
+    }
+  }, resourceAbortController.signal).catch((e) => {
+    if (e.message === 'Resource download aborted') {
+      console.log('Resource download aborted due to app quit.');
+    } else {
+      console.error('Error during resource download:', e);
+    }
+  });
 
   setApacheMain(mainWindow);
   setMysqlMain(mainWindow);
@@ -38,6 +60,11 @@ app.on('activate', () => {
 });
 
 app.on('before-quit', async (event) => {
+  isAppClosing = true;
+  if (resourceAbortController) {
+    resourceAbortController.abort();
+  }
+  
   event.preventDefault();
 
   try {
