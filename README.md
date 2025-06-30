@@ -126,9 +126,10 @@ FhyServe/
 │   ├── nidejs/
 │   ├── php/
 │   ├── php-fpm/
-│   ├── python/
-└── htdocs/
-    └── phpmyadmin/
+│   └── python/
+└── public_html/
+    └── apache_web/
+        └── phpmyadmin/
 ```
 
 ---
