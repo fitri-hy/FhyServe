@@ -66,10 +66,10 @@ Get the latest version of **FhyServe** via the following official link:
 
 | File Name                               | Size   | Release Date         | Description                     |
 | :-------------------------------------- | :----- | :------------------- | :------------------------------ |
-| `FhyServer_Setup_1.0.2_x64.exe`         | 420 MB | 2025-06-29           | Installer full version (64-bit) |
-| `FhyServer_Portable_1.0.2_x64.zip`      | 589 MB | 2025-06-29           | Portable full version (64-bit)  |
-| `FhyServer_Setup_LITE_1.0.2_x64.exe`    | 84 MB  | 2025-06-30           | Installer lite version (64-bit) |
-| `FhyServer_Portable_LITE_1.0.2_x64.zip` | 115 MB | 2025-06-30           | Portable lite version (64-bit)  |
+| [FhyServer_Setup_1.0.2_x64.exe](https://github.com/fitri-hy/FhyServe/releases/download/1.0.2/FhyServer_Setup_1.0.2_x64.exe)         | 420 MB | 2025-06-29           | Installer full version (64-bit) |
+| [FhyServer_Portable_1.0.2_x64.zip](https://github.com/fitri-hy/FhyServe/releases/download/1.0.2/FhyServer_Portable_1.0.2_x64.zip)      | 589 MB | 2025-06-29           | Portable full version (64-bit)  |
+| [FhyServer_Setup_LITE_1.0.2_x64.exe](https://github.com/fitri-hy/FhyServe/releases/download/1.0.2/FhyServer_Setup_LITE_1.0.2_x64.exe)    | 84 MB  | 2025-06-30           | Installer lite version (64-bit) |
+| [FhyServer_Portable_LITE_1.0.2_x64.zip](https://github.com/fitri-hy/FhyServe/releases/download/1.0.2/FhyServer_Portable_LITE_1.0.2_x64.zip) | 115 MB | 2025-06-30           | Portable lite version (64-bit)  |
 
 #### Additional Information
 
