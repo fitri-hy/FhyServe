@@ -82,7 +82,8 @@ npm run build
 
 > FhyServe has implemented **Automatic Resource Check & Download** so you don't need to download manually.
 
-**If you still want to download the resources manually, please use the following link or download the **resources-development.zip** in the releases section**
+If you still want to download the resources manually, please use the following link or download the **resources-development.zip** in the releases section
+
 | 🔗 Resource    | 📥 Official Link |
 |----------------|------------------|
 | **NGINX**      | [nginx-1.28.0](https://nginx.org/en/download.html/) |
