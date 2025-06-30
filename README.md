@@ -1,4 +1,4 @@
-<img src="./templates/images/sss.jpg"/>
+<img src="./templates/images/s.jpg"/>
 
 <div align="center">
 
@@ -39,6 +39,7 @@
 - 📊 **Monitoring**
 - 📦 **Composer**
 - 🐭 **Go**
+- 💎 **Ruby**
 - 🧱 **CMS & Framework Auto Installer Package.**
 
 #### CMS Package Included
@@ -111,6 +112,7 @@ npm run build
 | **Git**        | [MinGit-2.50.0-64-bit](https://github.com/git-for-windows/git/releases/tag/v2.50.0.windows.1) |
 | **Composer**   | [composer-setup](https://getcomposer.org/download/) |
 | **Go**         | [go1.24.4.windows-amd64.zip](https://go.dev/dl/) |
+| **Ruby**         | [rubyinstaller-3.4.4-2-x64.7z](https://github.com/oneclick/rubyinstaller2/releases) |
 
 **Folder Structure for Resource Placement**
 
@@ -127,6 +129,7 @@ FhyServe/
 │   ├── php/
 │   ├── php-fpm/
 │   └── python/
+│   ├── ruby/
 └── public_html/
     └── apache_web/
         └── phpmyadmin/

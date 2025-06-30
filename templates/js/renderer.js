@@ -244,8 +244,36 @@ window.golangAPI.onStatus(({ project, status }) => {
   }
 });
 
-openFolderGo.addEventListener('click', async () => {
-  const result = await window.golangAPI.openGoFolder();
+// Ruby
+const rubyStatusText = document.querySelector('#ruby-status');
+const rubyToggle = document.querySelector('#rubyToggle');
+const openFolderRuby = document.getElementById('open-ruby-folder');
+
+rubyToggle.addEventListener('change', e => {
+  if (e.target.checked) {
+    window.rubyAPI.start();
+  } else {
+    window.rubyAPI.stop();
+  }
+});
+
+window.rubyAPI.onStatus(({ project, status }) => {
+  if (project !== 'main') return;
+
+  rubyStatusText.textContent = status;
+  if (status === 'RUNNING') {
+    rubyStatusText.classList.add('text-green-500', 'dark:text-green-600');
+    rubyStatusText.classList.remove('text-rose-500', 'dark:text-rose-600');
+    rubyToggle.checked = true;
+  } else {
+    rubyStatusText.classList.add('text-rose-500', 'dark:text-rose-600');
+    rubyStatusText.classList.remove('text-green-500', 'dark:text-green-600');
+    rubyToggle.checked = false;
+  }
+});
+
+openFolderRuby.addEventListener('click', async () => {
+  const result = await window.rubyAPI.openRubyFolder();
   if (!result.success) {
     alert('Failed to open folder: ' + result.message);
   }

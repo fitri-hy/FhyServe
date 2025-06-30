@@ -8,6 +8,7 @@ const { setNginxMain, stopNginx } = require('./runtime/nginx');
 const { setNodeMain, stopNodeServer } = require('./runtime/node');
 const { setPythonMain, stopPython } = require('./runtime/python');
 const { setGoMain, stopGoServer } = require('./runtime/go');
+const { setRubyMain, stopRubyServer } = require('./runtime/ruby');
 const { setCmdMain, stopCmd } = require('./runtime/cmd');
 const { setCronJobMain, stopAllCronJobs } = require('./runtime/cronjob');
 const { AbortController } = require('abort-controller');
@@ -44,6 +45,7 @@ app.whenReady().then(() => {
   setNodeMain(mainWindow);
   setPythonMain(mainWindow);
   setGoMain(mainWindow);
+  setRubyMain(mainWindow);
   setCmdMain(mainWindow);
   setCronJobMain(mainWindow);
 
@@ -73,6 +75,8 @@ app.on('before-quit', async (event) => {
     await stopNginx();
     await stopNodeServer();
     await stopPython();
+    await stopGoServer();
+    await stopRubyServer();
     await stopAllCronJobs();
     await stopCmd();
     await stopAllCronJobs();

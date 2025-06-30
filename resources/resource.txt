@@ -1,14 +1,1 @@
-FhyServe/
-├── resource/
-│   ├── apache/			← Place extracted files
-│   ├── composer/		← Place extracted files
-│   ├── git/			← Place extracted files
-│   ├── go/			← Place extracted files
-│   ├── mysql/			← Place extracted files
-│   ├── nginx/			← Place extracted files
-│   ├── nidejs/			← Place extracted files
-│   ├── php/			← Place extracted files
-│   ├── php-fpm/		← Place extracted files
-│   ├── python/			← Place extracted files
-└── htdocs/
-    └── phpmyadmin/		← Place extracted files
+Place extracted files

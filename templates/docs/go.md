@@ -5,7 +5,7 @@
 - Click **Root Directory**.
 - Create a New Folder for your project (for example, myproject).
 - Inside the folder, create an **index.go** file or other necessary project files.
-- **Start** the Python server by clicking Start.
+- **Start** the Golang server by clicking Start.
 - To see a list of projects, open your browser and navigate to:
 
 ```

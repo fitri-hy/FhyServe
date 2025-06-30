@@ -62,6 +62,14 @@ contextBridge.exposeInMainWorld('golangAPI', {
   openGoFolder: () => ipcRenderer.invoke('open-go-folder'),
 });
 
+// Ruby
+contextBridge.exposeInMainWorld('rubyAPI', {
+  start: () => ipcRenderer.send('ruby-start'),
+  stop: () => ipcRenderer.send('ruby-stop'),
+  onStatus: (callback) => ipcRenderer.on('ruby-status', (event, data) => callback(data)),
+  openRubyFolder: () => ipcRenderer.invoke('open-ruby-folder'),
+});
+
 // CMD
 contextBridge.exposeInMainWorld('cmdAPI', {
   start: () => ipcRenderer.send('cmd-start'),

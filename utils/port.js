@@ -16,6 +16,8 @@ let config = {
   MYSQL_PORT: 3306,
   NODEJS_PORT: 2999,
   PYHTON_PORT: 4000,
+  GOLANG_PORT: 5000,
+  RUBY_PORT: 4559,
 };
 
 function loadConfig() {

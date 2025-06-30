@@ -3,21 +3,20 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 const kill = require('tree-kill');
 const http = require('http');
-const find = require('find-process');
 const pidusage = require('pidusage');
 const chokidar = require('chokidar');
 const { getBasePath, isDevelopment } = require('../utils/pathResource');
 const { getPORT } = require('../utils/port');
 const { getWATCHER } = require('../utils/watcher');
 
-const BASE_PORT = getPORT('GOLANG_PORT');
+const BASE_PORT = getPORT('RUBY_PORT');
 const CHOKIDAR = getWATCHER('WATCHER');
 
 const basePath = getBasePath();
-const goExec = path.join(basePath, 'resources', 'go', 'bin', 'go.exe');
-const goWebDir = isDevelopment()
-  ? path.join(basePath, 'public_html', 'go_web')
-  : path.join(basePath, 'resources', 'public_html', 'go_web');
+const rubyExec = path.join(basePath, 'resources', 'ruby', 'bin', 'ruby.exe');
+const rubyWebDir = isDevelopment()
+  ? path.join(basePath, 'public_html', 'ruby_web')
+  : path.join(basePath, 'resources', 'public_html', 'ruby_web');
 
 let mainWindow = null;
 let watcher = null;
@@ -27,19 +26,19 @@ function formatLog(projectName, message) {
   return `[${projectName.toUpperCase()}] ${message}`;
 }
 
-function setGoMain(win) {
+function setRubyMain(win) {
   mainWindow = win;
 }
 
 function logToRenderer(message) {
   if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send('service-log', { service: 'golang', message });
+    mainWindow.webContents.send('service-log', { service: 'ruby', message });
   }
 }
 
 function updateStatus(project, status) {
   if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send('golang-status', { project, status });
+    mainWindow.webContents.send('ruby-status', { project, status });
   }
 }
 
@@ -50,7 +49,7 @@ function delay(ms) {
 function extractPortFromScript(scriptPath) {
   try {
     const content = fs.readFileSync(scriptPath, 'utf8');
-    const match = content.match(/port\s*:=\s*["'](\d+)["']/i);
+    const match = content.match(/PORT\s*=\s*["']?(\d+)["']?/i);
     if (match) return parseInt(match[1], 10);
   } catch (err) {
     logToRenderer(`Failed to read port from ${scriptPath}: ${err.message}`);
@@ -59,16 +58,16 @@ function extractPortFromScript(scriptPath) {
 }
 
 function scanSubProjects() {
-  if (!fs.existsSync(goWebDir)) return [];
+  if (!fs.existsSync(rubyWebDir)) return [];
 
-  const entries = fs.readdirSync(goWebDir, { withFileTypes: true });
+  const entries = fs.readdirSync(rubyWebDir, { withFileTypes: true });
   const projects = [];
 
   for (const entry of entries) {
     if (entry.isDirectory()) {
-      const script = path.join(goWebDir, entry.name, 'index.go');
+      const script = path.join(rubyWebDir, entry.name, 'index.rb');
       if (fs.existsSync(script)) projects.push(entry.name);
-    } else if (entry.isFile() && entry.name === 'index.go') {
+    } else if (entry.isFile() && entry.name === 'index.rb') {
       projects.push('main');
     }
   }
@@ -98,14 +97,14 @@ async function waitForReady(port, timeout = 5000) {
 }
 
 async function startProcess(projectName, scriptPath, port, cwd, isRestart = false) {
-  if (!fs.existsSync(goExec)) {
-    logToRenderer(formatLog(projectName, `Go executable not found at ${goExec}`));
+  if (!fs.existsSync(rubyExec)) {
+    logToRenderer(formatLog(projectName, `Ruby executable not found at ${rubyExec}`));
     updateStatus(projectName, 'ERROR');
     return;
   }
 
   if (!fs.existsSync(scriptPath)) {
-    logToRenderer(formatLog(projectName, `index.go not found in ${scriptPath}`));
+    logToRenderer(formatLog(projectName, `index.rb not found in ${scriptPath}`));
     updateStatus(projectName, 'ERROR');
     return;
   }
@@ -121,7 +120,7 @@ async function startProcess(projectName, scriptPath, port, cwd, isRestart = fals
   }
 
   return new Promise((resolve, reject) => {
-    const cmd = spawn(goExec, ['run', scriptPath], {
+    const cmd = spawn(rubyExec, [scriptPath], {
       cwd,
       stdio: ['ignore', 'pipe', 'pipe']
     });
@@ -142,6 +141,12 @@ async function startProcess(projectName, scriptPath, port, cwd, isRestart = fals
       if (ready) {
         updateStatus(projectName, 'RUNNING');
         processes[projectName] = { proc: cmd, port };
+        
+        // Log custom main server started message
+        if (projectName.toLowerCase() === 'main') {
+          logToRenderer(formatLog(projectName, `Main server started on http://localhost:${port}`));
+        }
+        
         logToRenderer(formatLog(projectName, 'is running.'));
         resolve();
       } else {
@@ -154,43 +159,10 @@ async function startProcess(projectName, scriptPath, port, cwd, isRestart = fals
   });
 }
 
-async function startGoServer() {
-  const subProjects = scanSubProjects();
-  for (const proj of subProjects) {
-    const scriptPath = proj === 'main'
-      ? path.join(goWebDir, 'index.go')
-      : path.join(goWebDir, proj, 'index.go');
-
-    const port = extractPortFromScript(scriptPath);
-    if (!port) {
-      logToRenderer(formatLog(proj, 'No port found, skipping'));
-      continue;
-    }
-
-    await startProcess(proj, scriptPath, port, path.dirname(scriptPath));
-  }
-
-  if (CHOKIDAR) {
-    watchSubProjects(goWebDir);
-  }
-}
-
-async function restartProject(projectName) {
-  const scriptPath = projectName === 'main'
-    ? path.join(goWebDir, 'index.go')
-    : path.join(goWebDir, projectName, 'index.go');
-
-  const port = extractPortFromScript(scriptPath);
-  if (!port) return;
-
-  logToRenderer(formatLog(projectName, 'Restarting...'));
-  await startProcess(projectName, scriptPath, port, path.dirname(scriptPath), true);
-}
-
-function watchSubProjects(goWebDir) {
+function watchSubProjects(rubyWebDir) {
   if (watcher) watcher.close();
 
-  watcher = chokidar.watch(goWebDir, {
+  watcher = chokidar.watch(rubyWebDir, {
     ignored: /(^|[\/\\])\../,
     persistent: true,
     depth: 5,
@@ -211,7 +183,7 @@ function watchSubProjects(goWebDir) {
 
   watcher
     .on('change', pathFile => {
-      const proj = getProjectNameFromPath(pathFile, goWebDir);
+      const proj = getProjectNameFromPath(pathFile, rubyWebDir);
       if (proj) {
         changedProjects.add(proj);
         scheduleRestart();
@@ -220,11 +192,81 @@ function watchSubProjects(goWebDir) {
     .on('error', err => logToRenderer(formatLog('WATCHER', `Watcher error: ${err.message}`)));
 
   watcher.on('ready', () => {
-    logToRenderer('[WATCHER] Watching Go projects...');
+    logToRenderer(formatLog('WATCHER', 'Watching Ruby projects...'));
   });
 }
 
-async function stopGoServer() {
+async function startRubyServer() {
+  const subProjects = scanSubProjects();
+  for (const proj of subProjects) {
+    const scriptPath = proj === 'main'
+      ? path.join(rubyWebDir, 'index.rb')
+      : path.join(rubyWebDir, proj, 'index.rb');
+
+    const port = extractPortFromScript(scriptPath);
+    if (!port) {
+      logToRenderer(formatLog(proj, 'No port found, skipping'));
+      continue;
+    }
+
+    await startProcess(proj, scriptPath, port, path.dirname(scriptPath));
+  }
+
+  if (CHOKIDAR) {
+    watchSubProjects(rubyWebDir);
+  }
+}
+
+async function restartProject(projectName) {
+  const scriptPath = projectName === 'main'
+    ? path.join(rubyWebDir, 'index.rb')
+    : path.join(rubyWebDir, projectName, 'index.rb');
+
+  const port = extractPortFromScript(scriptPath);
+  if (!port) return;
+
+  logToRenderer(formatLog(projectName, 'Restarting...'));
+  await startProcess(projectName, scriptPath, port, path.dirname(scriptPath), true);
+}
+
+function watchSubProjects(rubyWebDir) {
+  if (watcher) watcher.close();
+
+  watcher = chokidar.watch(rubyWebDir, {
+    ignored: /(^|[\/\\])\../,
+    persistent: true,
+    depth: 5,
+  });
+
+  const changedProjects = new Set();
+  let restartTimeout = null;
+
+  const scheduleRestart = () => {
+    if (restartTimeout) clearTimeout(restartTimeout);
+    restartTimeout = setTimeout(async () => {
+      for (const proj of changedProjects) {
+        await restartProject(proj);
+      }
+      changedProjects.clear();
+    }, 1000);
+  };
+
+  watcher
+    .on('change', pathFile => {
+      const proj = getProjectNameFromPath(pathFile, rubyWebDir);
+      if (proj) {
+        changedProjects.add(proj);
+        scheduleRestart();
+      }
+    })
+    .on('error', err => logToRenderer(formatLog('WATCHER', `Watcher error: ${err.message}`)));
+
+  watcher.on('ready', () => {
+    logToRenderer(formatLog('WATCHER', 'Watching Ruby projects...'));
+  });
+}
+
+async function stopRubyServer() {
   for (const [projectName, { proc }] of Object.entries(processes)) {
     logToRenderer(formatLog(projectName, 'Stopping...'));
     kill(proc.pid, 'SIGTERM', () => {
@@ -235,11 +277,10 @@ async function stopGoServer() {
   processes = {};
 }
 
-// Monitoring
-async function getGoStats() {
+async function getRubyStats() {
   if (!processes || Object.keys(processes).length === 0) {
     return {
-      name: 'Go',
+      name: 'Ruby',
       status: 'STOPPED',
     };
   }
@@ -247,7 +288,7 @@ async function getGoStats() {
   const firstProject = Object.values(processes)[0];
   if (!firstProject || !firstProject.proc) {
     return {
-      name: 'Go',
+      name: 'Ruby',
       status: 'STOPPED',
     };
   }
@@ -255,7 +296,7 @@ async function getGoStats() {
   try {
     const usage = await pidusage(firstProject.proc.pid);
     return {
-      name: 'Go',
+      name: 'Ruby',
       pid: firstProject.proc.pid,
       cpu: usage.cpu.toFixed(1) + '%',
       memory: (usage.memory / 1024 / 1024).toFixed(1) + ' MB',
@@ -264,7 +305,7 @@ async function getGoStats() {
     };
   } catch (err) {
     return {
-      name: 'Go',
+      name: 'Ruby',
       status: 'ERROR',
       error: err.message
     };
@@ -272,8 +313,8 @@ async function getGoStats() {
 }
 
 module.exports = {
-  startGoServer,
-  stopGoServer,
-  setGoMain,
-  getGoStats,
+  startRubyServer,
+  stopRubyServer,
+  setRubyMain,
+  getRubyStats,
 };
