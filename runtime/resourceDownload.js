@@ -2,9 +2,10 @@ const axios = require('axios');
 const fs = require('fs-extra');
 const path = require('path');
 const AdmZip = require('adm-zip');
+const { getCheckResource } = require('../utils/checkResource');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 
-const CHECK_RESOURCE = true;
+const CHECK_RESOURCE = getCheckResource('CHECK_RESOURCE');
 
 const basePath = getBasePath();
 const tempPath = isDevelopment()

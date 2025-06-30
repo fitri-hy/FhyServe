@@ -59,15 +59,44 @@
 
 ## 📥 Latest Release
 
-[**Download**](https://github.com/fitri-hy/FhyServe/releases/latest) to get the latest version of FhyServe.
+Get the latest version of **FhyServe** via the following official link:
+[**Download Latest Release**](https://github.com/fitri-hy/FhyServe/releases/latest)
+
+#### Latest Release Details V1.0.2
+
+| File Name                               | Size   | Release Date         | Description                     |
+| :-------------------------------------- | :----- | :------------------- | :------------------------------ |
+| `FhyServer_Setup_1.0.2_x64.exe`         | 420 MB | 2025-06-29           | Installer full version (64-bit) |
+| `FhyServer_Portable_1.0.2_x64.zip`      | 589 MB | 2025-06-29           | Portable full version (64-bit)  |
+| `FhyServer_Setup_LITE_1.0.2_x64.exe`    | 84 MB  | 2025-06-30           | Installer lite version (64-bit) |
+| `FhyServer_Portable_LITE_1.0.2_x64.zip` | 115 MB | 2025-06-30           | Portable lite version (64-bit)  |
+
+#### Additional Information
+
+* **Setup**: Installer version that must be installed on the system before use.
+* **Portable**: Can be run directly without installation.
+* **Lite**: Light version that requires additional downloads on the system.
 
 ---
+## 🛠️ Development Installer
 
-## 🧰 Development Preparation
+```
+git clone https://github.com/fitri-hy/FhyServe.git
+npm install
+npm start
+```
 
-**1. Download (ZIP/GZ) Supporting Components**
+**Build**
 
-Please download and extract the following files to the appropriate folder:
+```
+npm run build
+```
+
+### Download Resources Manually (Optional)
+
+> FhyServe has implemented **Automatic Resource Check & Download** so you don't need to download manually.
+
+**If you still want to download the resources manually, please use the following links:**
 
 | 🔗 Resource    | 📥 Official Link |
 |----------------|------------------|
@@ -83,34 +112,23 @@ Please download and extract the following files to the appropriate folder:
 | **Composer**   | [composer-setup](https://getcomposer.org/download/) |
 | **Go**         | [go1.24.4.windows-amd64.zip](https://go.dev/dl/) |
 
+**Folder Structure for Resource Placement**
+
 ```
 FhyServe/
 ├── resource/
-│   ├── apache/			← Place extracted files
-│   ├── composer/		← Place extracted files
-│   ├── git/			← Place extracted files
-│   ├── go/				← Place extracted files
-│   ├── mysql/			← Place extracted files
-│   ├── nginx/			← Place extracted files
-│   ├── nidejs/			← Place extracted files
-│   ├── php/			← Place extracted files
-│   ├── php-fpm/		← Place extracted files
-│   ├── python/			← Place extracted files
+│   ├── apache/
+│   ├── composer/
+│   ├── git/
+│   ├── go/
+│   ├── mysql/
+│   ├── nginx/
+│   ├── nidejs/
+│   ├── php/
+│   ├── php-fpm/
+│   ├── python/
 └── htdocs/
-    └── phpmyadmin/		← Place extracted files
-```
-
-**2. Installation**
-
-```
-npm install
-npm start
-```
-
-**3. Build**
-
-```
-npm run build
+    └── phpmyadmin/
 ```
 
 ---
