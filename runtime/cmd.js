@@ -2,7 +2,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 const kill = require('tree-kill');
 const pidusage = require('pidusage');
-const { getBasePath, apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder } = require('../utils/pathResource');
+const { getBasePath, apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder, goOpenFolder } = require('../utils/pathResource');
 const { getENV } = require('../utils/env');
 
 const PATH_SYSTEM = getENV('PATH_SYSTEM');
@@ -106,6 +106,9 @@ function sendCommand(command, isSQL = false) {
       break;
     case 'go python_web':
       targetPath = pythonOpenFolder();
+      break;
+    case 'go go_web':
+      targetPath = goOpenFolder();
       break;
 	case 'go default':
       const cdCommand = process.platform === 'win32'
