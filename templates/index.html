@@ -436,8 +436,16 @@
 					</button>
 				</div>
 				<div class="flex flex-col flex-grow min-h-0">
-					<h2 class="font-semibold mb-1">Body</h2>
-					<textarea id="body" placeholder="Request Body JSON (optional)" class="flex-grow resize-none w-full bg-gray-50 dark:bg-neutral-900 p-2 rounded border border-gray-200 dark:border-neutral-800 focus:outline-none text-xs overflow-auto min-h-[100px]"></textarea>
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+						<div class="flex flex-col">
+							<h2 class="font-semibold mb-1">Headers</h2>
+							<textarea id="headers" placeholder='{"Authorization": "Bearer token"}' class="flex-grow resize-none w-full bg-gray-50 dark:bg-neutral-900 p-2 rounded border border-gray-200 dark:border-neutral-800 focus:outline-none text-xs overflow-auto min-h-[90px] lg:min-h-[150px]"></textarea>
+						</div>
+						<div class="flex flex-col">
+							<h2 class="font-semibold mb-1">Body</h2>
+							<textarea id="body" placeholder='{"Content-Type": "application/json"}' class="flex-grow resize-none w-full bg-gray-50 dark:bg-neutral-900 p-2 rounded border border-gray-200 dark:border-neutral-800 focus:outline-none text-xs overflow-auto min-h-[90px] lg:min-h-[150px]"></textarea>
+						</div>
+					</div>
 					<div class="flex flex-col flex-grow min-h-0 mt-4">
 						<h2 class="font-semibold mb-1">Response</h2>
 						<pre class="flex-grow resize-none w-full bg-gray-50 dark:bg-neutral-900 p-2 rounded border border-gray-200 dark:border-neutral-800 focus:outline-none text-xs overflow-auto h-full"><code id="response"></code></pre>

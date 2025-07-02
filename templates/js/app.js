@@ -17,43 +17,60 @@ tabButtons.forEach(button => {
 
 // API Client
 async function sendRequest() {
-      const method = document.getElementById('method').value;
-      const url = document.getElementById('url').value.trim();
-      const bodyText = document.getElementById('body').value.trim();
-      const responseBox = document.getElementById('response');
+  const method = document.getElementById('method').value;
+  const url = document.getElementById('url').value.trim();
+  const bodyText = document.getElementById('body').value.trim();
+  const headersText = document.getElementById('headers').value.trim();
+  const responseBox = document.getElementById('response');
 
-      if (!url) {
-        alert('Please enter a valid URL');
-        return;
-      }
+  if (!url) {
+    alert('Please enter a valid URL');
+    return;
+  }
 
-      let options = { method };
-      if (method !== 'GET' && method !== 'DELETE' && bodyText) {
-        try {
-          options.body = JSON.stringify(JSON.parse(bodyText));
-          options.headers = { 'Content-Type': 'application/json' };
-        } catch {
-          alert('Invalid JSON body');
-          return;
-        }
-      }
+  let headers = {};
 
-      responseBox.textContent = 'Loading...';
-
-      try {
-        const res = await fetch(url, options);
-        const contentType = res.headers.get('content-type') || '';
-        let responseText;
-
-        if (contentType.includes('application/json')) {
-          const json = await res.json();
-          responseText = JSON.stringify(json, null, 2);
-        } else {
-          responseText = await res.text();
-        }
-
-        responseBox.textContent = `Status: ${res.status} ${res.statusText}\n\n${responseText}`;
-      } catch (error) {
-        responseBox.textContent = 'Error:\n' + error.message;
-      }
+  // Parse headers
+  if (headersText) {
+    try {
+      headers = JSON.parse(headersText);
+    } catch {
+      alert('Invalid JSON headers');
+      return;
     }
+  }
+
+  let options = { method, headers };
+
+  // Handle body if needed
+  if (method !== 'GET' && method !== 'DELETE' && bodyText) {
+    try {
+      options.body = JSON.stringify(JSON.parse(bodyText));
+      if (!headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
+      }
+    } catch {
+      alert('Invalid JSON body');
+      return;
+    }
+  }
+
+  responseBox.textContent = 'Loading...';
+
+  try {
+    const res = await fetch(url, options);
+    const contentType = res.headers.get('content-type') || '';
+    let responseText;
+
+    if (contentType.includes('application/json')) {
+      const json = await res.json();
+      responseText = JSON.stringify(json, null, 2);
+    } else {
+      responseText = await res.text();
+    }
+
+    responseBox.textContent = `Status: ${res.status} ${res.statusText}\n\n${responseText}`;
+  } catch (error) {
+    responseBox.textContent = 'Error:\n' + error.message;
+  }
+}
