@@ -70,7 +70,7 @@
 </head>
 <body class="flex bg-gray-50 gap-4 dark:bg-neutral-900 text-gray-700 dark:text-gray-100">
 	
-	<section class="flex-none w-64 h-screen py-4 pl-4 overflow-y-auto flex flex-col gap-2">
+	<section class="flex-none w-64 h-screen py-4 pl-4 overflow-y-auto flex flex-col gap-2 overflow-hidden">
 		<div class="w-full mb-1 flex justify-between items-center gap-4">
 			<h2 class="font-extrabold tracking-wide text-lg">
 				Server & Runtime
@@ -549,6 +549,16 @@
 			</div>
 		</div>
 
+		<div id="tab7" class="tab-content hidden flex flex-col w-full h-[calc(100vh-74px)] pr-4">
+			<div id="resource-monitor" class="flex flex-col gap-2">
+				<h2 class="font-extrabold tracking-wide text-lg">
+					Resource Monitoring
+				</h2>
+				<canvas id="cpu-chart" width="400" height="200"></canvas>
+				<canvas id="ram-chart" width="400" height="200"></canvas>
+				<canvas id="disk-chart" width="400" height="200"></canvas>
+			</div>
+		</div>
 	</section>
 	
 	<div id="loading" class="hidden fixed inset-0 bg-white bg-opacity-20 flex flex-col items-center justify-center z-50 backdrop-blur-sm">
@@ -576,6 +586,133 @@
 	</div>
 	
 	<script src="./js/chart.js"></script>
+	<script>
+		const cpuChart = new Chart(ctxCpu, {
+		  type: 'line',
+		  data: {
+			labels: [],
+			datasets: [{
+			  label: 'CPU Usage',
+			  data: [],
+			  borderColor: 'rgba(255, 99, 132, 1)',
+			  borderWidth: 2,
+			  backgroundColor: 'rgba(255, 99, 132, 0.2)',
+			  tension: 0.1
+			}]
+		  },
+		  options: {
+			responsive: true,
+			scales: {
+			  x: {
+				display: true,
+				title: {
+				  display: true,
+				  text: 'Time'
+				}
+			  },
+			  y: {
+				beginAtZero: true,
+				display: true,
+				title: {
+				  display: true,
+				  text: 'Usage (%)'
+				}
+			  }
+			},
+			plugins: {
+			  legend: {
+				display: true,
+				position: 'top'
+			  }
+			}
+		  }
+		});
+
+		const ramChart = new Chart(ctxRam, {
+		  type: 'line',
+		  data: {
+			labels: [],
+			datasets: [{
+			  label: 'RAM Usage',
+			  data: [],
+			  borderColor: 'rgba(54, 162, 235, 1)',
+			  borderWidth: 2,
+			  backgroundColor: 'rgba(54, 162, 235, 0.2)',
+			  tension: 0.1
+			}]
+		  },
+		  options: {
+			responsive: true,
+			scales: {
+			  x: {
+				display: true,
+				title: {
+				  display: true,
+				  text: 'Time'
+				}
+			  },
+			  y: {
+				beginAtZero: true,
+				display: true,
+				title: {
+				  display: true,
+				  text: 'Usage (%)'
+				}
+			  }
+			},
+			plugins: {
+			  legend: {
+				display: true,
+				position: 'top'
+			  }
+			}
+		  }
+		});
+
+		const diskChart = new Chart(ctxDisk, {
+		  type: 'line',
+		  data: {
+			labels: [],
+			datasets: [{
+			  label: 'Disk Usage',
+			  data: [],
+			  borderColor: 'rgba(75, 192, 192, 1)',
+			  borderWidth: 2,
+			  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+			  tension: 0.1
+			}]
+		  },
+		  options: {
+			responsive: true,
+			scales: {
+			  x: {
+				display: true,
+				title: {
+				  display: true,
+				  text: 'Time'
+				}
+			  },
+			  y: {
+				beginAtZero: true,
+				display: true,
+				title: {
+				  display: true,
+				  text: 'Usage (%)'
+				}
+			  }
+			},
+			plugins: {
+			  legend: {
+				display: true,
+				position: 'top'
+			  }
+			}
+		  }
+		});
+	</script>
+	<script>
+		setInterval(updateCharts, 500);
+	</script>
 	<script src="./js/renderer.js"></script>
 	<script src="./js/app.js"></script>
 </body>

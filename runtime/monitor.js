@@ -7,6 +7,7 @@ const { getNodeStats } = require('./node');
 const { getPythonStats } = require('./python');
 const { getGoStats } = require('./go');
 const { getRubyStats } = require('./ruby');
+const si = require('systeminformation');
 
 async function getServiceStats() {
   const result = [];
@@ -70,4 +71,40 @@ async function getServiceStats() {
   return result;
 }
 
-module.exports = { getServiceStats };
+function getCpuUsage() {
+  return new Promise((resolve, reject) => {
+    si.currentLoad()
+      .then(data => resolve(data.currentload))
+      .catch(error => reject(error));
+  });
+}
+
+function getMemoryUsage() {
+  return new Promise((resolve, reject) => {
+    si.mem()
+      .then(data => resolve({
+        total: data.total,
+        free: data.free,
+        used: data.used
+      }))
+      .catch(error => reject(error));
+  });
+}
+
+function getDiskUsage() {
+  return new Promise((resolve, reject) => {
+    si.fsSize()
+      .then(data => resolve(data.map(disk => ({
+        fs: disk.fs,
+        size: disk.size,
+        used: disk.used
+      }))))
+      .catch(error => reject(error));
+  });
+}
+
+function getSystemStats() {
+  return Promise.all([getCpuUsage(), getMemoryUsage(), getDiskUsage()]);
+}
+
+module.exports = { getServiceStats, getSystemStats };
