@@ -749,13 +749,13 @@ window.addEventListener('DOMContentLoaded', () => {
         <td class="w-full px-4 py-2 whitespace-nowrap text-blue-500 font-mono select-all cursor-pointer">${tunnel.url || '-'}</td>
         <td class="px-4 py-2 whitespace-nowrap">${publicIP}</td>
         <td class="px-4 py-2 whitespace-nowrap text-center space-x-2">
-          <button data-id="${tunnel.id}" data-action="start" class="startBtn text-green-500">
+          <button data-id="${tunnel.id}" data-action="start" class="startBtn text-emerald-500 hover:text-emerald-600 dark:text-emerald-600 dark:hover:text-emerald-500 hover:scale-105 hover:duration-300 transition-all">
 			<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M21.409 9.353a2.998 2.998 0 0 1 0 5.294L8.597 21.614C6.534 22.737 4 21.277 4 18.968V5.033c0-2.31 2.534-3.769 4.597-2.648z"/></svg>
 		  </button>
-          <button data-id="${tunnel.id}" data-action="stop" class="stopBtn text-yellow-500">
+          <button data-id="${tunnel.id}" data-action="stop" class="stopBtn text-yellow-500 hover:text-yellow-600 dark:text-yellow-600 dark:hover:text-yellow-500 hover:scale-105 hover:duration-300 transition-all">
 			<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12"/></svg>
 		  </button>
-          <button data-id="${tunnel.id}" data-action="delete" class="deleteBtn text-rose-500">
+          <button data-id="${tunnel.id}" data-action="delete" class="deleteBtn text-rose-500 hover:text-rose-600 dark:text-rose-600 dark:hover:text-rose-500 hover:scale-105 hover:duration-300 transition-all">
 			<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M2.75 6.167c0-.46.345-.834.771-.834h2.665c.529-.015.996-.378 1.176-.916l.03-.095l.115-.372c.07-.228.131-.427.217-.605c.338-.702.964-1.189 1.687-1.314c.184-.031.377-.031.6-.031h3.478c.223 0 .417 0 .6.031c.723.125 1.35.612 1.687 1.314c.086.178.147.377.217.605l.115.372l.03.095c.18.538.74.902 1.27.916h2.57c.427 0 .772.373.772.834S20.405 7 19.979 7H3.52c-.426 0-.771-.373-.771-.833M11.607 22h.787c2.707 0 4.06 0 4.941-.863c.88-.864.97-2.28 1.15-5.111l.26-4.081c.098-1.537.147-2.305-.295-2.792s-1.187-.487-2.679-.487H8.23c-1.491 0-2.237 0-2.679.487s-.392 1.255-.295 2.792l.26 4.08c.18 2.833.27 4.248 1.15 5.112S8.9 22 11.607 22"/></svg>
 		  </button>
         </td>
