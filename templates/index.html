@@ -334,13 +334,14 @@
 		</div>
 	</section>
 	
-	<section class="w-full overflow-hidden py-4">
-		<div class="flex flex-none items-center justify-center gap-2 mb-2 max-w-xl pr-4">
-			<button class="tab-btn font-bold w-full text-xs bg-emerald-500 dark:bg-emerald-600 text-white p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab1">MAIN</button>
-			<button class="tab-btn font-bold w-full text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab2">CRONJOB</button>
-			<button class="tab-btn font-bold w-full text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab3">API Client</button>
-			<button class="tab-btn font-bold w-full text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab4">Pack Installer</button>
-			<button class="tab-btn font-bold w-full text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab5">Monitoring</button>
+	<section class="w-full overflow-x-auto py-4">
+		<div class="flex flex-none items-center gap-2 mb-2 pr-4">
+			<button class="tab-btn whitespace-nowrap font-bold w-[100px] text-xs bg-emerald-500 dark:bg-emerald-600 text-white p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab1">MAIN</button>
+			<button class="tab-btn whitespace-nowrap font-bold w-[100px] text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab2">CRONJOB</button>
+			<button class="tab-btn whitespace-nowrap font-bold w-[100px] text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab3">API Client</button>
+			<button class="tab-btn whitespace-nowrap font-bold w-[100px] text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab4">Pack Installer</button>
+			<button class="tab-btn whitespace-nowrap font-bold w-[100px] text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab5">Tunnels</button>
+			<button class="tab-btn whitespace-nowrap font-bold w-[100px] text-xs bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab6">Monitoring</button>
 		</div>
 
 		<div id="tab1" class="tab-content flex flex-col w-full h-[calc(100vh-74px)] pr-4">
@@ -487,6 +488,35 @@
 		</div>
 		
 		<div id="tab5" class="tab-content hidden flex flex-col w-full h-[calc(100vh-74px)] pr-4">
+			<div class="bg-white h-full rounded dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 p-4 flex flex-col">
+				<div class="mb-2 flex items-center gap-2">
+					<input type="number" type="number" max="5" id="portInput" placeholder="Enter PORT" class="max-w-xs w-full bg-gray-50 dark:bg-neutral-900 p-2 rounded border border-gray-200 dark:border-neutral-800 focus:outline-none text-xs" />
+					<button id="createBtn" class="text-emerald-500 hover:text-emerald-600 transition-all hover:duration-300 hover:scale-105">
+						<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24">
+						<path fill="currentColor" fill-rule="evenodd" d="M12 22c-4.714 0-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12s0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22m0-13.75a.75.75 0 0 1 .75.75v2.25H15a.75.75 0 0 1 0 1.5h-2.25V15a.75.75 0 0 1-1.5 0v-2.25H9a.75.75 0 0 1 0-1.5h2.25V9a.75.75 0 0 1 .75-.75" clip-rule="evenodd" />
+						</svg>
+					</button>
+				</div>
+
+				<div class="bg-gray-50 dark:bg-neutral-900 flex-1 overflow-y-auto rounded border border-gray-200 dark:border-neutral-800">
+					<table class="min-w-full">
+						<thead class="bg-emerald-500 dark:bg-emerald-600 text-white sticky top-0 z-10">
+							<tr>
+								<th class="px-4 py-2 text-left text-sm font-semibold">PORT</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold">STATUS</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold">URL</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold">IP PUBLIC</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold">ACTION</th>
+							</tr>
+						</thead>
+						<tbody id="tunnelsTableBody" class="text-xs px-2">
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div id="tab6" class="tab-content hidden flex flex-col w-full h-[calc(100vh-74px)] pr-4">
 			<div class="bg-white rounded dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 p-4 flex flex-col h-full">
 				<div class="w-full h-full mb-4">
 					<canvas id="serviceChart" class="w-full h-full bg-white dark:bg-neutral-900 rounded"></canvas>

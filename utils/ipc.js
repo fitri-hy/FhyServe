@@ -13,6 +13,7 @@ const { createCronJob, readCronJobs, updateCronJob, deleteCronJob, startCronJob,
 const { getServiceStats } = require('../runtime/monitor');
 const { apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder, goOpenFolder, rubyOpenFolder, portOpenFolder } = require('./pathResource');
 const { installCMS } = require('../runtime/autoInstaller');
+const { createTunnel, deleteTunnel, getAllTunnels, startTunnel, stopTunnel, } = require('./tunnels');
 
 function setupIPC() {
   // Dark Mode
@@ -199,6 +200,43 @@ function setupIPC() {
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
+    }
+  });
+  
+  // Tunels
+  ipcMain.handle('get-tunnels', () => {
+    return getAllTunnels();
+  });
+
+  ipcMain.handle('create-tunnel', (event, port) => {
+    try {
+      const tunnel = createTunnel(port);
+      return { success: true, tunnel };
+    } catch (e) {
+      return { success: false, message: e.message };
+    }
+  });
+
+  ipcMain.handle('delete-tunnel', (event, id) => {
+    const deleted = deleteTunnel(id);
+    return { success: deleted };
+  });
+
+  ipcMain.handle('start-tunnel', async (event, id) => {
+    try {
+      const url = await startTunnel(id);
+      return { success: true, url };
+    } catch (e) {
+      return { success: false, message: e.message };
+    }
+  });
+
+  ipcMain.handle('stop-tunnel', (event, id) => {
+    try {
+      const stopped = stopTunnel(id);
+      return { success: stopped };
+    } catch (e) {
+      return { success: false, message: e.message };
     }
   });
 }

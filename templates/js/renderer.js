@@ -705,3 +705,125 @@ window.resourceDlAPI.onResourceProgress((progress) => {
       break;
   }
 });
+
+// Tunnels
+async function getPublicIP() {
+  try {
+    const res = await fetch('https://api.ipify.org?format=json');
+    const data = await res.json();
+    return data.ip || '-';
+  } catch {
+    return '-';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const portInput = document.getElementById('portInput');
+  const createBtn = document.getElementById('createBtn');
+  const tunnelsTableBody = document.getElementById('tunnelsTableBody');
+
+  async function loadTunnels() {
+    const tunnels = await window.tunnelAPI.getTunnels();
+    tunnelsTableBody.innerHTML = '';
+
+    const publicIP = await getPublicIP();
+	
+	if (tunnels.length === 0) {
+      tunnelsTableBody.innerHTML = `
+      <tr>
+        <td colspan="5" class="text-center py-4">There are no tunnels available yet.</td>
+      </tr>
+      `;
+      return;
+    }
+
+    tunnels.forEach((tunnel) => {
+      const tr = document.createElement('tr');
+	  tr.classList.add('border-b', 'border-gray-100', 'dark:border-neutral-800');
+
+      tr.innerHTML = `
+        <td class="px-4 py-2 font-bold whitespace-nowrap">${tunnel.port}</td>
+        <td class="px-4 py-2 font-bold capitalize whitespace-nowrap ${tunnel.status === 'RUNNING' ? 'text-emerald-500' : 'text-rose-500'}">
+		  ${tunnel.status}
+		</td>
+        <td class="w-full px-4 py-2 whitespace-nowrap text-blue-500 font-mono select-all cursor-pointer">${tunnel.url || '-'}</td>
+        <td class="px-4 py-2 whitespace-nowrap">${publicIP}</td>
+        <td class="px-4 py-2 whitespace-nowrap text-center space-x-2">
+          <button data-id="${tunnel.id}" data-action="start" class="startBtn text-green-500">
+			<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M21.409 9.353a2.998 2.998 0 0 1 0 5.294L8.597 21.614C6.534 22.737 4 21.277 4 18.968V5.033c0-2.31 2.534-3.769 4.597-2.648z"/></svg>
+		  </button>
+          <button data-id="${tunnel.id}" data-action="stop" class="stopBtn text-yellow-500">
+			<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12"/></svg>
+		  </button>
+          <button data-id="${tunnel.id}" data-action="delete" class="deleteBtn text-rose-500">
+			<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M2.75 6.167c0-.46.345-.834.771-.834h2.665c.529-.015.996-.378 1.176-.916l.03-.095l.115-.372c.07-.228.131-.427.217-.605c.338-.702.964-1.189 1.687-1.314c.184-.031.377-.031.6-.031h3.478c.223 0 .417 0 .6.031c.723.125 1.35.612 1.687 1.314c.086.178.147.377.217.605l.115.372l.03.095c.18.538.74.902 1.27.916h2.57c.427 0 .772.373.772.834S20.405 7 19.979 7H3.52c-.426 0-.771-.373-.771-.833M11.607 22h.787c2.707 0 4.06 0 4.941-.863c.88-.864.97-2.28 1.15-5.111l.26-4.081c.098-1.537.147-2.305-.295-2.792s-1.187-.487-2.679-.487H8.23c-1.491 0-2.237 0-2.679.487s-.392 1.255-.295 2.792l.26 4.08c.18 2.833.27 4.248 1.15 5.112S8.9 22 11.607 22"/></svg>
+		  </button>
+        </td>
+      `;
+
+      tunnelsTableBody.appendChild(tr);
+    });
+
+    document.querySelectorAll('.startBtn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+        await window.tunnelAPI.startTunnel(id);
+        await loadTunnels();
+      });
+    });
+
+    document.querySelectorAll('.stopBtn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+        await window.tunnelAPI.stopTunnel(id);
+        await loadTunnels();
+      });
+    });
+
+    document.querySelectorAll('.deleteBtn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+        await window.tunnelAPI.deleteTunnel(id);
+        await loadTunnels();
+      });
+    });
+
+    document.querySelectorAll('td:nth-child(3)').forEach((td) => {
+      td.addEventListener('click', () => {
+        const url = td.textContent;
+        if (url && url !== '-') {
+          navigator.clipboard.writeText(url).then(() => {
+            alert('Tunnel URL copied to clipboard!');
+          });
+        }
+      });
+    });
+  }
+
+  createBtn.addEventListener('click', async () => {
+    const port = parseInt(portInput.value, 10);
+    if (isNaN(port) || port <= 0) {
+      alert('The port must be filled!');
+      return;
+    }
+
+    const existingTunnels = await window.tunnelAPI.getTunnels();
+    const portUsed = existingTunnels.some(tunnel => tunnel.port === port);
+
+    if (portUsed) {
+      alert(`Port ${port} is already in use! Please use another port.`);
+      return;
+    }
+
+    const res = await window.tunnelAPI.createTunnel(port);
+    if (res.success) {
+      portInput.value = '';
+      loadTunnels();
+    } else {
+      alert('Failed to create tunnel: ' + res.message);
+    }
+});
+
+
+  loadTunnels();
+});

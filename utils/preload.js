@@ -119,3 +119,12 @@ contextBridge.exposeInMainWorld('autoInstallerAPI', {
 contextBridge.exposeInMainWorld('resourceDlAPI', {
   onResourceProgress: (callback) => ipcRenderer.on('resource-progress', (event, data) => callback(data))
 });
+
+// Tunnels
+contextBridge.exposeInMainWorld('tunnelAPI', {
+  getTunnels: () => ipcRenderer.invoke('get-tunnels'),
+  createTunnel: (port) => ipcRenderer.invoke('create-tunnel', port),
+  deleteTunnel: (id) => ipcRenderer.invoke('delete-tunnel', id),
+  startTunnel: (id) => ipcRenderer.invoke('start-tunnel', id),
+  stopTunnel: (id) => ipcRenderer.invoke('stop-tunnel', id),
+});

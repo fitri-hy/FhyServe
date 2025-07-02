@@ -41,6 +41,7 @@
 - 🐭 **Go**
 - 💎 **Ruby**
 - 🧱 **CMS & Framework Auto Installer Package.**
+- 🛰️ **Local Tunels**
 
 #### CMS Package Included
 
