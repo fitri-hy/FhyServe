@@ -17,7 +17,7 @@ const publichtmlPath = isDevelopment()
   ? path.join(basePath, 'public_html', 'apache_web')
   : path.join(basePath, 'resources', 'public_html', 'apache_web');
 
-const zipUrl = 'https://github.com/fitri-hy/FhyServe/releases/download/1.0.3/resources-development.zip';
+const zipUrl = 'https://github.com/fitri-hy/FhyServe/releases/download/1.0.4/resources-development.zip';
 const zipTempPath = path.join(tempPath, 'resource-development.zip');
 
 const requiredResourcesFolders = [
