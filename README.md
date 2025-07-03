@@ -64,62 +64,20 @@
 Get the latest version of **FhyServe** via the following official link:
 [**Download Latest Release**](https://github.com/fitri-hy/FhyServe/releases/latest)
 
----
-## 🛠️ Development Installer
-
-```
-git clone https://github.com/fitri-hy/FhyServe.git
-npm install
-npm start
-```
-
-**Build**
-
-```
-npm run build
-```
-
-### Download Resources Manually (Optional)
-
-> FhyServe has implemented **Automatic Resource Check & Download** so you don't need to download manually.
-
-If you still want to download the resources manually, please use the following link or download the **resources-development.zip** in the releases section
-
-| 🔗 Resource    | 📥 Official Link |
+| 🔗 Resource    | 📥 Version |
 |----------------|------------------|
-| **NGINX**      | [nginx-1.28.0](https://nginx.org/en/download.html/) |
-| **PHP**        | [php-8.3.22-Win32-vs16-x64](https://windows.php.net/downloads/releases/) |
-| **PHP-FPM**    | [php-8.3.22-nts-Win32-vs16-x64](https://windows.php.net/download/) |
-| **phpMyAdmin** | [phpMyAdmin-5.2.2-all-languages](https://www.phpmyadmin.net/downloads/) |
-| **MySQL**      | [mysql-8.4.5-winx64](https://dev.mysql.com/downloads/mysql/) |
-| **Apache**     | [httpd-2.4.63-250207-win64-VS17](https://www.apachelounge.com/download/) |
-| **NodeJS**     | [node-v22.17.0-win-x64](https://nodejs.org/en/download) |
-| **Python**     | [python-3.13.5-embed-amd64](https://www.python.org/downloads/windows/) |
-| **Git**        | [MinGit-2.50.0-64-bit](https://github.com/git-for-windows/git/releases/tag/v2.50.0.windows.1) |
-| **Composer**   | [composer-setup](https://getcomposer.org/download/) |
-| **Go**         | [go1.24.4.windows-amd64.zip](https://go.dev/dl/) |
-| **Ruby**         | [rubyinstaller-3.4.4-2-x64.7z](https://github.com/oneclick/rubyinstaller2/releases) |
-
-**Folder Structure for Resource Placement**
-
-```
-FhyServe/
-├── resource/
-│   ├── apache/
-│   ├── composer/
-│   ├── git/
-│   ├── go/
-│   ├── mysql/
-│   ├── nginx/
-│   ├── nodejs/
-│   ├── php/
-│   ├── php-fpm/
-│   └── python/
-│   ├── ruby/
-└── public_html/
-    └── apache_web/
-        └── phpmyadmin/
-```
+| **NGINX**      | Nginx 1.28.0 |
+| **PHP**        | PHP 8.3.22 |
+| **PHP-FPM**    | PHP 8.3.22-nts |
+| **phpMyAdmin** | PHPMyAdmin 5.2.2 |
+| **MySQL**      | MySQL 8.4.5 |
+| **Apache**     | HTTPD 2.4.63 |
+| **NodeJS**     | Node 22.17.0 |
+| **Python**     | Python-3.13.5 |
+| **Git**        | MinGit 2.50.0 |
+| **Composer**   | Composer 2.8.9 |
+| **Go**         | Go 1.24.4 |
+| **Ruby**       | Ruby 3.4.4-2 |
 
 ---
 
