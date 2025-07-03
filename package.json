@@ -135,7 +135,7 @@
     "chokidar": "^4.0.3",
     "find-process": "^1.4.10",
     "http-proxy": "^1.18.1",
-    "localtunnel": "^1.8.3",
+    "localtunnel": "^2.0.2",
     "marked": "^15.0.12",
     "mysql2": "^3.14.1",
     "node-cron": "^4.1.1",

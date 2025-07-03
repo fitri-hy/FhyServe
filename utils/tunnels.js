@@ -50,22 +50,32 @@ async function startTunnel(id) {
     return tunnelData.url;
   }
 
-  const tunnelInstance = await localtunnel({ port: tunnelData.port });
+  try {
+    const tunnelInstance = await localtunnel({ port: tunnelData.port });
 
-  tunnelInstance.on('close', () => {
+    tunnelInstance.on('close', () => {
+      tunnels[id].tunnelInstance = undefined;
+      tunnels[id].status = 'STOPPED';
+      tunnels[id].url = null;
+      saveTunnels();
+    });
+
+    tunnels[id].tunnelInstance = tunnelInstance;
+    tunnels[id].status = 'RUNNING';
+    tunnels[id].url = tunnelInstance.url;
+    saveTunnels();
+
+    return tunnelInstance.url;
+
+  } catch (err) {
     tunnels[id].tunnelInstance = undefined;
-    tunnels[id].status = 'STOPPED';
+    tunnels[id].status = 'ERROR';
     tunnels[id].url = null;
     saveTunnels();
-  });
 
-  tunnels[id].tunnelInstance = tunnelInstance;
-  tunnels[id].status = 'RUNNING';
-  tunnels[id].url = tunnelInstance.url;
-
-  saveTunnels();
-
-  return tunnelInstance.url;
+    console.error(`Failed to start tunnel for id ${id}:`, err.message);
+    throw new Error(`Failed to connect to LocalTunnel: ${err.message}`);
+  }
 }
 
 function stopTunnel(id) {
