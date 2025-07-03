@@ -111,7 +111,7 @@ FhyServe/
 │   ├── go/
 │   ├── mysql/
 │   ├── nginx/
-│   ├── nidejs/
+│   ├── nodejs/
 │   ├── php/
 │   ├── php-fpm/
 │   └── python/

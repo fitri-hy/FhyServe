@@ -1,6 +1,9 @@
 const { app, dialog, shell, Menu } = require('electron');
 const axios = require('axios');
 const { checkForUpdates } = require('../../utils/checkUpdate');
+const { backupResources } = require('../../utils/backupResource');
+const { importResources } = require('../../utils/importResource');
+const { stopAllTunnels } = require('../../utils/tunnels');
 const { createDocsWindow } = require('../docsWindow');
 const { stopApache } = require('../../runtime/apache');
 const { stopMysql } = require('../../runtime/mysql');
@@ -20,7 +23,8 @@ async function stopAllServices() {
     stopPython(),
     stopGoServer(),
     stopCmd(),
-    stopAllCronJobs()
+    stopAllCronJobs(),
+	stopAllTunnels(),
   ]);
 }
 
@@ -59,6 +63,23 @@ function createMainMenu(win) {
         { role: 'quit' },
       ],
     },
+	{
+	  label: 'Resources',
+      submenu: [
+		{
+		  label: 'Backup',
+		  click: () => {
+		    backupResources(win);
+		  }
+		},
+		{
+		  label: 'Import',
+		  click: () => {
+		    importResources(win);
+		  }
+		},
+      ],
+	},
 	{
 	  label: 'Documentation',
 	  click: () => {
