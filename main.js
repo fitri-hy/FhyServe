@@ -1,6 +1,7 @@
 const { app, BrowserWindow } = require('electron');
 const { createWindow } = require('./screen/indexWindow');
 const { setupIPC } = require('./utils/ipc');
+const { stopAllTunnels } = require('./utils/tunnels');
 const { createMainMenu, checkForUpdates } = require('./screen/menu/mainMenu');
 const { setApacheMain, stopApache } = require('./runtime/apache');
 const { setMysqlMain, stopMysql } = require('./runtime/mysql');
@@ -80,6 +81,7 @@ app.on('before-quit', async (event) => {
     await stopAllCronJobs();
     await stopCmd();
     await stopAllCronJobs();
+	await stopAllTunnels();
 
     app.exit(0);
   } catch (err) {

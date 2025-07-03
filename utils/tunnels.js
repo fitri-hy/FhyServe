@@ -127,6 +127,19 @@ function getAllTunnels() {
   }));
 }
 
+async function stopAllTunnels() {
+  const allTunnels = getAllTunnels();
+  for (const t of allTunnels) {
+    if (t.status === 'RUNNING') {
+      try {
+        await stopTunnel(t.id);
+      } catch (err) {
+        console.error(`Failed to stop tunnel ${t.id}:`, err);
+      }
+    }
+  }
+}
+
 loadTunnels();
 
 module.exports = {
@@ -135,4 +148,5 @@ module.exports = {
   createTunnel,
   deleteTunnel,
   getAllTunnels,
+  stopAllTunnels,
 };
