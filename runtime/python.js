@@ -9,7 +9,7 @@ const { getBasePath, isDevelopment } = require('../utils/pathResource');
 const { getPORT } = require('../utils/port');
 const { getWATCHER } = require('../utils/watcher');
 
-const BASE_PORT = getPORT('PYTHON_PORT');
+const BASE_PORT = getPORT('PYHTON_PORT');
 const CHOKIDAR = getWATCHER('WATCHER');
 
 let pythonProcesses = {};
