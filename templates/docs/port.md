@@ -11,7 +11,7 @@
 	  "PHP_FPM_PORT": 1111,
 	  "MYSQL_PORT": 3306,
 	  "NODEJS_PORT": 2999,
-	  "PYHTON_PORT": 4000
+	  "PYTHON_PORT": 4000
 	}
 	```
 
