@@ -5,68 +5,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<title>FhyServe</title>
 	<link href="./css/styles.css" rel="stylesheet" />
-	<style>
-		::-webkit-scrollbar {
-		  width: 6px;
-		  height: 6px;
-		}
-
-		::-webkit-scrollbar-track {
-		  background: var(--scrollbar-track);
-		  border-radius: 10px;
-		}
-
-		::-webkit-scrollbar-thumb {
-		  background-color: var(--scrollbar-thumb);
-		  border-radius: 10px;
-		  border: 2px solid var(--scrollbar-track);
-		}
-
-		* {
-		  scrollbar-width: thin;
-		  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-		}
-
-		:root {
-		  --scrollbar-track: #f1f1f1;
-		  --scrollbar-thumb: #888;
-		}
-
-		@media (prefers-color-scheme: dark) {
-		  :root {
-			--scrollbar-track: #2d2d2d;
-			--scrollbar-thumb: #555;
-		  }
-		}
-		
-		@keyframes spin-slow {
-			0% {
-				transform: rotate(0deg);
-			}
-			100% {
-				transform: rotate(360deg);
-			}
-		}
-	  
-		.animate-spin-slow {
-			animation: spin-slow 1.75s linear infinite;
-		}
-
-		@keyframes fadeInUp {
-			0% {
-				opacity: 0;
-				transform: translateY(10px);
-			}
-			100% {
-				opacity: 1;
-				transform: translateY(0);
-			}
-		}
-		
-		.animate-fade-in-up {
-			animation: fadeInUp 0.8s ease forwards;
-		}
-	</style>
 </head>
 <body class="flex bg-gray-50 gap-4 dark:bg-neutral-900 text-gray-700 dark:text-gray-100">
 	
@@ -363,7 +301,7 @@
 					<div id="menu-cmd-info" class="dropdown-menu hidden absolute top-6 right-0 z-40 w-96 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded shadow-md p-2 text-xs">
 						<h2 class="text-lg font-bold text-center pb-2 border-b border-gray-200 dark:border-neutral-800 mb-2">Custom Commands</h2>
 						<ul class="list-disc pl-5 prose-sm dark:prose-invert">
-						<li><code class="text-emerald-600 font-semibold">go default</code> set default config (rerun app is required).</li>
+						<li><code class="text-emerald-600 font-semibold">go default</code> set default config web server (Restart).</li>
 						<li><code class="text-emerald-600 font-semibold">go apache_web</code> go to Apache root directory.</li>
 						<li><code class="text-emerald-600 font-semibold">go nginx_web</code> go to Nginx root directory.</li>
 						<li><code class="text-emerald-600 font-semibold">go node_web</code> go to NodeJS root directory.</li>
@@ -586,133 +524,6 @@
 	</div>
 	
 	<script src="./js/chart.js"></script>
-	<script>
-		const cpuChart = new Chart(ctxCpu, {
-		  type: 'line',
-		  data: {
-			labels: [],
-			datasets: [{
-			  label: 'CPU Usage',
-			  data: [],
-			  borderColor: 'rgba(255, 99, 132, 1)',
-			  borderWidth: 2,
-			  backgroundColor: 'rgba(255, 99, 132, 0.2)',
-			  tension: 0.1
-			}]
-		  },
-		  options: {
-			responsive: true,
-			scales: {
-			  x: {
-				display: true,
-				title: {
-				  display: true,
-				  text: 'Time'
-				}
-			  },
-			  y: {
-				beginAtZero: true,
-				display: true,
-				title: {
-				  display: true,
-				  text: 'Usage (%)'
-				}
-			  }
-			},
-			plugins: {
-			  legend: {
-				display: true,
-				position: 'top'
-			  }
-			}
-		  }
-		});
-
-		const ramChart = new Chart(ctxRam, {
-		  type: 'line',
-		  data: {
-			labels: [],
-			datasets: [{
-			  label: 'RAM Usage',
-			  data: [],
-			  borderColor: 'rgba(54, 162, 235, 1)',
-			  borderWidth: 2,
-			  backgroundColor: 'rgba(54, 162, 235, 0.2)',
-			  tension: 0.1
-			}]
-		  },
-		  options: {
-			responsive: true,
-			scales: {
-			  x: {
-				display: true,
-				title: {
-				  display: true,
-				  text: 'Time'
-				}
-			  },
-			  y: {
-				beginAtZero: true,
-				display: true,
-				title: {
-				  display: true,
-				  text: 'Usage (%)'
-				}
-			  }
-			},
-			plugins: {
-			  legend: {
-				display: true,
-				position: 'top'
-			  }
-			}
-		  }
-		});
-
-		const diskChart = new Chart(ctxDisk, {
-		  type: 'line',
-		  data: {
-			labels: [],
-			datasets: [{
-			  label: 'Disk Usage',
-			  data: [],
-			  borderColor: 'rgba(75, 192, 192, 1)',
-			  borderWidth: 2,
-			  backgroundColor: 'rgba(75, 192, 192, 0.2)',
-			  tension: 0.1
-			}]
-		  },
-		  options: {
-			responsive: true,
-			scales: {
-			  x: {
-				display: true,
-				title: {
-				  display: true,
-				  text: 'Time'
-				}
-			  },
-			  y: {
-				beginAtZero: true,
-				display: true,
-				title: {
-				  display: true,
-				  text: 'Usage (%)'
-				}
-			  }
-			},
-			plugins: {
-			  legend: {
-				display: true,
-				position: 'top'
-			  }
-			}
-		  }
-		});
-	</script>
-	<script>
-		setInterval(updateCharts, 500);
-	</script>
 	<script src="./js/renderer.js"></script>
 	<script src="./js/app.js"></script>
 </body>

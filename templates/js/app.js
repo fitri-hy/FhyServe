@@ -30,7 +30,6 @@ async function sendRequest() {
 
   let headers = {};
 
-  // Parse headers
   if (headersText) {
     try {
       headers = JSON.parse(headersText);
@@ -42,7 +41,6 @@ async function sendRequest() {
 
   let options = { method, headers };
 
-  // Handle body if needed
   if (method !== 'GET' && method !== 'DELETE' && bodyText) {
     try {
       options.body = JSON.stringify(JSON.parse(bodyText));
@@ -74,3 +72,129 @@ async function sendRequest() {
     responseBox.textContent = 'Error:\n' + error.message;
   }
 }
+
+// Chart
+const cpuChart = new Chart(ctxCpu, {
+  type: 'line',
+  data: {
+	labels: [],
+	datasets: [{
+	  label: 'CPU Usage',
+	  data: [],
+	  borderColor: 'rgba(255, 99, 132, 1)',
+	  borderWidth: 2,
+	  backgroundColor: 'rgba(255, 99, 132, 0.2)',
+	  tension: 0.1
+	}]
+  },
+  options: {
+	responsive: true,
+	scales: {
+	  x: {
+		display: true,
+		title: {
+		  display: true,
+		  text: 'Time'
+        }
+	  },
+	  y: {
+        beginAtZero: true,
+        display: true,
+        title: {
+          display: true,
+          text: 'Usage (%)'
+        }
+	  }
+	},
+	plugins: {
+	  legend: {
+        display: true,
+        position: 'top'
+	  }
+	}
+  }
+});
+
+const ramChart = new Chart(ctxRam, {
+  type: 'line',
+  data: {
+	labels: [],
+	datasets: [{
+	  label: 'RAM Usage',
+	  data: [],
+	  borderColor: 'rgba(54, 162, 235, 1)',
+	  borderWidth: 2,
+	  backgroundColor: 'rgba(54, 162, 235, 0.2)',
+	  tension: 0.1
+	}]
+  },
+  options: {
+	responsive: true,
+	scales: {
+	  x: {
+        display: true,
+        title: {
+          display: true,
+          text: 'Time'
+        }
+	  },
+	  y: {
+        beginAtZero: true,
+        display: true,
+        title: {
+          display: true,
+          text: 'Usage (%)'
+        }
+	  }
+	},
+	plugins: {
+	  legend: {
+        display: true,
+        position: 'top'
+	  }
+	}
+  }
+});
+
+const diskChart = new Chart(ctxDisk, {
+  type: 'line',
+  data: {
+	labels: [],
+	datasets: [{
+	  label: 'Disk Usage',
+	  data: [],
+	  borderColor: 'rgba(75, 192, 192, 1)',
+	  borderWidth: 2,
+	  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+	  tension: 0.1
+	}]
+  },
+  options: {
+	responsive: true,
+	scales: {
+	  x: {
+        display: true,
+        title: {
+          display: true,
+          text: 'Time'
+        }
+	  },
+	  y: {
+        beginAtZero: true,
+        display: true,
+        title: {
+          display: true,
+          text: 'Usage (%)'
+        }
+	  }
+	},
+	plugins: {
+	  legend: {
+        display: true,
+        position: 'top'
+	  }
+	}
+  }
+});
+
+setInterval(updateCharts, 500);
