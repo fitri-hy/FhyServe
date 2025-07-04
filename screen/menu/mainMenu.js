@@ -13,6 +13,7 @@ const { stopPython } = require('../../runtime/python');
 const { stopGoServer } = require('../../runtime/go');
 const { stopCmd } = require('../../runtime/cmd');
 const { stopAllCronJobs } = require('../../runtime/cronjob');
+const { createBrowserWindow } = require('../../screen/browserWindow');
 
 async function stopAllServices() {
   await Promise.all([
@@ -114,6 +115,12 @@ function createMainMenu(win) {
 		},
       ],
     },
+	{
+	  label: 'Browser',
+	  click: () => {
+	    createBrowserWindow();
+	  },
+	},
   ];
 
   const menu = Menu.buildFromTemplate(template);
