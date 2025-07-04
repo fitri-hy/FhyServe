@@ -86,9 +86,14 @@ function startPhpFpm() {
   
   updatePhpFpmIni();
 
+  const env = { ...process.env };
+  const phpPath = path.join(basePath, 'resources', 'php-fpm');
+  env.PATH = `${phpPath};${env.PATH}`;
+
   phpFpmProcess = spawn(phpFpmPath, ['-b', `127.0.0.1:${PHP_FPM_PORT}`], {
     cwd: path.dirname(phpFpmPath),
     stdio: ['ignore', 'pipe', 'pipe'],
+	env,
   });
 
   phpFpmProcess.stdout?.on('data', data => logToRenderer(`[php-fpm] ${data.toString()}`));

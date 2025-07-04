@@ -226,9 +226,13 @@ async function startApache(port = PORT) {
 
   updateApacheConfig(port);
 
+  const env = { ...process.env };
+  env.PATH = `${phpPath};${env.PATH}`;
+  
   apacheProcess = spawn(apachePath, [], {
     cwd: apacheCwd,
     stdio: ['ignore', 'pipe', 'pipe'],
+	env,
   });
 
   apacheProcess.stdout?.on('data', (data) => logToRenderer(data.toString()));
