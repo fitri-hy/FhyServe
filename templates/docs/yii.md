@@ -1,10 +1,10 @@
-## Slim Installation
+## Yii Installation
 
 1. Open **FhyServe** and go to the **PACK INSTALLER** menu.
 2. Configure installation:
 
    * **Installation Location**: `public_html/apache_web` or `public_html/nginx_web`
-   * **Choose a Packing**: Slim
+   * **Choose a Packing**: Yii
    * **Select Version**: Latest
    * Click **Install**
    
@@ -12,9 +12,9 @@
 4. Type in CMD:
 
    * `go apache_web` for Apache or `go nginx_web` for Nginx
-   * `cd slim`
+   * `cd yii`
    * `composer install`
    * `composer dump-autoload`
    
 5. Next, Enable the service according to the installation location (Apache or Nginx)
-6. Go to `https://localhost:PORT/slim/public` to start the Slim site.
+6. Go to `https://localhost:PORT/yii/web` to start the yii site.
