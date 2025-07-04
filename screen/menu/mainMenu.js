@@ -48,9 +48,10 @@ function createMainMenu(win) {
           accelerator: process.platform === 'darwin' ? 'Cmd+Ctrl+F' : 'F11',
           click: () => win.setFullScreen(!win.isFullScreen()),
         },
+		{ role: 'reload' },
         {
           label: 'Restart',
-          accelerator: process.platform === 'darwin' ? 'Cmd+R' : 'Ctrl+R',
+          accelerator: process.platform === 'darwin' ? 'Cmd+Shift+R' : 'Ctrl+Shift+R',
           click: () => {
             restartApp();
           }

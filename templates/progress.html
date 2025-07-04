@@ -5,30 +5,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<title>Progress</title>
 	<link href="./css/styles.css" rel="stylesheet" />
-	<style>
-	  progress#progressBar::-webkit-progress-bar {
-		background-color: #d1fae5;
-	  }
-	  progress#progressBar::-webkit-progress-value {
-		background-color: #10b981;
-	  }
-
-	  progress#progressBar::-moz-progress-bar {
-		background-color: #10b981;
-	  }
-	  
-	  .dark progress#progressBar::-webkit-progress-bar {
-	    background-color: #166534;
-	  }
-
-	  .dark progress#progressBar::-webkit-progress-value {
-	    background-color: #16a34a;
-	  }
-
-	  .dark progress#progressBar::-moz-progress-bar {
-	    background-color: #16a34a;
-	  }
-	</style>
 </head>
 <body class="bg-white dark:bg-neutral-950 text-gray-700 dark:text-gray-100 w-full h-screen flex flex-col gap-4 justify-center items-center">
 	<main class="w-full flex flex-col gap-2 items-center justify-center p-4">
@@ -46,6 +22,7 @@
       percentText.innerHTML = `Progress: <span class="font-bold text-emerald-500 dark:text-emerald-500">${percent}%</span>. Please wait...`;
       progressBar.value = percent;
     });
+	
     function sendHeight() {
       const body = document.body;
       const height = body.scrollHeight;

@@ -5,41 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Documentation</title>
   <link href="./css/styles.css" rel="stylesheet" />
-  <style>
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: var(--scrollbar-track);
-      border-radius: 10px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background-color: var(--scrollbar-thumb);
-      border-radius: 10px;
-      border: 2px solid var(--scrollbar-track);
-    }
-    * {
-      scrollbar-width: thin;
-      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-    }
-    :root {
-      --scrollbar-track: #f1f1f1;
-      --scrollbar-thumb: #888;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --scrollbar-track: #2d2d2d;
-        --scrollbar-thumb: #555;
-      }
-    }
-  </style>
 </head>
 <body class="p-3 flex gap-3 h-screen w-full bg-gray-50 dark:bg-neutral-800 text-gray-700 dark:text-gray-200 text-sm">
 
   <div class="flex-none w-52 flex flex-col p-2 bg-white dark:bg-neutral-900 border border-gray-200/60 dark:border-neutral-700/60 overflow-y-auto rounded">
     <div id="tab-list" class="space-y-1">
-      <button onclick="Tab('introduction')" class="tab-btn px-2 py-1 border-l-4 border-green-500 dark:border-green-700 w-full text-left">Introduction</button>
+      <p class="font-semibold pb-1 text-xs">General</p>
+	  <button onclick="Tab('introduction')" class="tab-btn px-2 py-1 border-l-4 border-green-500 dark:border-green-700 w-full text-left">Introduction</button>
       <button onclick="Tab('apache')" class="tab-btn px-2 py-1 border-l-4 border-gray-100 dark:border-neutral-900 hover:border-green-500 dark:hover:border-green-700 w-full text-left">Apache</button>
       <button onclick="Tab('nginx')" class="tab-btn px-2 py-1 border-l-4 border-gray-100 dark:border-neutral-900 hover:border-green-500 dark:hover:border-green-700 w-full text-left">Nginx</button>
       <button onclick="Tab('nodejs')" class="tab-btn px-2 py-1 border-l-4 border-gray-100 dark:border-neutral-900 hover:border-green-500 dark:hover:border-green-700 w-full text-left">NodeJS</button>
@@ -51,6 +23,11 @@
 	  <button onclick="Tab('env')" class="tab-btn px-2 py-1 border-l-4 border-gray-100 dark:border-neutral-900 hover:border-green-500 dark:hover:border-green-700 w-full text-left">ENV</button>
  	  <button onclick="Tab('watcher')" class="tab-btn px-2 py-1 border-l-4 border-gray-100 dark:border-neutral-900 hover:border-green-500 dark:hover:border-green-700 w-full text-left">Watcher</button>
  	  <button onclick="Tab('ftp')" class="tab-btn px-2 py-1 border-l-4 border-gray-100 dark:border-neutral-900 hover:border-green-500 dark:hover:border-green-700 w-full text-left">FTP</button>
+      <p class="font-semibold pt-4 pb-1 text-xs">Pack Installer</p>
+ 	  <button onclick="Tab('wordpress')" class="tab-btn px-2 py-1 border-l-4 border-gray-100 dark:border-neutral-900 hover:border-green-500 dark:hover:border-green-700 w-full text-left">Wordpress</button>
+ 	  <button onclick="Tab('joomla')" class="tab-btn px-2 py-1 border-l-4 border-gray-100 dark:border-neutral-900 hover:border-green-500 dark:hover:border-green-700 w-full text-left">Joomla</button>
+ 	  <button onclick="Tab('laravel')" class="tab-btn px-2 py-1 border-l-4 border-gray-100 dark:border-neutral-900 hover:border-green-500 dark:hover:border-green-700 w-full text-left">Laravel</button>
+ 	  <button onclick="Tab('codeIgniter')" class="tab-btn px-2 py-1 border-l-4 border-gray-100 dark:border-neutral-900 hover:border-green-500 dark:hover:border-green-700 w-full text-left">CodeIgniter</button>
    </div>
   </div>
 
