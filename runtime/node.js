@@ -11,6 +11,8 @@ const { getWATCHER } = require('../utils/watcher');
 
 const BASE_PORT = getPORT('NODEJS_PORT');
 const CHOKIDAR = getWATCHER('WATCHER');
+const RESTART_DEBOUNCE = {};
+
 
 let watcher = null;
 
@@ -76,50 +78,55 @@ function extractPortFromScript(scriptPath) {
 }
 
 async function restartProject(projectName) {
-  if (projectName === 'main') {
-    const mainScript = serverCwd;
-    logToRenderer(formatLog('main', 'Restarting main process due to file changes...'));
+  if (RESTART_DEBOUNCE[projectName]) {
+    clearTimeout(RESTART_DEBOUNCE[projectName]);
+  }
+  RESTART_DEBOUNCE[projectName] = setTimeout(async () => {
+    if (projectName === 'main') {
+      const mainScript = serverCwd;
+      logToRenderer(formatLog('main', 'Restarting main process due to file changes...'));
 
-    const subProjects = scanSubProjects().sort();
-    const projectPorts = {};
-    for (const proj of subProjects) {
-      if (proj === 'main') continue;
+      const subProjects = scanSubProjects().sort();
+      const projectPorts = {};
+      for (const proj of subProjects) {
+        if (proj === 'main') continue;
+
+        const scriptPath = isDevelopment()
+          ? path.join(basePath, 'public_html', 'node_web', proj, 'index.js')
+          : path.join(basePath, 'resources', 'public_html', 'node_web', proj, 'index.js');
+
+        const port = extractPortFromScript(scriptPath);
+        if (port) projectPorts[proj] = port;
+      }
+      const portsArg = JSON.stringify(projectPorts);
+
+      try {
+        await startProcess('main', mainScript, BASE_PORT, path.dirname(mainScript), true, portsArg);
+      } catch (err) {
+        logToRenderer(formatLog('main', `Failed to restart main: ${err.message}`));
+      }
+    } else {
 
       const scriptPath = isDevelopment()
-        ? path.join(basePath, 'public_html', 'node_web', proj, 'index.js')
-        : path.join(basePath, 'resources', 'public_html', 'node_web', proj, 'index.js');
+        ? path.join(basePath, 'public_html', 'node_web', projectName, 'index.js')
+        : path.join(basePath, 'resources', 'public_html', 'node_web', projectName, 'index.js');
+
+      if (!fs.existsSync(scriptPath)) return;
 
       const port = extractPortFromScript(scriptPath);
-      if (port) projectPorts[proj] = port;
+      if (!port) {
+        logToRenderer(formatLog(projectName, 'Port not found in index.js, skipping restart.'));
+        return;
+      }
+
+      logToRenderer(formatLog(projectName, 'Restarting due to file changes...'));
+      try {
+        await startProcess(projectName, scriptPath, port, path.dirname(scriptPath), true);
+      } catch (err) {
+        logToRenderer(formatLog(projectName, `Failed to restart: ${err.message}`));
+      }
     }
-    const portsArg = JSON.stringify(projectPorts);
-
-    try {
-      await startProcess('main', mainScript, BASE_PORT, path.dirname(mainScript), true, portsArg);
-    } catch (err) {
-      logToRenderer(formatLog('main', `Failed to restart main: ${err.message}`));
-    }
-  } else {
-
-    const scriptPath = isDevelopment()
-      ? path.join(basePath, 'public_html', 'node_web', projectName, 'index.js')
-      : path.join(basePath, 'resources', 'public_html', 'node_web', projectName, 'index.js');
-
-    if (!fs.existsSync(scriptPath)) return;
-
-    const port = extractPortFromScript(scriptPath);
-    if (!port) {
-      logToRenderer(formatLog(projectName, 'Port not found in index.js, skipping restart.'));
-      return;
-    }
-
-    logToRenderer(formatLog(projectName, 'Restarting due to file changes...'));
-    try {
-      await startProcess(projectName, scriptPath, port, path.dirname(scriptPath), true);
-    } catch (err) {
-      logToRenderer(formatLog(projectName, `Failed to restart: ${err.message}`));
-    }
-  }
+  }, 1000);
 }
 
 function watchSubProjects() {
