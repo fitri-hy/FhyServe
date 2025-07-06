@@ -24,22 +24,44 @@ const nginxConfPath = path.join(nginxCwd, 'conf', 'nginx.conf');
 const phpFpmPath = path.join(basePath, 'resources', 'php-fpm', 'php-cgi.exe');
 const phpFpmIniPath = path.join(basePath, 'resources', 'php-fpm', 'php.ini');
 
+/**
+ * Sets the main window reference for the Nginx service.
+ * 
+ * @param {BrowserWindow} win - The Electron BrowserWindow instance to use for communication.
+ */
 function setNginxMain(win) {
   mainWindow = win;
 }
 
+/**
+ * Ensures a directory exists, creating it if necessary.
+ * 
+ * @param {string} dirPath - Path to the directory to check/create.
+ */
 const ensureDirExists = (dirPath) => {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
 };
 
+/**
+ * Logs a message to the renderer process.
+ * 
+ * @param {string} message - The message to be sent to the renderer process.
+ * This message is associated with the 'nginx' service.
+ */
 function logToRenderer(message) {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('service-log', { service: 'nginx', message });
   }
 }
-
+/**
+ * Enables a specific PHP extension in the php.ini configuration file.
+ * 
+ * @param {string} phpIniPath - Absolute path to the php.ini configuration file
+ * @param {string} extensionName - Name of the PHP extension to enable
+ * @returns {void}
+ */
 function enablePhpExtension(phpIniPath, extensionName) {
   try {
     let iniContent = fs.readFileSync(phpIniPath, 'utf8');
@@ -63,6 +85,12 @@ function enablePhpExtension(phpIniPath, extensionName) {
   }
 }
 
+/**
+ * Updates the PHP-FPM configuration by enabling required extensions.
+ * This ensures all necessary PHP functionality is available for the web server.
+ * 
+ * @returns {void}
+ */
 function updatePhpFpmIni() {
   const extensions = ['mysqli', 'openssl', 'pdo_mysql', 'curl', 'fileinfo', 'zip', 'intl', 'mbstring'];
 
@@ -71,19 +99,45 @@ function updatePhpFpmIni() {
   });
 }
 
+/**
+ * Sends the current Nginx service status to the renderer process.
+ * 
+ * @param {string} status - The current status of the Nginx service (e.g., 'RUNNING', 'STOPPED')
+ * @returns {void}
+ */
 function updateStatus(status) {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('nginx-status', status);
   }
 }
 
+/**
+ * Creates a promise that resolves after the specified delay.
+ * Useful for implementing pauses between operations.
+ * 
+ * @param {number} ms - The delay in milliseconds
+ * @returns {Promise<void>} A promise that resolves after the specified delay
+ */
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Starts the PHP-FPM server process.
+ * 
+ * This function launches the PHP FastCGI Process Manager with the configured port.
+ * It first updates the PHP-FPM configuration, sets up the environment with proper
+ * paths, and spawns the PHP-FPM process. The function also configures logging
+ * from stdout and stderr to be sent to the renderer process.
+ * 
+ * If the PHP-FPM process is already running, this function returns without
+ * taking any action to prevent duplicate instances.
+ * 
+ * @returns {void}
+ */
 function startPhpFpm() {
   if (phpFpmProcess) return;
-  
+
   updatePhpFpmIni();
 
   const env = { ...process.env };
@@ -93,7 +147,7 @@ function startPhpFpm() {
   phpFpmProcess = spawn(phpFpmPath, ['-b', `127.0.0.1:${PHP_FPM_PORT}`], {
     cwd: path.dirname(phpFpmPath),
     stdio: ['ignore', 'pipe', 'pipe'],
-	env,
+    env,
   });
 
   phpFpmProcess.stdout?.on('data', data => logToRenderer(`[php-fpm] ${data.toString()}`));
@@ -103,7 +157,21 @@ function startPhpFpm() {
     phpFpmProcess = null;
   });
 }
-
+/**
+ * Updates the Nginx configuration file to include a server block with the specified port.
+ * 
+ * This function reads the existing nginx.conf file, checks if the desired server block
+ * configuration already exists, and if not, adds it to the http block. The server block
+ * is configured with the appropriate document root, PHP-FPM settings, and listening port.
+ * 
+ * The function handles path normalization for cross-platform compatibility and ensures
+ * proper indentation in the configuration file.
+ * 
+ * @param {number} [port=PORT] - The port on which Nginx should listen. Defaults to the
+ *                               value of the PORT constant.
+ * @returns {void}
+ * @throws {Error} Logs errors to the renderer if file operations fail
+ */
 function updateNginxConfig(port = PORT) {
   try {
     if (!fs.existsSync(nginxConfPath)) return;
@@ -162,6 +230,13 @@ server {
 }
 
 
+/**
+ * Waits for the Nginx server to become ready and responsive.
+ * 
+ * @param {number} [port=PORT] - The port number to check for Nginx readiness
+ * @param {number} [timeout=5000] - Maximum time to wait in milliseconds
+ * @returns {Promise<boolean>} - Resolves to true if Nginx is ready, false otherwise
+ */
 async function waitForNginxReady(port = PORT, timeout = 5000) {
   const start = Date.now();
   while (Date.now() - start < timeout) {
@@ -181,9 +256,18 @@ async function waitForNginxReady(port = PORT, timeout = 5000) {
   return false;
 }
 
+/**
+ * Starts the Nginx server on the specified port.
+ * 
+ * This function handles directory creation, configuration updates,
+ * PHP-FPM initialization, and process management for Nginx.
+ * 
+ * @param {number} [port=PORT] - The port number on which Nginx will listen
+ * @returns {Promise<void>} - Resolves when the server has started or failed to start
+ */
 async function startNginx(port = PORT) {
   if (nginxProcess) return;
-  
+
   if (!isDevelopment()) {
     const logsPath = path.join(basePath, 'resources', 'nginx', 'logs');
     const tempPath = path.join(basePath, 'resources', 'nginx', 'temp');
@@ -221,9 +305,17 @@ async function startNginx(port = PORT) {
   }
 }
 
+/**
+ * Stops the Nginx server and associated PHP-FPM process.
+ * 
+ * This function identifies all running Nginx processes by name and
+ * terminates them, along with any PHP-FPM processes that were started.
+ * 
+ * @returns {Promise<boolean>} - Resolves to true if successful, false otherwise
+ */
 async function stopNginx() {
   logToRenderer('Stopping...');
-  
+
   if (phpFpmProcess) {
     phpFpmProcess.kill('SIGTERM');
     phpFpmProcess = null;
@@ -259,12 +351,26 @@ async function stopNginx() {
           }
         });
       }
-	  logToRenderer('Has stopped.');
+      logToRenderer('Has stopped.');
     });
   });
 }
-
-// Monitoring
+/**
+ * Gets the runtime statistics for the Nginx service.
+ * This function checks the global variable `nginxProcess` to determine if Nginx is running.
+ * If Nginx is not running, it returns an object indicating the stopped state.
+ * If Nginx is running, it uses `pidusage` to get CPU and memory usage, and returns detailed status information.
+ * If an error occurs while getting the status, it returns an object containing error information.
+ *
+ * @returns {Promise<Object>} An object containing the following fields:
+ *   - name {string} Service name, fixed as 'Nginx'
+ *   - pid {number} Nginx process ID (only when the service is running)
+ *   - cpu {string} CPU usage, formatted as '<number>%' (only when the service is running)
+ *   - memory {string} Memory usage, formatted as '<number> MB' (only when the service is running)
+ *   - port {number} Port number Nginx is listening on (only when the service is running)
+ *   - status {string} Service status, possible values are 'STOPPED', 'RUNNING', or 'ERROR'
+ *   - error {string} Error message (only when status is 'ERROR')
+ */
 async function getNginxStats() {
   if (!nginxProcess) {
     return {
@@ -292,4 +398,4 @@ async function getNginxStats() {
   }
 }
 
-module.exports = { startNginx, stopNginx, setNginxMain, getNginxStats  };
+module.exports = { startNginx, stopNginx, setNginxMain, getNginxStats };
