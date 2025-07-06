@@ -92,4 +92,4 @@ MIT License © 2025 – FhyLabs Team.
 Contributions are very welcome!.
 Please feel free to fork this repo, create an issue, or submit a pull request for new features or performance improvements 🚀
 
-Thank you for your support: [kelasfullstack.id & codepolitan](https://www.instagram.com/p/DLrgC-Eyxa3)
+Thank you for your support: [kelasfullstack.id](https://www.instagram.com/p/DLrgC-Eyxa3), [codepolitan](https://www.instagram.com/p/DLrgC-Eyxa3), [Aqsa-Jimmy](https://www.facebook.com/share/p/19YR5JbiTP/)
