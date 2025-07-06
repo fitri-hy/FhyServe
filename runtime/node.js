@@ -61,8 +61,13 @@ function getProjectNameFromPath(changedPath, baseDir) {
 
 function extractPortFromScript(scriptPath) {
   try {
-    const content = fs.readFileSync(scriptPath, 'utf8');
-    const match = content.match(/(?:const|let|var)\s+port\s*=\s*(\d+);?/i);
+    const fd = fs.openSync(scriptPath, 'r');
+    const buffer = Buffer.alloc(1024);
+    const bytesRead = fs.readSync(fd, buffer, 0, 1024, 0);
+    fs.closeSync(fd);
+    const content = buffer.toString('utf8', 0, bytesRead);
+
+    const match = content.match(/\b(?:const|let|var)\s+port\s*=\s*(\d+)\b/i);
     if (match) return parseInt(match[1], 10);
   } catch (err) {
     logToRenderer(`Failed to read port from ${scriptPath}: ${err.message}`);
@@ -74,16 +79,16 @@ async function restartProject(projectName) {
   if (projectName === 'main') {
     const mainScript = serverCwd;
     logToRenderer(formatLog('main', 'Restarting main process due to file changes...'));
-    
+
     const subProjects = scanSubProjects().sort();
     const projectPorts = {};
     for (const proj of subProjects) {
       if (proj === 'main') continue;
-	  
+
       const scriptPath = isDevelopment()
-	    ? path.join(basePath, 'public_html', 'node_web', proj, 'index.js')
-	    : path.join(basePath, 'resources', 'public_html', 'node_web', proj, 'index.js');
-		
+        ? path.join(basePath, 'public_html', 'node_web', proj, 'index.js')
+        : path.join(basePath, 'resources', 'public_html', 'node_web', proj, 'index.js');
+
       const port = extractPortFromScript(scriptPath);
       if (port) projectPorts[proj] = port;
     }
@@ -95,11 +100,11 @@ async function restartProject(projectName) {
       logToRenderer(formatLog('main', `Failed to restart main: ${err.message}`));
     }
   } else {
-	  
+
     const scriptPath = isDevelopment()
-	  ? path.join(basePath, 'public_html', 'node_web', projectName, 'index.js')
-	  : path.join(basePath, 'resources', 'public_html', 'node_web', projectName, 'index.js');
-	  
+      ? path.join(basePath, 'public_html', 'node_web', projectName, 'index.js')
+      : path.join(basePath, 'resources', 'public_html', 'node_web', projectName, 'index.js');
+
     if (!fs.existsSync(scriptPath)) return;
 
     const port = extractPortFromScript(scriptPath);
@@ -119,8 +124,8 @@ async function restartProject(projectName) {
 
 function watchSubProjects() {
   const nodeServerDir = isDevelopment()
-	? path.join(basePath, 'public_html', 'node_web' )
-	: path.join(basePath, 'resources', 'public_html', 'node_web');
+    ? path.join(basePath, 'public_html', 'node_web')
+    : path.join(basePath, 'resources', 'public_html', 'node_web');
 
   if (watcher) {
     watcher.close();
@@ -192,8 +197,8 @@ function watchSubProjects() {
 
 function scanSubProjects() {
   const nodeServerDir = isDevelopment()
-	? path.join(basePath, 'public_html', 'node_web' )
-	: path.join(basePath, 'resources', 'public_html', 'node_web',);
+    ? path.join(basePath, 'public_html', 'node_web')
+    : path.join(basePath, 'resources', 'public_html', 'node_web',);
   if (!fs.existsSync(nodeServerDir)) return [];
 
   return fs.readdirSync(nodeServerDir, { withFileTypes: true })
@@ -212,7 +217,7 @@ async function waitForReady(port, timeout = 5000) {
         req.setTimeout(1000, () => req.destroy());
       });
       if (res.statusCode === 200) return true;
-    } catch (_) {}
+    } catch (_) { }
     await delay(500);
   }
   return false;
@@ -287,7 +292,7 @@ async function startProcess(projectName, scriptPath, port, cwd, isRestart = fals
         processes[projectName] = { proc, port };
         sendProjectPortsUpdate();
         resolve();
-		logToRenderer(formatLog(projectName, 'Is running.'));
+        logToRenderer(formatLog(projectName, 'Is running.'));
       } else {
         updateStatus(projectName, 'ERROR');
         if (!isRestart) logToRenderer(formatLog(projectName, `Failed to start or respond.`));
@@ -316,11 +321,11 @@ async function startNodeServer() {
   const projectPorts = {};
   for (const proj of subProjects) {
     if (proj === 'main') continue;
-	
+
     const scriptPath = isDevelopment()
-	    ? path.join(basePath, 'public_html', 'node_web', proj, 'index.js')
-	    : path.join(basePath, 'resources', 'public_html', 'node_web', proj, 'index.js');
-		
+      ? path.join(basePath, 'public_html', 'node_web', proj, 'index.js')
+      : path.join(basePath, 'resources', 'public_html', 'node_web', proj, 'index.js');
+
     const port = extractPortFromScript(scriptPath);
     if (port) projectPorts[proj] = port;
   }
@@ -330,11 +335,11 @@ async function startNodeServer() {
 
   for (const proj of subProjects) {
     if (proj === 'main') continue;
-	
+
     const scriptPath = isDevelopment()
-	    ? path.join(basePath, 'public_html', 'node_web', proj, 'index.js')
-	    : path.join(basePath, 'resources', 'public_html', 'node_web', proj, 'index.js');
-		
+      ? path.join(basePath, 'public_html', 'node_web', proj, 'index.js')
+      : path.join(basePath, 'resources', 'public_html', 'node_web', proj, 'index.js');
+
     const port = extractPortFromScript(scriptPath);
     if (!port) {
       logToRenderer(formatLog(proj, `No valid port found in index.js, skipping...`));
