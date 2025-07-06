@@ -80,6 +80,29 @@ const createTab = (url, customId) => {
   webview.setAttribute('useragent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36');
   webviews.append(webview);
 
+  webview.isDomReady = false;
+
+  const updateNavButtons = () => {
+    backBtn.disabled = !webview.canGoBack();
+    forwardBtn.disabled = !webview.canGoForward();
+    backBtn.style.opacity = backBtn.disabled ? 0.4 : 1;
+    forwardBtn.style.opacity = forwardBtn.disabled ? 0.4 : 1;
+  };
+
+  webview.addEventListener('dom-ready', () => {
+    webview.isDomReady = true;
+    updateNavButtons();
+
+    if (activeTabId === id) {
+      setActiveTab(id);
+    }
+
+    saveTabs();
+  });
+
+  webview.addEventListener('did-navigate', updateNavButtons);
+  webview.addEventListener('did-navigate-in-page', updateNavButtons);
+
   const tabObj = { id, tab, webview, label, backBtn, forwardBtn };
   tabs.push(tabObj);
 
@@ -100,22 +123,14 @@ const createTab = (url, customId) => {
     e.stopPropagation();
     if (webview.canGoForward()) webview.goForward();
   };
-  reloadBtn.onclick = e => { e.stopPropagation(); webview.src = webview.src };
+  reloadBtn.onclick = e => { e.stopPropagation(); webview.reload(); };
   closeBtn.onclick = e => { e.stopPropagation(); closeTab(id) };
 
-  const updateNavButtons = () => {
-    backBtn.disabled = !webview.canGoBack();
-    forwardBtn.disabled = !webview.canGoForward();
-    backBtn.style.opacity = backBtn.disabled ? 0.4 : 1;
-    forwardBtn.style.opacity = forwardBtn.disabled ? 0.4 : 1;
-  };
-
-  webview.addEventListener('did-navigate', updateNavButtons);
-  webview.addEventListener('did-navigate-in-page', updateNavButtons);
-
   updateTabLabels();
-  if (!customId) setActiveTab(id);
-  saveTabs();
+
+  if (!customId) {
+    activeTabId = id; 
+  }
 };
 
 const closeTab = id => {
