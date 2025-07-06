@@ -1,6 +1,7 @@
 const $ = id => document.getElementById(id);
 const tabs = [], tabsContainer = $('tabs'), webviews = $('webviews-container');
 let activeTabId = null;
+let editingTabId = null;
 
 const updateTabLabels = () => tabs.forEach((t, i) => {
   t.label.textContent = `TAB-${i + 1}`;
@@ -62,6 +63,13 @@ const createTab = (url, customId) => {
   tabs.push(tabObj);
 
   tab.onclick = () => setActiveTab(id);
+  tab.ondblclick = e => {
+    e.stopPropagation();
+    editingTabId = id;
+    $('url-input').value = webview.src;
+    $('modal').classList.replace('hidden', 'flex');
+    $('url-input').focus();
+  };
   reloadBtn.onclick = e => { e.stopPropagation(); webview.src = webview.src };
   closeBtn.onclick = e => { e.stopPropagation(); closeTab(id) };
 
@@ -91,14 +99,30 @@ const loadTabs = () => {
 };
 
 $('add-tab-btn').onclick = () => { $('url-input').value = ''; $('modal').classList.replace('hidden', 'flex'); $('url-input').focus(); };
-$('cancel-btn').onclick = () => $('modal').classList.replace('flex', 'hidden');
+$('cancel-btn').onclick = () => {
+  $('modal').classList.replace('flex', 'hidden');
+  editingTabId = null;
+};
 $('open-btn').onclick = () => {
   try {
-const url = new URL($('url-input').value.trim());
-    createTab(url.href);
+    const url = new URL($('url-input').value.trim());
+    if (editingTabId) {
+      const tab = tabs.find(t => t.id === editingTabId);
+      if (tab) {
+        tab.webview.src = url.href;
+        saveTabs();
+      }
+      editingTabId = null;
+    } else {
+      createTab(url.href);
+    }
     $('cancel-btn').click();
-  } catch { alert('Invalid URL'); $('url-input').focus(); }
+  } catch {
+    alert('Invalid URL');
+    $('url-input').focus();
+  }
 };
+
 $('url-input').onkeydown = e => { if (e.key === 'Enter') $('open-btn').click(); };
 
 window.addEventListener('DOMContentLoaded', loadTabs);
