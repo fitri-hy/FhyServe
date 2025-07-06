@@ -77,6 +77,7 @@ contextBridge.exposeInMainWorld('cmdAPI', {
   sendCommand: (cmd) => ipcRenderer.send('cmd-send', cmd),
   onOutput: (callback) => ipcRenderer.on('cmd-output', (_e, data) => callback(data)),
   onStatus: (callback) => ipcRenderer.on('cmd-status', (_e, status) => callback(status)),
+  onClear: (callback) => ipcRenderer.on('cmd-clear', () => callback()),
 });
 
 // Log

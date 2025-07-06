@@ -312,6 +312,10 @@ window.cmdAPI.onOutput(data => {
   cmdWrapper.scrollTop = cmdWrapper.scrollHeight;
 });
 
+window.cmdAPI.onClear(() => {
+  cmdOutput.textContent = '';
+});
+
 cmdInput.addEventListener('keydown', e => {
   if (e.key === 'Enter' && cmdToggle.checked) {
     const command = cmdInput.value;

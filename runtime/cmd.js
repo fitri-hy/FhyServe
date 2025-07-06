@@ -9,6 +9,7 @@ const PATH_SYSTEM = getENV('PATH_SYSTEM');
 
 let cmdProcess = null;
 let mainWindow = null;
+let lastPrompt = '';
 
 const basePath = getBasePath();
 
@@ -59,8 +60,27 @@ function startCmd() {
   });
 
   cmdProcess.stdout.on('data', (data) => {
-    const msg = data.toString();
-    mainWindow?.webContents.send('cmd-output', msg);
+    const output = data.toString();
+    const lines = output.split(/\r?\n/);
+
+    for (let line of lines) {
+      line = line.trim();
+      if (line === '') continue;
+
+      if (/^echo\s+%cd%$/i.test(line)) continue;
+
+      if (/^[A-Z]:\\/.test(line)) {
+        lastPrompt = line.replace(/>+$/, '') + '>';
+       continue;
+      }
+
+      mainWindow?.webContents.send('cmd-output', line + '\n');
+    }
+
+    if (lastPrompt) {
+    mainWindow?.webContents.send('cmd-output', lastPrompt + ' ');
+      lastPrompt = '';
+    }
   });
 
   cmdProcess.stderr.on('data', (data) => {
@@ -94,6 +114,12 @@ function sendCommand(command, isSQL = false) {
 
   let cmd = command.trim();
   let targetPath = null;
+  
+  if (cmd === 'cls' || cmd === 'clear') {
+    mainWindow?.webContents.send('cmd-clear');
+    cmdProcess.stdin.write('echo %CD%\n');
+    return;
+  }
   
   switch (cmd) {
     case 'go apache_web':
@@ -136,7 +162,7 @@ function sendCommand(command, isSQL = false) {
     cmd += ';';
   }
 
-  cmdProcess.stdin.write(cmd + '\n');
+  cmdProcess.stdin.write(cmd + '\r\n');
 }
 
 // Monitoring
