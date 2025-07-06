@@ -18,6 +18,14 @@ const { ensureResources } = require("./runtime/resourceDownload");
 let mainWindow;
 let isAppClosing = false;
 let resourceAbortController = null;
+/**
+ * Main application initialization for Electron app
+ * 
+ * This file sets up the main electron process, initializes all services,
+ * handles resource downloading, and manages application lifecycle events.
+ * It ensures proper startup of all server processes (Apache, MySQL, Nginx, etc.)
+ * and their graceful shutdown when the application is closed.
+ */
 
 app.whenReady().then(() => {
   mainWindow = createWindow();
