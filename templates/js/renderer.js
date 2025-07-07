@@ -6,17 +6,22 @@ const sunIcon = `
 const moonIcon = `
 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M2 12C2 6.477 6.477 2 12 2c.463 0 .54.693.143.933a6.5 6.5 0 1 0 8.924 8.924c.24-.396.933-.32.933.143c0 1.138-.19 2.231-.54 3.25H22a.75.75 0 0 1 0 1.5H2a.75.75 0 0 1 0-1.5h.54A10 10 0 0 1 2 12m3 6.25a.75.75 0 0 0 0 1.5h14a.75.75 0 0 0 0-1.5zm3 3a.75.75 0 0 0 0 1.5h8a.75.75 0 0 0 0-1.5zM19.9 2.307a.483.483 0 0 0-.9 0l-.43 1.095a.48.48 0 0 1-.272.274l-1.091.432a.486.486 0 0 0 0 .903l1.091.432a.48.48 0 0 1 .272.273L19 6.81c.162.41.74.41.9 0l.43-1.095a.48.48 0 0 1 .273-.273l1.091-.432a.486.486 0 0 0 0-.903l-1.091-.432a.48.48 0 0 1-.273-.274z"/><path fill="currentColor" d="M16.033 8.13a.483.483 0 0 0-.9 0l-.157.399a.48.48 0 0 1-.272.273l-.398.158a.486.486 0 0 0 0 .903l.398.157c.125.05.223.148.272.274l.157.399c.161.41.739.41.9 0l.157-.4a.48.48 0 0 1 .272-.273l.398-.157a.486.486 0 0 0 0-.903l-.398-.158a.48.48 0 0 1-.272-.273z"/></svg>
 `;
-
+/**
+ * Theme Management Module
+ * Handles dark/light theme toggling, persistence, and UI updates
+ */
 function updateToggleIcon(isDark) {
   const btn = document.getElementById('toggle-btn');
   btn.innerHTML = isDark ? sunIcon : moonIcon;
 }
 
+// Initialize theme based on saved preference
 let isDark = localStorage.getItem('darkMode') === 'true';
 document.documentElement.classList.toggle('dark', isDark);
 window.themeAPI.setDarkMode(isDark);
 updateToggleIcon(isDark);
 
+// Theme toggle event handler
 document.getElementById('toggle-btn').addEventListener('click', () => {
   isDark = !isDark;
   document.documentElement.classList.toggle('dark', isDark);
@@ -25,13 +30,20 @@ document.getElementById('toggle-btn').addEventListener('click', () => {
   updateToggleIcon(isDark);
 });
 
+/**
+ * Logging System
+ * Captures service logs and displays them in the UI
+ */
 window.serviceAPI.onLog(({ service, message }) => {
   const prefix = `[${service.toUpperCase()}] `;
   logElement.textContent += '\n' + prefix + message.trim();
   logginWrapper.scrollTop = logginWrapper.scrollHeight;
 });
 
-// Dropdown
+/**
+ * Dropdown Menu Controller
+ * Manages visibility of dropdown menus throughout the application
+ */
 document.querySelectorAll('.dropdown-toggle').forEach(button => {
   button.addEventListener('click', () => {
     const dropdownId = button.getAttribute('data-dropdown');
@@ -47,6 +59,7 @@ document.querySelectorAll('.dropdown-toggle').forEach(button => {
   });
 });
 
+// Close dropdowns when clicking outside
 document.addEventListener('click', (e) => {
   if (!e.target.closest('.dropdown-toggle') && !e.target.closest('.dropdown-menu')) {
     document.querySelectorAll('.dropdown-menu').forEach(menu => {
@@ -55,7 +68,10 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Apache
+/**
+ * Apache Service Controller
+ * Handles Apache service operations and status display
+ */
 const statusText = document.getElementById('apache-status');
 const toggle = document.getElementById('apacheToggle');
 const logginWrapper = document.getElementById('logging-wrapper');
@@ -90,7 +106,10 @@ openFolderApache.addEventListener('click', async () => {
   }
 });
 
-// MySQL
+/**
+ * MySQL Service Controller
+ * Handles MySQL service operations and status display
+ */
 const mysqlStatusText = document.querySelector('#mysql-status');
 const mysqlToggle = document.querySelector('#mysqlToggle');
 
@@ -343,7 +362,12 @@ const cronStatus = document.getElementById('cronjob-status');
 
 cronToggle.checked = false;
 updateCronStatus(false);
-
+/**
+ * Loads and displays registered cronjobs from the API
+ * Populates the list element with job information or a message when no jobs exist
+ * @async
+ * @returns {Promise<void>}
+ */
 async function loadCronjobs() {
   const jobs = await window.cronAPI.read();
   list.innerHTML = '';
@@ -392,6 +416,11 @@ async function loadCronjobs() {
   });
 }
 
+/**
+ * Updates the cron service status indicator
+ * @param {boolean} isRunning - Whether the cron service is currently running
+ * @returns {void}
+ */
 function updateCronStatus(isRunning) {
   if (isRunning) {
     cronStatus.textContent = 'RUNNING';
@@ -404,6 +433,12 @@ function updateCronStatus(isRunning) {
   }
 }
 
+/**
+ * Handles form submission for creating a new cronjob
+ * Validates input and sends creation request to the API
+ * @param {Event} e - Form submission event
+ * @returns {void}
+ */
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
@@ -422,6 +457,11 @@ form.addEventListener('submit', (e) => {
   setTimeout(loadCronjobs, 300);
 });
 
+/**
+ * Handles toggling the cron service on/off
+ * Updates UI and sends appropriate API requests
+ * @returns {void}
+ */
 cronToggle.addEventListener('change', async () => {
   if (cronToggle.checked) {
     window.cronAPI.startAll();
@@ -432,9 +472,13 @@ cronToggle.addEventListener('change', async () => {
   }
 });
 
+// Initialize cronjob list
 loadCronjobs();
 
-// Monitoring
+/**
+ * Service monitoring visualization
+ * Creates and manages a chart to display CPU and RAM usage of services
+ */
 const ctx = document.getElementById('serviceChart').getContext('2d');
 const maxDataPoints = 30;
 const serviceData = {};
@@ -478,6 +522,12 @@ const chart = new Chart(ctx, {
   }
 });
 
+/**
+ * Fetches and displays service statistics
+ * Updates the monitoring table and chart with current service data
+ * @async
+ * @returns {Promise<void>}
+ */
 async function refreshServiceStats() {
   try {
     const stats = await window.monitoringAPI.getServiceStats();
@@ -485,10 +535,10 @@ async function refreshServiceStats() {
     container.innerHTML = '';
 
     stats.forEach(service => {
-	  const statusClass = service.status === 'RUNNING'
+      const statusClass = service.status === 'RUNNING'
         ? 'text-emerald-500'
         : 'text-rose-500';
-	  container.innerHTML += `
+      container.innerHTML += `
 		<tr>
 		  <td class="px-4 py-2 font-bold">${service.name}</td>
 		  <td class="px-4 py-2 font-semibold ${statusClass}">${service.status}</td>
@@ -554,8 +604,17 @@ async function refreshServiceStats() {
   }
 }
 
+// Start periodic refresh of service statistics
 setInterval(refreshServiceStats, 5000);
 refreshServiceStats();
+/**
+ * Auto Installer Module
+ * 
+ * Handles the installation of various CMS platforms into the server environment.
+ * Manages UI interactions, version selection, and installation progress tracking.
+ * 
+ * @module AutoInstaller
+ */
 
 // Auto Installer
 window.addEventListener('DOMContentLoaded', () => {
@@ -568,6 +627,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   progressBar.style.display = 'none';
 
+  /**
+   * Updates the version dropdown options based on selected CMS
+   * Populates version select with appropriate options for each CMS type
+   */
   function updateVersionOptions() {
     const cms = cmsSelect.value.toLowerCase();
 
@@ -646,6 +709,11 @@ window.addEventListener('DOMContentLoaded', () => {
   updateVersionOptions();
   cmsSelect.addEventListener('change', updateVersionOptions);
 
+  /**
+   * Handles the CMS installation process
+   * Manages UI state during installation, shows progress, and handles errors
+   * @async
+   */
   installButton.addEventListener('click', async () => {
     const cmsName = cmsSelect.value;
     const version = versionSelect.value || 'latest';
@@ -660,6 +728,11 @@ window.addEventListener('DOMContentLoaded', () => {
     statusText.textContent = `Starting installation of ${cmsName} version ${version} to public_html/${target}_web...`;
     progressBar.value = 0;
 
+    /**
+     * Progress handler callback for installation process
+     * @param {number} downloaded - Bytes downloaded
+     * @param {number} total - Total bytes to download
+     */
     const onProgressHandler = (downloaded, total) => {
       const percent = Math.round((downloaded / total) * 100);
       progressBar.value = percent;
@@ -686,13 +759,22 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-
-// Resource Download
+/**
+ * Resource Download Handler
+ * Manages UI updates during resource download and extraction processes
+ * Listens to progress events from the main process and updates the UI accordingly
+ */
 const loadingEl = document.getElementById('loading');
 const loadingMessage = document.getElementById('loading-message');
 
+/**
+ * Event handler for resource download/extraction progress updates
+ * @param {Object} progress - Progress information object
+ * @param {string} progress.status - Current status of the operation
+ * @param {string} progress.message - Human-readable progress message
+ */
 window.resourceDlAPI.onResourceProgress((progress) => {
-  switch(progress.status) {
+  switch (progress.status) {
     case 'download_start':
     case 'download_progress':
     case 'extracting':
@@ -709,8 +791,20 @@ window.resourceDlAPI.onResourceProgress((progress) => {
       break;
   }
 });
+/**
+ * Tunnels Management Module
+ * 
+ * This module provides functionality to create, manage, and monitor local tunnels
+ * for exposing local development servers to the public internet.
+ * It handles UI interactions for tunnel creation, starting/stopping tunnels,
+ * and displaying tunnel status information.
+ */
 
-// Tunnels
+/**
+ * Fetches the public IP address of the current machine
+ * @async
+ * @returns {Promise<string>} The public IP address or '-' if unavailable
+ */
 async function getPublicIP() {
   try {
     const res = await fetch('https://api.ipify.org?format=json');
@@ -726,13 +820,17 @@ window.addEventListener('DOMContentLoaded', () => {
   const createBtn = document.getElementById('createBtn');
   const tunnelsTableBody = document.getElementById('tunnelsTableBody');
 
+  /**
+   * Loads and displays all tunnels in the UI
+   * @async
+   */
   async function loadTunnels() {
     const tunnels = await window.tunnelAPI.getTunnels();
     tunnelsTableBody.innerHTML = '';
 
     const publicIP = await getPublicIP();
-	
-	if (tunnels.length === 0) {
+
+    if (tunnels.length === 0) {
       tunnelsTableBody.innerHTML = `
       <tr>
         <td colspan="5" class="text-center py-4">There are no tunnels available yet.</td>
@@ -743,7 +841,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     tunnels.forEach((tunnel) => {
       const tr = document.createElement('tr');
-	  tr.classList.add('border-b', 'border-gray-100', 'dark:border-neutral-800');
+      tr.classList.add('border-b', 'border-gray-100', 'dark:border-neutral-800');
 
       tr.innerHTML = `
         <td class="px-4 py-2 font-bold whitespace-nowrap">${tunnel.port}</td>
@@ -768,6 +866,15 @@ window.addEventListener('DOMContentLoaded', () => {
       tunnelsTableBody.appendChild(tr);
     });
 
+    // Set up event handlers for tunnel actions
+    setupTunnelActionHandlers();
+  }
+
+  /**
+   * Sets up event handlers for tunnel action buttons and URL copying
+   */
+  function setupTunnelActionHandlers() {
+    // Start tunnel button handler
     document.querySelectorAll('.startBtn').forEach((btn) => {
       btn.addEventListener('click', async () => {
         const id = btn.getAttribute('data-id');
@@ -776,6 +883,7 @@ window.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    // Stop tunnel button handler
     document.querySelectorAll('.stopBtn').forEach((btn) => {
       btn.addEventListener('click', async () => {
         const id = btn.getAttribute('data-id');
@@ -784,6 +892,7 @@ window.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    // Delete tunnel button handler
     document.querySelectorAll('.deleteBtn').forEach((btn) => {
       btn.addEventListener('click', async () => {
         const id = btn.getAttribute('data-id');
@@ -792,6 +901,7 @@ window.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    // Copy URL on click handler
     document.querySelectorAll('td:nth-child(3)').forEach((td) => {
       td.addEventListener('click', () => {
         const url = td.textContent;
@@ -804,6 +914,11 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  /**
+   * Handles the creation of a new tunnel
+   * Validates port input and checks for port conflicts before creation
+   * @async
+   */
   createBtn.addEventListener('click', async () => {
     const port = parseInt(portInput.value, 10);
     if (isNaN(port) || port <= 0) {
@@ -826,8 +941,8 @@ window.addEventListener('DOMContentLoaded', () => {
     } else {
       alert('Failed to create tunnel: ' + res.message);
     }
-});
+  });
 
-
+  // Initialize the tunnels list on page load
   loadTunnels();
 });
