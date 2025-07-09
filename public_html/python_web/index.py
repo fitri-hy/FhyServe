@@ -38,6 +38,7 @@ class Handler(BaseHTTPRequestHandler):
             projects = get_subprojects()
             response = {
                 'main': f"localhost:{port}",
+                'rootDirectory': f"public_html/python_web/*",
                 'projects': projects
             }
             self.wfile.write(json.dumps(response).encode('utf-8'))
