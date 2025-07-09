@@ -244,6 +244,13 @@ window.golangAPI.onStatus(({ project, status }) => {
   }
 });
 
+openFolderGo.addEventListener('click', async () => {
+  const result = await window.golangAPI.openGoFolder();
+  if (!result.success) {
+    alert('Failed to open folder: ' + result.message);
+  }
+});
+
 // Ruby
 const rubyStatusText = document.querySelector('#ruby-status');
 const rubyToggle = document.querySelector('#rubyToggle');
