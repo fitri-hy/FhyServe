@@ -19,7 +19,11 @@ let config = {
   GOLANG_PORT: 5000,
   RUBY_PORT: 4559,
 };
-
+/**
+ * Loads port configuration from the JSON config file
+ * If the file doesn't exist, keeps default port configuration values
+ * Logs warning or error messages as appropriate
+ */
 function loadConfig() {
   try {
     if (!fs.existsSync(configPath)) {
@@ -34,12 +38,19 @@ function loadConfig() {
   }
 }
 
+// Initialize configuration on startup
 loadConfig();
 
+// Watch for configuration file changes and reload when modified
 chokidar.watch(configPath).on('change', () => {
   loadConfig();
 });
 
+/**
+ * Retrieves port number for a specified service
+ * @param {string} portKey - The key identifying the service port (e.g. 'APACHE_PORT')
+ * @returns {number|null} - The port number or null if not found
+ */
 function getPORT(portKey) {
   if (!portKey) return null;
   return config[portKey] || null;

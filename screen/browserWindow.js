@@ -1,6 +1,16 @@
 const { BrowserWindow, nativeTheme } = require('electron');
 const path = require('path');
 
+/**
+ * Creates a new browser window for the application.
+ * 
+ * This function initializes a BrowserWindow with specific dimensions,
+ * constraints, and configuration settings. The window is set up with
+ * secure web preferences including context isolation and limited
+ * node integration for security.
+ * 
+ * @returns {BrowserWindow} The configured browser window instance
+ */
 function createBrowserWindow() {
   const win = new BrowserWindow({
     title: 'Browser',

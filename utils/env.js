@@ -13,6 +13,11 @@ let config = {
   PATH_SYSTEM: false,
 };
 
+/**
+ * Loads environment configuration from the specified JSON file
+ * If the file doesn't exist, uses default configuration values
+ * Logs appropriate warning or error messages
+ */
 function loadConfig() {
   try {
     if (!fs.existsSync(configPath)) {
@@ -27,12 +32,19 @@ function loadConfig() {
   }
 }
 
+// Initialize configuration on startup
 loadConfig();
 
+// Watch for configuration file changes and reload when modified
 chokidar.watch(configPath).on('change', () => {
   loadConfig();
 });
 
+/**
+ * Retrieves a specific environment variable from the loaded configuration
+ * @param {string} envKey - The key of the environment variable to retrieve
+ * @returns {*} The value of the environment variable or null if not found
+ */
 function getENV(envKey) {
   if (!envKey) return null;
   return envKey in config ? config[envKey] : null;

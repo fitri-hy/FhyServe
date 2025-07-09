@@ -1,3 +1,14 @@
+/**
+ * Electron Preload Script
+ * 
+ * This script serves as a secure bridge between the renderer process (web content) and 
+ * the main Electron process. It exposes a controlled set of APIs to the renderer using
+ * contextBridge, allowing the web content to communicate with native Electron features
+ * without having direct access to Node.js or Electron APIs, which enhances security.
+ * 
+ * Each exposed API corresponds to a specific service or functionality in the application,
+ * providing methods for starting/stopping services, handling events, and managing resources.
+ */
 const { contextBridge, ipcRenderer } = require('electron');
 
 let projectPorts = {};

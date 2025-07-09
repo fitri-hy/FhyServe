@@ -23,6 +23,12 @@ const requiredPublicHtmlFolders = [
   path.join('apache_web', 'phpmyadmin')
 ];
 
+/**
+ * Checks if specified folders exist in the base directory
+ * @param {string} base - Base directory path to check
+ * @param {string[]} folderList - List of folder names to check
+ * @returns {Promise<string[]>} - Array of missing folder paths (relative to base)
+ */
 async function folderExistsCheck(base, folderList) {
   const missing = [];
 
@@ -37,6 +43,17 @@ async function folderExistsCheck(base, folderList) {
   return missing;
 }
 
+/**
+ * Runs a backup worker in a separate thread
+ * @param {Object} data - Data to pass to the worker
+ * @param {string} data.resourcePath - Path to the resources directory
+ * @param {string} data.publicHtmlPath - Path to the public_html directory
+ * @param {string[]} data.requiredResourcesFolders - List of required resource folders
+ * @param {string[]} data.requiredPublicHtmlFolders - List of required public_html folders
+ * @param {string} data.tempZipPath - Path where temporary zip file will be created
+ * @param {Function} onProgress - Callback function for progress updates
+ * @returns {Promise<void>} - Resolves when backup is complete
+ */
 function runBackupWorker(data, onProgress) {
   return new Promise((resolve, reject) => {
     const worker = new Worker(path.join(__dirname, 'worker.js'), {
@@ -63,6 +80,11 @@ function runBackupWorker(data, onProgress) {
   });
 }
 
+/**
+ * Creates a modal progress window
+ * @param {BrowserWindow} parent - Parent window that will own this modal
+ * @returns {BrowserWindow} - The configured progress window instance
+ */
 function createProgressWindow(parent) {
   const progressWin = new BrowserWindow({
     width: 350,
@@ -87,7 +109,19 @@ function createProgressWindow(parent) {
 
   return progressWin;
 }
-
+/**
+ * Backs up application resources and public_html folders to a zip file
+ * 
+ * This function performs the following steps:
+ * 1. Validates that all required resource folders exist
+ * 2. Prompts the user to select a save location
+ * 3. Creates a temporary zip file using a worker thread
+ * 4. Copies the zip to the user-selected location
+ * 
+ * @param {BrowserWindow} win - The parent Electron window
+ * @returns {Promise<void>} - Resolves when backup completes or is cancelled
+ * @throws {Error} - If backup process fails
+ */
 async function backupResources(win) {
   let progressWin = null;
   try {

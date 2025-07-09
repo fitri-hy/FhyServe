@@ -12,6 +12,11 @@ let config = {
   CHECK_RESOURCE: true,
 };
 
+/**
+ * Loads configuration from the specified config file path
+ * If the file doesn't exist, keeps default configuration values
+ * Logs warning or error messages as appropriate
+ */
 function loadConfig() {
   try {
     if (!fs.existsSync(configPath)) {
@@ -26,12 +31,19 @@ function loadConfig() {
   }
 }
 
+// Initialize configuration on startup
 loadConfig();
 
+// Watch for configuration file changes and reload when modified
 chokidar.watch(configPath).on('change', () => {
   loadConfig();
 });
 
+/**
+ * Retrieves a specific configuration value by key
+ * @param {string} checkKey - The configuration key to retrieve
+ * @returns {*|null} - The configuration value or null if not found
+ */
 function getCheckResource(checkKey) {
   if (!checkKey) return null;
   return config[checkKey] || null;

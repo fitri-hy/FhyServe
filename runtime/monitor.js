@@ -9,6 +9,24 @@ const { getGoStats } = require('./go');
 const { getRubyStats } = require('./ruby');
 const si = require('systeminformation');
 
+/**
+ * Retrieves runtime statistics for all services.
+ * 
+ * This function collects status information from all services (Apache, CMD, MySQL, 
+ * Nginx, Node.js, Python, Go, and Ruby) by calling their respective stats functions.
+ * For each service, it attempts to get the current stats and handles any errors that
+ * might occur during the process.
+ * 
+ * @async
+ * @returns {Promise<Array<Object>>} An array of service status objects, each containing:
+ *   - name {string} The service name
+ *   - status {string} Current status ('RUNNING', 'STOPPED', or 'ERROR')
+ *   - pid {number} Process ID (only when service is running)
+ *   - cpu {string} CPU usage formatted as percentage (only when service is running)
+ *   - memory {string} Memory usage formatted in MB (only when service is running)
+ *   - port {string|number} Port the service is running on (only when service is running)
+ *   - error {string} Error message (only when status is 'ERROR')
+ */
 async function getServiceStats() {
   const result = [];
 
@@ -71,6 +89,13 @@ async function getServiceStats() {
   return result;
 }
 
+/**
+ * Gets the current CPU usage percentage.
+ * 
+ * @async
+ * @returns {Promise<number>} A promise that resolves with the current CPU load percentage
+ * @throws {Error} If there was an error retrieving CPU information
+ */
 function getCpuUsage() {
   return new Promise((resolve, reject) => {
     si.currentLoad()
@@ -79,6 +104,16 @@ function getCpuUsage() {
   });
 }
 
+/**
+ * Gets the current memory usage statistics.
+ * 
+ * @async
+ * @returns {Promise<Object>} A promise that resolves with memory usage data:
+ *   - total {number} Total memory in bytes
+ *   - free {number} Free memory in bytes
+ *   - used {number} Used memory in bytes
+ * @throws {Error} If there was an error retrieving memory information
+ */
 function getMemoryUsage() {
   return new Promise((resolve, reject) => {
     si.mem()
@@ -91,6 +126,16 @@ function getMemoryUsage() {
   });
 }
 
+/**
+ * Gets disk usage statistics for all mounted filesystems.
+ * 
+ * @async
+ * @returns {Promise<Array<Object>>} A promise that resolves with an array of disk usage objects:
+ *   - fs {string} Name of the filesystem
+ *   - size {number} Total size in bytes
+ *   - used {number} Used space in bytes
+ * @throws {Error} If there was an error retrieving disk information
+ */
 function getDiskUsage() {
   return new Promise((resolve, reject) => {
     si.fsSize()
@@ -103,6 +148,16 @@ function getDiskUsage() {
   });
 }
 
+/**
+ * Gets combined system statistics including CPU, memory and disk usage.
+ * 
+ * @async
+ * @returns {Promise<Array>} A promise that resolves with an array containing:
+ *   - [0] {number} CPU usage percentage
+ *   - [1] {Object} Memory usage statistics
+ *   - [2] {Array<Object>} Disk usage statistics
+ * @throws {Error} If there was an error retrieving system information
+ */
 function getSystemStats() {
   return Promise.all([getCpuUsage(), getMemoryUsage(), getDiskUsage()]);
 }

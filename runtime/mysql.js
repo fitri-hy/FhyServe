@@ -20,26 +20,55 @@ const mysqldPath = path.join(mysqlBinPath, 'mysqld.exe');
 const myIniPath = path.join(mysqlCwd, 'my.ini');
 const dataDir = path.join(mysqlCwd, 'data');
 
+/**
+ * Sets the main window reference for MySQL operations.
+ * 
+ * @param {BrowserWindow} win - The Electron BrowserWindow instance to communicate with
+ */
 function setMysqlMain(win) {
   mainWindow = win;
 }
 
+/**
+ * Sends a log message to the renderer process.
+ * 
+ * @param {string} message - The message to be sent to the renderer process
+ */
 function logToRenderer(message) {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('service-log', { service: 'mysql', message });
   }
 }
 
+/**
+ * Updates the MySQL service status in the renderer process.
+ * 
+ * @param {string} status - The status to be sent (e.g., 'RUNNING', 'STOPPED', 'ERROR')
+ */
 function updateStatus(status) {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('mysql-status', status);
   }
 }
 
+/**
+ * Creates a promise that resolves after a specified delay.
+ * 
+ * @param {number} ms - The delay time in milliseconds
+ * @returns {Promise<void>} A promise that resolves after the specified delay
+ */
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-
+/**
+ * Creates or updates the MySQL configuration file (my.ini).
+ * 
+ * This function writes the necessary MySQL server configuration to the my.ini file
+ * if it doesn't exist. The configuration includes essential settings like data directory,
+ * port number, character set, and error log location.
+ * 
+ * @returns {void}
+ */
 function writeMyIni() {
   if (!fs.existsSync(myIniPath)) {
     const iniContent = `
@@ -57,10 +86,23 @@ skip-grant-tables=0
 `;
     fs.writeFileSync(myIniPath, iniContent.trim(), 'utf8');
   } else {
-    
+
   }
 }
-
+/**
+ * Initializes the MySQL data directory and sets a root password.
+ * 
+ * This function checks if MySQL has been initialized before. If not, it:
+ * 1. Removes any existing data directory
+ * 2. Initializes MySQL with insecure defaults (no password)
+ * 3. Starts MySQL with skip-grant-tables to modify security settings
+ * 4. Sets the root password
+ * 5. Stops the temporary MySQL instance
+ * 
+ * @param {string} rootPassword - The password to set for MySQL root user (defaults to 'root')
+ * @returns {Promise<void>} A promise that resolves when initialization is complete
+ * @throws {Error} If initialization, connection, or password setting fails
+ */
 async function initializeDataDirWithRootPassword(rootPassword = 'root') {
   const ibdataPath = path.join(dataDir, 'ibdata1');
 
@@ -147,32 +189,22 @@ async function initializeDataDirWithRootPassword(rootPassword = 'root') {
 
   await delay(5000);
 }
-
-async function waitForMysqlReady(port = PORT, timeout = 7000) {
-  const start = Date.now();
-  while (Date.now() - start < timeout) {
-    try {
-      await new Promise((resolve, reject) => {
-        const socket = new net.Socket();
-        socket.setTimeout(1000);
-        socket.once('connect', () => {
-          socket.destroy();
-          resolve();
-        });
-        socket.once('timeout', () => {
-          socket.destroy();
-          reject(new Error('timeout'));
-        });
-        socket.once('error', reject);
-        socket.connect(port, '127.0.0.1');
-      });
-      return true;
-    } catch (_) {}
-    await delay(500);
-  }
-  return false;
-}
-
+/**
+ * Starts the MySQL server on the specified port.
+ * 
+ * This function performs the following operations:
+ * 1. Checks if MySQL is already running
+ * 2. Validates the existence of the MySQL daemon executable
+ * 3. Ensures proper configuration file exists
+ * 4. Initializes the database with root password if needed
+ * 5. Spawns the MySQL process with appropriate parameters
+ * 6. Sets up logging and event handlers
+ * 7. Waits for MySQL to become ready for connections
+ * 8. Updates the service status accordingly
+ * 
+ * @param {number} [port=PORT] - The port number on which MySQL will listen
+ * @returns {Promise<void>} A promise that resolves when the server has started or failed to start
+ */
 async function startMysql(port = PORT) {
   if (mysqlProcess) return;
 
@@ -214,7 +246,16 @@ async function startMysql(port = PORT) {
     updateStatus('STOPPED');
   }
 }
-
+/**
+ * Stops the MySQL server process.
+ * 
+ * This function attempts to gracefully terminate the MySQL server process.
+ * If the process reference is not available, it attempts to kill any running
+ * mysqld.exe processes using taskkill. After stopping, it updates the service
+ * status to 'STOPPED'.
+ * 
+ * @returns {Promise<void>} A promise that resolves when MySQL has been stopped
+ */
 async function stopMysql() {
   logToRenderer('Stopping...');
 
@@ -222,7 +263,7 @@ async function stopMysql() {
     try {
       execSync('taskkill /F /IM mysqld.exe /T');
     } catch (err) {
-
+      // Silently handle errors when no process is found
     }
     updateStatus('STOPPED');
     return;
@@ -238,7 +279,7 @@ async function stopMysql() {
     try {
       execSync('taskkill /F /IM mysqld.exe /T');
     } catch (err) {
-
+      // Silently handle errors when no process is found
     }
 
     await delay(3000);
@@ -246,8 +287,22 @@ async function stopMysql() {
     mysqlProcess = null;
   });
 }
-
-// Monitoring
+/**
+ * Gets the runtime statistics for the MySQL service.
+ * This function checks the global variable `mysqlProcess` to determine if MySQL is running.
+ * If MySQL is not running, it returns an object indicating the stopped state.
+ * If MySQL is running, it uses `pidusage` to get CPU and memory usage, and returns detailed status information.
+ * If an error occurs while getting the status, it returns an object containing error information.
+ *
+ * @returns {Promise<Object>} An object containing the following fields:
+ *   - name {string} Service name, fixed as 'MySQL'
+ *   - pid {number} MySQL process ID (only when the service is running)
+ *   - cpu {string} CPU usage, formatted as '<number>%' (only when the service is running)
+ *   - memory {string} Memory usage, formatted as '<number> MB' (only when the service is running)
+ *   - port {number} Port number MySQL is listening on (only when the service is running)
+ *   - status {string} Service status, possible values are 'STOPPED', 'RUNNING', or 'ERROR'
+ *   - error {string} Error message (only when status is 'ERROR')
+ */
 async function getMysqlStats() {
   if (!mysqlProcess || !mysqlProcess.pid) {
     return {
