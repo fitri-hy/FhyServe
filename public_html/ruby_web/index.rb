@@ -5,6 +5,7 @@ PORT = 4560
 
 response_data = {
   main: "localhost:#{PORT}",
+  rootDirectory: "public_html/ruby_web/*",
   projects: [
     {
       name: "main",

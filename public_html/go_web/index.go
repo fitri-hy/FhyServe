@@ -17,6 +17,7 @@ type Project struct {
 
 type Response struct {
 	Main     string    `json:"main"`
+	RootDirectory string    `json:"rootDirectory"`
 	Projects []Project `json:"projects"`
 }
 
@@ -59,6 +60,7 @@ func main() {
 
 		resp := Response{
 			Main:     fmt.Sprintf("localhost:%s", port),
+			RootDirectory: "public_html/go_web/*",
 			Projects: projects,
 		}
 
