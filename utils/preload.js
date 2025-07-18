@@ -129,3 +129,32 @@ contextBridge.exposeInMainWorld('tunnelAPI', {
   startTunnel: (id) => ipcRenderer.invoke('start-tunnel', id),
   stopTunnel: (id) => ipcRenderer.invoke('stop-tunnel', id),
 });
+
+// PM2
+contextBridge.exposeInMainWorld('pm2API', {
+  list: () => ipcRenderer.invoke('pm2-list'),
+  action: (action, id) => ipcRenderer.invoke('pm2-action', action, id),
+  pickFile: () => ipcRenderer.invoke('pick-file'),
+  startWithName: (filePath, name) => ipcRenderer.invoke('start-with-name', filePath, name),
+
+  getLogs: (pmId) => ipcRenderer.invoke('pm2-logs', pmId),
+
+  startTailLog: (pmId) => ipcRenderer.invoke('pm2-start-tail-log', pmId),
+  stopTailLog: (pmId) => ipcRenderer.invoke('pm2-stop-tail-log', pmId),
+
+  onLogOutLine: (callback) => {
+    ipcRenderer.on('pm2-log-out-line', (event, data) => callback(data));
+  },
+  onLogErrLine: (callback) => {
+    ipcRenderer.on('pm2-log-err-line', (event, data) => callback(data));
+  },
+  onLogError: (callback) => {
+    ipcRenderer.on('pm2-log-error', (event, data) => callback(data));
+  },
+
+  removeAllLogListeners: () => {
+    ipcRenderer.removeAllListeners('pm2-log-out-line');
+    ipcRenderer.removeAllListeners('pm2-log-err-line');
+    ipcRenderer.removeAllListeners('pm2-log-error');
+  }
+});

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { ipcMain, nativeTheme, shell } = require('electron');
+const { ipcMain, nativeTheme, shell, dialog } = require('electron');
 const { startApache, stopApache } = require('../runtime/apache');
 const { startMysql, stopMysql } = require('../runtime/mysql');
 const { startNginx, stopNginx } = require('../runtime/nginx');
@@ -13,6 +13,7 @@ const { createCronJob, readCronJobs, updateCronJob, deleteCronJob, startCronJob,
 const { getServiceStats } = require('../runtime/monitor');
 const { apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder, goOpenFolder, rubyOpenFolder, portOpenFolder } = require('./pathResource');
 const { installCMS } = require('../runtime/autoInstaller');
+const pm2runtime = require('../runtime/pm2');
 const { createTunnel, deleteTunnel, getAllTunnels, startTunnel, stopTunnel, } = require('./tunnels');
 
 function setupIPC() {
@@ -239,6 +240,22 @@ function setupIPC() {
       return { success: false, message: e.message };
     }
   });
+  
+  // PM2
+  ipcMain.handle('pm2-list', () => pm2runtime.list());
+  ipcMain.handle('pm2-action', (event, action, id) => pm2runtime.action(action, id));
+  ipcMain.handle('pick-file', async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [{ name: 'JavaScript Files', extensions: ['js'] }],
+    });
+    if (canceled || !filePaths[0]) return null;
+    return filePaths[0];
+  });
+  ipcMain.handle('start-with-name', (event, filePath, name) => pm2runtime.startWithName(filePath, name));
+  ipcMain.handle('pm2-logs', (event, pmId) => pm2runtime.getLogs(pmId));
+  ipcMain.handle('pm2-start-tail-log', (event, pmId) => pm2runtime.startTailLog(pmId, event.sender));
+  ipcMain.handle('pm2-stop-tail-log', (event, pmId) => pm2runtime.stopTailLog(pmId));
 }
 
 module.exports = { setupIPC };

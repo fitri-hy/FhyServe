@@ -838,3 +838,179 @@ window.addEventListener('DOMContentLoaded', () => {
 
   loadTunnels();
 });
+
+
+// PM2
+let selectedFilePathPM2 = null;
+let currentTailedPmIdPM2 = null;
+
+const btnSelectFilePM2 = document.getElementById('btn-select-file-PM2');
+const entryFilePathPM2 = document.getElementById('entry-file-path-PM2');
+const serviceNameInputPM2 = document.getElementById('service-name-PM2');
+const addServiceFormPM2 = document.getElementById('add-service-form-PM2');
+const pm2Table = document.getElementById('pm2-table-PM2');
+
+const logModalPM2 = document.getElementById('log-modal-PM2');
+const outLogElemPM2 = document.getElementById('out-log-PM2');
+const errLogElemPM2 = document.getElementById('err-log-PM2');
+const serviceNameElemPM2 = document.getElementById('log-service-name-PM2');
+const closeLogModalBtnPM2 = document.getElementById('close-log-modal-PM2');
+
+btnSelectFilePM2.addEventListener('click', async () => {
+  const filePath = await window.pm2API.pickFile();
+  if (filePath) {
+    selectedFilePathPM2 = filePath;
+    entryFilePathPM2.textContent = filePath;
+    const currentName = serviceNameInputPM2.value.trim();
+    if (!currentName) {
+      const fileName = filePath.split(/[\\/]/).pop();
+      const defaultName = fileName.replace(/\.js$/, '');
+      serviceNameInputPM2.value = defaultName;
+    }
+  }
+});
+
+addServiceFormPM2.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const name = serviceNameInputPM2.value.trim();
+  if (!name) {
+    alert('Please enter service name');
+    return;
+  }
+  if (!selectedFilePathPM2) {
+    alert('Please select entry point file');
+    return;
+  }
+
+  try {
+    await window.pm2API.startWithName(selectedFilePathPM2, name);
+    alert('Service added: ' + name);
+    selectedFilePathPM2 = null;
+    entryFilePathPM2.textContent = 'No file selected';
+    serviceNameInputPM2.value = '';
+    refreshPM2();
+  } catch (err) {
+    alert('Failed to add service: ' + (err.message || err));
+  }
+});
+
+async function refreshPM2() {
+  pm2Table.innerHTML = '<tr><td colspan="6" class="px-4 py-2 whitespace-nowrap text-center">Loading...</td></tr>';
+
+  try {
+    const list = await window.pm2API.list();
+
+    if (!list || list.length === 0) {
+      pm2Table.innerHTML = '<tr><td colspan="6" class="px-4 py-2 whitespace-nowrap text-center">No processes running.</td></tr>';
+      return;
+    }
+
+    pm2Table.innerHTML = '';
+	list.forEach(proc => {
+	  const isStopped = proc.pm2_env.status === 'stopped';
+	  const actionBtn = isStopped
+		? `<button class="action-btn text-emerald-500 dark:text-emerald-600 hover:text-emerald-600 dark:hover:text-emerald-500" onclick="doActionPM2('start', ${proc.pm_id})">
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M21.409 9.353a2.998 2.998 0 0 1 0 5.294L8.597 21.614C6.534 22.737 4 21.277 4 18.968V5.033c0-2.31 2.534-3.769 4.597-2.648z"/></svg>
+		</button>`
+		: `<button class="action-btn text-rose-500 dark:text-rose-600 hover:text-rose-600 dark:hover:text-rose-500" onclick="doActionPM2('stop', ${proc.pm_id})">
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12"/></svg>
+		</button>`;
+
+	  const row = document.createElement('tr');
+	  row.innerHTML = `
+		<td class="px-4 py-2 whitespace-nowrap">${proc.pm_id}</td>
+		<td class="px-4 py-2 whitespace-nowrap w-full">${proc.name}</td>
+		<td class="px-4 py-2 whitespace-nowrap uppercase font-semibold ${proc.pm2_env.status === 'online' ? 'text-emerald-500' : 'text-rose-500'}">${proc.pm2_env.status}</td>
+		<td class="px-4 py-2 whitespace-nowrap">${proc.monit.cpu.toFixed(2)} %</td>
+		<td class="px-4 py-2 whitespace-nowrap">${(proc.monit.memory / 1024 / 1024).toFixed(2)} MB</td>
+		<td class="px-4 py-2 whitespace-nowrap">
+			<div class="flex items-center gap-1">
+				${actionBtn}
+				<button class="action-btn text-amber-500 dark:text-amber-600 hover:text-amber-600 dark:hover:text-amber-500" onclick="doActionPM2('restart', ${proc.pm_id})">
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10m-16.54-.917a6.59 6.59 0 0 1 6.55-5.833a6.59 6.59 0 0 1 5.242 2.592a.75.75 0 0 1-1.192.911a5.09 5.09 0 0 0-4.05-2.003a5.09 5.09 0 0 0-5.037 4.333h.364a.75.75 0 0 1 .53 1.281l-1.169 1.167a.75.75 0 0 1-1.06 0L4.47 12.364a.75.75 0 0 1 .53-1.28zm12.902-.614a.75.75 0 0 0-1.06 0l-1.168 1.167a.75.75 0 0 0 .53 1.28h.363a5.09 5.09 0 0 1-5.036 4.334a5.08 5.08 0 0 1-4.038-1.986a.75.75 0 0 0-1.188.916a6.58 6.58 0 0 0 5.226 2.57a6.59 6.59 0 0 0 6.549-5.833H19a.75.75 0 0 0 .53-1.281z" clip-rule="evenodd"/></svg>
+				</button>
+				<button class="delete-btn text-rose-500 dark:text-rose-600 hover:text-rose-600 dark:hover:text-rose-500" onclick="doActionPM2('delete', ${proc.pm_id})">
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6.524c0-.395.327-.714.73-.714h4.788c.006-.842.098-1.995.932-2.793A3.68 3.68 0 0 1 12 2a3.68 3.68 0 0 1 2.55 1.017c.834.798.926 1.951.932 2.793h4.788c.403 0 .73.32.73.714a.72.72 0 0 1-.73.714H3.73A.72.72 0 0 1 3 6.524"/><path fill="currentColor" fill-rule="evenodd" d="M11.596 22h.808c2.783 0 4.174 0 5.08-.886c.904-.886.996-2.34 1.181-5.246l.267-4.187c.1-1.577.15-2.366-.303-2.866c-.454-.5-1.22-.5-2.753-.5H8.124c-1.533 0-2.3 0-2.753.5s-.404 1.289-.303 2.866l.267 4.188c.185 2.906.277 4.36 1.182 5.245c.905.886 2.296.886 5.079.886m-1.35-9.811c-.04-.434-.408-.75-.82-.707c-.413.043-.713.43-.672.864l.5 5.263c.04.434.408.75.82.707c.413-.044.713-.43.672-.864zm4.329-.707c.412.043.713.43.671.864l-.5 5.263c-.04.434-.409.75-.82.707c-.413-.044-.713-.43-.672-.864l.5-5.264c.04-.433.409-.75.82-.707" clip-rule="evenodd"/></svg>
+				</button>
+				<button onclick="showLogsPM2(${proc.pm_id}, '${proc.name}')" class="text-sky-500 dark:text-sky-600 hover:text-sky-600 dark:hover:text-sky-500">
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10m-10 5.75a.75.75 0 0 0 .75-.75v-6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75M12 7a1 1 0 1 1 0 2a1 1 0 0 1 0-2" clip-rule="evenodd"/></svg>
+				</button>
+			</div>
+		</td>
+	  `;
+	  pm2Table.appendChild(row);
+	});
+
+  } catch (err) {
+    console.error('Failed to load PM2 list:', err);
+    pm2Table.innerHTML = `<tr><td colspan="6" class="px-4 py-2 whitespace-nowrap text-center">Error loading PM2 list: ${err}</td></tr>`;
+  }
+}
+
+async function doActionPM2(action, id) {
+  try {
+    await window.pm2API.action(action, Number(id));
+    refreshPM2();
+  } catch (err) {
+    alert('Error: ' + (err.message || err));
+  }
+}
+
+async function showLogsPM2(pmId, name) {
+  serviceNameElemPM2.textContent = name;
+  outLogElemPM2.textContent = 'Loading...';
+  errLogElemPM2.textContent = 'Loading...';
+
+  logModalPM2.style.display = 'block';
+
+  try {
+    const logs = await window.pm2API.getLogs(pmId);
+    outLogElemPM2.textContent = logs?.outLog || '(No output log)';
+    errLogElemPM2.textContent = logs?.errLog || '(No error log)';
+
+    if (currentTailedPmIdPM2 !== null) {
+      await window.pm2API.stopTailLog(currentTailedPmIdPM2);
+      window.pm2API.removeAllLogListeners();
+    }
+
+    currentTailedPmIdPM2 = pmId;
+
+    await window.pm2API.startTailLog(pmId);
+
+    window.pm2API.onLogOutLine(({ pmId: tailPmId, line }) => {
+      if (tailPmId === currentTailedPmIdPM2) {
+        outLogElemPM2.textContent += '\n' + line;
+        outLogElemPM2.scrollTop = outLogElemPM2.scrollHeight;
+      }
+    });
+
+    window.pm2API.onLogErrLine(({ pmId: tailPmId, line }) => {
+      if (tailPmId === currentTailedPmIdPM2) {
+        errLogElemPM2.textContent += '\n' + line;
+        errLogElemPM2.scrollTop = errLogElemPM2.scrollHeight;
+      }
+    });
+
+    window.pm2API.onLogError(({ pmId: tailPmId, error }) => {
+      if (tailPmId === currentTailedPmIdPM2) {
+        errLogElemPM2.textContent += '\n' + error;
+        errLogElemPM2.scrollTop = errLogElemPM2.scrollHeight;
+      }
+    });
+  } catch (err) {
+    outLogElemPM2.textContent = 'Error loading logs: ' + (err.message || err);
+    errLogElemPM2.textContent = '';
+  }
+}
+
+closeLogModalBtnPM2.addEventListener('click', async () => {
+  logModalPM2.style.display = 'none';
+  if (currentTailedPmIdPM2 !== null) {
+    await window.pm2API.stopTailLog(currentTailedPmIdPM2);
+    window.pm2API.removeAllLogListeners();
+    currentTailedPmIdPM2 = null;
+  }
+});
+
+refreshPM2();

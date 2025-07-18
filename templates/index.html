@@ -279,7 +279,8 @@
 			<button class="tab-btn whitespace-nowrap font-bold w-[100px] text-[10px] bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab3">API CLIENT</button>
 			<button class="tab-btn whitespace-nowrap font-bold w-[100px] text-[10px] bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab4">PACK INSTALLER</button>
 			<button class="tab-btn whitespace-nowrap font-bold w-[100px] text-[10px] bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab5">TUNNELS</button>
-			<button class="tab-btn whitespace-nowrap font-bold w-[100px] text-[10px] bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab6">MONITORING</button>
+			<button class="tab-btn whitespace-nowrap font-bold w-[100px] text-[10px] bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab6">PM2</button>
+			<button class="tab-btn whitespace-nowrap font-bold w-[100px] text-[10px] bg-white dark:bg-neutral-700 p-2 rounded border border-gray-200 dark:border-neutral-800" data-tab="tab7">MONITORING</button>
 		</div>
 
 		<div id="tab1" class="tab-content flex flex-col w-full h-[calc(100vh-74px)] pr-4">
@@ -433,7 +434,7 @@
 			</div>
 		</div>
 		
-		<div id="tab5" class="tab-content hidden flex flex-col w-full h-[calc(100vh-74px)] pr-4">
+		<div id="tab5" class="tab-content relative hidden flex flex-col w-full h-[calc(100vh-74px)] pr-4">
 			<div class="bg-white h-full rounded dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 p-4 flex flex-col">
 				<div class="mb-2 flex items-center gap-2">
 					<input type="number" type="number" max="5" id="portInput" placeholder="Enter PORT" class="max-w-xs w-full bg-gray-50 dark:bg-neutral-900 p-2 rounded border border-gray-200 dark:border-neutral-800 focus:outline-none text-xs" />
@@ -462,7 +463,80 @@
 			</div>
 		</div>
 
-		<div id="tab6" class="tab-content hidden flex flex-col w-full h-[calc(100vh-74px)] pr-4">
+		<div id="tab6" class="tab-content relative hidden flex flex-col w-full h-[calc(100vh-74px)] pr-4">
+			<div class="bg-white overflow-y-auto rounded dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 p-4 flex flex-col h-full">
+				<div class="w-full flex-none flex flex-col gap-1 mb-4">
+					<form id="add-service-form-PM2" class="flex gap-2 items-end">
+						<div class="w-full flex flex-col gap-1">
+							<label for="service-name-PM2" class="font-semibold text-sm">Service Name: <span id="entry-file-path-PM2" class="text-xs font-normal">No file selected</span></label>
+							<input type="text" id="service-name-PM2" required placeholder="Ex. my-app" class="w-full bg-gray-50 dark:bg-neutral-900 p-2 rounded border border-gray-200 dark:border-neutral-800 focus:outline-none text-xs" />
+						</div>
+						<button type="button" id="btn-select-file-PM2" class="text-emerald-500 hover:text-emerald-600 transition-all hover:duration-300 hover:scale-105">
+							<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M2.07 5.258C2 5.626 2 6.068 2 6.95V14c0 3.771 0 5.657 1.172 6.828S6.229 22 10 22h4c3.771 0 5.657 0 6.828-1.172S22 17.771 22 14v-2.202c0-2.632 0-3.949-.77-4.804a3 3 0 0 0-.224-.225C20.151 6 18.834 6 16.202 6h-.374c-1.153 0-1.73 0-2.268-.153a4 4 0 0 1-.848-.352C12.224 5.224 11.816 4.815 11 4l-.55-.55c-.274-.274-.41-.41-.554-.53a4 4 0 0 0-2.18-.903C7.53 2 7.336 2 6.95 2c-.883 0-1.324 0-1.692.07A4 4 0 0 0 2.07 5.257M16.283 3c.365 0 .548 0 .702.02c1.018.14 1.828.943 2.014 1.98a5 5 0 0 0-.461-.081c-.64-.084-1.448-.084-2.45-.084h-.334c-.942 0-1.3-.005-1.625-.101a2.5 2.5 0 0 1-.542-.233c-.296-.17-.552-.428-1.218-1.118L12 3zM13 9.25a.75.75 0 0 0 0 1.5h5a.75.75 0 0 0 0-1.5z" clip-rule="evenodd"/></svg>
+						</button>
+						<button type="submit" class="text-emerald-500 hover:text-emerald-600 transition-all hover:duration-300 hover:scale-105">
+							<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M12 22c-4.714 0-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12s0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22m0-13.75a.75.75 0 0 1 .75.75v2.25H15a.75.75 0 0 1 0 1.5h-2.25V15a.75.75 0 0 1-1.5 0v-2.25H9a.75.75 0 0 1 0-1.5h2.25V9a.75.75 0 0 1 .75-.75" clip-rule="evenodd"/></svg>
+						</button>
+					</form>
+				</div>
+				<div class="h-full overflow-y-auto rounded">
+					<table class="min-w-full">
+						<thead class="bg-emerald-500 dark:bg-emerald-600 text-white sticky top-0 z-10">
+							<tr>
+								<th class="px-4 py-2 text-left text-sm font-semibold rounded-tl">ID</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold">Name</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold">Status</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold">CPU</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold">Memory</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold rounded-tr">Actions</th>
+							</tr>
+						</thead>
+						<tbody id="pm2-table-PM2" class="bg-gray-50 dark:bg-neutral-900 divide-y divide-gray-100 dark:divide-neutral-700 text-xs">
+							<tr>
+								<td cols="6" class="text-center py-2">Loading...</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			<button onclick="refreshPM2()" class="absolute z-20 bottom-4 right-4 p-2 text-white shadow-md hover:shadow-lg bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-500 hover:scale-105 hover:duration-300 transition-all rounded-full" >
+				<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M8.47 2.47a.75.75 0 0 1 1.06 0l2 2A.75.75 0 0 1 11 5.75H9a6.25 6.25 0 1 0 0 12.5h.5a.75.75 0 0 1 0 1.5H9a7.75 7.75 0 0 1 0-15.5h.19l-.72-.72a.75.75 0 0 1 0-1.06M13.75 5a.75.75 0 0 1 .75-.75h.5a7.75 7.75 0 0 1 0 15.5h-.19l.72.72a.75.75 0 1 1-1.06 1.06l-2-2a.75.75 0 0 1 .53-1.28h2a6.25 6.25 0 1 0 0-12.5h-.5a.75.75 0 0 1-.75-.75" clip-rule="evenodd"/></svg>
+			</button>
+			
+			<div id="log-modal-PM2" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+			  <div class="w-full h-screen bg-white dark:bg-neutral-900 p-4 shadow-md overflow-hidden rounded">
+				<div class="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-neutral-700/70 pb-4">
+				  <h3 class="text-xl font-semibold">
+					Service Logs (<span id="log-service-name-PM2"></span>)
+				  </h3>
+				  <button id="close-log-modal-PM2" class="text-rose-500 dark:text-rose-600 hover:text-rose-600 dark:hover:text-rose-500">
+					<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
+					  <path fill="currentColor" fill-rule="evenodd"
+						d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10M8.97 8.97a.75.75 0 0 1 1.06 0L12 10.94l1.97-1.97a.75.75 0 0 1 1.06 1.06L13.06 12l1.97 1.97a.75.75 0 0 1-1.06 1.06L12 13.06l-1.97 1.97a.75.75 0 0 1-1.06-1.06L10.94 12l-1.97-1.97a.75.75 0 0 1 0-1.06"
+						clip-rule="evenodd" />
+					</svg>
+				  </button>
+				</div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-[calc(100%-4rem)]">
+				  <div class="flex flex-col min-h-0">
+					<h4 class="text-sm font-semibold mb-1">Output Log:</h4>
+					<div class="overflow-auto bg-emerald-50 dark:bg-emerald-950/40 rounded flex-1">
+					  <pre id="out-log-PM2" class="font-mono p-2 whitespace-pre-wrap text-xs w-full"></pre>
+					</div>
+				  </div>
+				  <div class="flex flex-col min-h-0">
+					<h4 class="text-sm font-semibold mb-1">Error Log:</h4>
+					<div class="overflow-auto bg-rose-50 dark:bg-rose-950/40 rounded flex-1">
+					  <pre id="err-log-PM2" class="font-mono p-2 whitespace-pre-wrap text-xs w-full"></pre>
+					</div>
+				  </div>
+				</div>
+			  </div>
+			</div>
+		</div>
+
+		<div id="tab7" class="tab-content hidden flex flex-col w-full h-[calc(100vh-74px)] pr-4">
 			<div class="bg-white overflow-y-auto rounded dark:bg-neutral-950 border border-gray-100 dark:border-neutral-800 p-4 flex flex-col h-full">
 				<div class="w-full h-full mb-4">
 					<canvas id="serviceChart" class="w-full h-full bg-white dark:bg-neutral-900 rounded"></canvas>
