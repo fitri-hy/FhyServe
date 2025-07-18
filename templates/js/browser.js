@@ -1,19 +1,39 @@
+/**
+ * Browser Tab Management System
+ * 
+ * This module handles the creation, management, and persistence of browser tabs.
+ * It provides functionality for tab selection, visual indication of active tabs,
+ * and saving/restoring tab state across sessions.
+ */
+
 const $ = id => document.getElementById(id);
 const tabs = [], tabsContainer = $('tabs'), webviews = $('webviews-container');
 let activeTabId = null;
 let editingTabId = null;
 
+/**
+ * Updates the labels and visual state of all tabs
+ * Sets the label text and applies appropriate styling based on active state
+ */
 const updateTabLabels = () => tabs.forEach((t, i) => {
   t.label.textContent = `TAB-${i + 1}`;
   t.tab.classList.toggle('border-emerald-500', t.id === activeTabId);
   t.tab.classList.toggle('border-gray-300', t.id !== activeTabId);
 });
 
+/**
+ * Persists the current tab state to local storage
+ * Saves tab URLs and active tab information for session restoration
+ */
 const saveTabs = () => {
   localStorage.setItem('tabs', JSON.stringify(tabs.map(t => ({ id: t.id, url: t.webview.src }))));
   localStorage.setItem('activeTabId', activeTabId);
 };
 
+/**
+ * Sets the specified tab as active and updates UI accordingly
+ * @param {string} id - The unique identifier of the tab to activate
+ */
 function setActiveTab(id) {
   tabs.forEach(({ id: tid, tab, webview, backBtn, forwardBtn }) => {
     const isActive = tid === id;
@@ -39,14 +59,26 @@ function setActiveTab(id) {
   activeTabId = id;
   saveTabs();
 }
-
+/**
+ * Creates a new browser tab with the specified URL
+ * 
+ * This function handles the creation of a new tab including:
+ * - Creating and styling the tab element with navigation buttons
+ * - Creating a webview for the tab content
+ * - Setting up event listeners for navigation, tab selection, and tab closure
+ * - Managing tab state and persistence
+ * 
+ * @param {string} url - The URL to load in the new tab
+ * @param {string} [customId] - Optional custom ID for the tab. If provided and a tab with this ID already exists, that tab will be activated instead
+ * @returns {void}
+ */
 const createTab = (url, customId) => {
   const id = customId || 'tab-' + crypto.randomUUID();
   if (tabs.some(t => t.id === id)) return setActiveTab(id);
 
   const tab = document.createElement('div');
   tab.className = 'flex items-center gap-0.5 py-1 border-b-2 cursor-pointer';
-  
+
   const label = document.createElement('span');
   label.className = 'tab-label';
   label.textContent = 'Tab';
@@ -129,10 +161,13 @@ const createTab = (url, customId) => {
   updateTabLabels();
 
   if (!customId) {
-    activeTabId = id; 
+    activeTabId = id;
   }
 };
-
+/**
+ * Closes a specific browser tab and updates the UI
+ * @param {string} id - The unique identifier of the tab to close
+ */
 const closeTab = id => {
   const i = tabs.findIndex(t => t.id === id);
   if (i < 0) return;
@@ -144,6 +179,10 @@ const closeTab = id => {
   saveTabs();
 };
 
+/**
+ * Restores tabs from local storage or creates a default tab
+ * Loads previously saved tabs and their URLs, or creates a new tab with Google if none exist
+ */
 const loadTabs = () => {
   const saved = JSON.parse(localStorage.getItem('tabs') || '[]');
   if (!saved.length) createTab('https://www.google.com');
@@ -153,6 +192,9 @@ const loadTabs = () => {
   tab ? setActiveTab(tab.id) : setActiveTab(tabs[0].id);
 };
 
+/**
+ * Event handlers for tab creation, URL input, and modal interactions
+ */
 $('add-tab-btn').onclick = () => { $('url-input').value = ''; $('modal').classList.replace('hidden', 'flex'); $('url-input').focus(); };
 $('cancel-btn').onclick = () => {
   $('modal').classList.replace('flex', 'hidden');
@@ -178,6 +220,12 @@ $('open-btn').onclick = () => {
   }
 };
 
+/**
+ * Enables Enter key submission in the URL input field
+ */
 $('url-input').onkeydown = e => { if (e.key === 'Enter') $('open-btn').click(); };
 
+/**
+ * Initialize tabs when the DOM is fully loaded
+ */
 window.addEventListener('DOMContentLoaded', loadTabs);

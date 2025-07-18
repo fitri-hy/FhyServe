@@ -15,13 +15,22 @@ const { apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder, goO
 const { installCMS } = require('../runtime/autoInstaller');
 const pm2runtime = require('../runtime/pm2');
 const { createTunnel, deleteTunnel, getAllTunnels, startTunnel, stopTunnel, } = require('./tunnels');
-
+/**
+ * Sets up all IPC (Inter-Process Communication) handlers for the application
+ * 
+ * This function establishes communication channels between the main Electron process
+ * and renderer processes. It handles all service operations (start/stop), file system
+ * operations, theme changes, terminal commands, cron jobs, tunneling, and other
+ * system functionalities.
+ * 
+ * The handlers are organized by service/feature for better maintainability.
+ */
 function setupIPC() {
   // Dark Mode
   ipcMain.on('dark-mode-changed', (event, isDark) => {
     nativeTheme.themeSource = isDark ? 'dark' : 'light';
   });
-  
+
   // Apache
   ipcMain.on('apache-start', () => {
     startApache();
@@ -30,7 +39,7 @@ function setupIPC() {
   ipcMain.on('apache-stop', () => {
     stopApache();
   });
-  
+
   ipcMain.handle('open-apache-folder', async () => {
     const folderPath = apacheOpenFolder();
     const result = await shell.openPath(folderPath);
@@ -39,7 +48,7 @@ function setupIPC() {
     }
     return { success: true };
   });
-  
+
   // MySQL
   ipcMain.on('mysql-start', () => {
     startMysql();
@@ -48,7 +57,7 @@ function setupIPC() {
   ipcMain.on('mysql-stop', () => {
     stopMysql();
   });
-  
+
   // Nginx
   ipcMain.on('nginx-start', () => {
     startNginx();
@@ -57,7 +66,7 @@ function setupIPC() {
   ipcMain.on('nginx-stop', () => {
     stopNginx();
   });
-  
+
   ipcMain.handle('open-nginx-folder', async () => {
     const folderPath = nginxOpenFolder();
     const result = await shell.openPath(folderPath);
@@ -66,7 +75,7 @@ function setupIPC() {
     }
     return { success: true };
   });
-  
+
   // Node
   ipcMain.on('nodejs-start', () => {
     startNodeServer();
@@ -75,7 +84,7 @@ function setupIPC() {
   ipcMain.on('nodejs-stop', () => {
     stopNodeServer();
   });
-  
+
   ipcMain.handle('open-node-folder', async () => {
     const folderPath = nodeOpenFolder();
     const result = await shell.openPath(folderPath);
@@ -84,16 +93,16 @@ function setupIPC() {
     }
     return { success: true };
   });
-  
+
   // Python
   ipcMain.on('python-start', () => {
     startPython();
   });
-  
+
   ipcMain.on('python-stop', () => {
     stopPython();
   });
-  
+
   ipcMain.handle('open-python-folder', async () => {
     const folderPath = pythonOpenFolder();
     const result = await shell.openPath(folderPath);
@@ -102,7 +111,7 @@ function setupIPC() {
     }
     return { success: true };
   });
-  
+
   // Golang
   ipcMain.on('golang-start', () => {
     startGoServer();
@@ -120,7 +129,7 @@ function setupIPC() {
     }
     return { success: true };
   });
-  
+
   // Ruby
   ipcMain.on('ruby-start', () => {
     startRubyServer();
@@ -138,7 +147,7 @@ function setupIPC() {
     }
     return { success: true };
   });
-  
+
   // CMD
   ipcMain.on('cmd-start', () => {
     startCmd();
@@ -151,7 +160,7 @@ function setupIPC() {
   ipcMain.on('cmd-send', (event, command) => {
     sendCommand(command);
   });
-  
+
   // Docs
   ipcMain.handle('load-markdown', async (event, section) => {
     const filePath = path.join(__dirname, '../templates/docs', `${section}.md`);
@@ -172,7 +181,7 @@ function setupIPC() {
     }
     return { success: true };
   });
-  
+
   // Cron Job
   ipcMain.on('cronjob-create', (e, data) => createCronJob(data));
   ipcMain.handle('cronjob-read', () => readCronJobs());
@@ -188,12 +197,12 @@ function setupIPC() {
     const jobs = getAllJobs();
     jobs.forEach(job => stopCronJob(job.id));
   });
-  
+
   // Monitoring
   ipcMain.handle('get-service-stats', async () => {
     return await getServiceStats();
   });
-  
+
   // Auto Installer
   ipcMain.handle('install-cms', async (event, cmsName, version, target) => {
     try {
@@ -203,7 +212,7 @@ function setupIPC() {
       return { success: false, error: error.message };
     }
   });
-  
+
   // Tunels
   ipcMain.handle('get-tunnels', () => {
     return getAllTunnels();

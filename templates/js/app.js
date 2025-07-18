@@ -1,21 +1,28 @@
-// Tab
+/**
+ * Tab functionality: Handles tab switching by managing active tab styles and content visibility
+ */
 const tabButtons = document.querySelectorAll('.tab-btn');
 const tabContents = document.querySelectorAll('.tab-content');
 tabButtons.forEach(button => {
-	button.addEventListener('click', () => {
-		const tabId = button.getAttribute('data-tab');
-		tabButtons.forEach(btn => {
-			btn.classList.remove('bg-emerald-500', 'text-white', 'font-semibold');
-			btn.classList.add('bg-white', 'dark:bg-neutral-700', 'text-gray-700', 'dark:text-white');
-		});
-		button.classList.add('bg-emerald-500', 'text-white', 'font-semibold');
-		button.classList.remove('bg-white', 'dark:bg-neutral-700', 'text-gray-700', 'dark:text-white');
-		tabContents.forEach(content => content.classList.add('hidden'));
-		document.getElementById(tabId).classList.remove('hidden');
-	});
+  button.addEventListener('click', () => {
+    const tabId = button.getAttribute('data-tab');
+    tabButtons.forEach(btn => {
+      btn.classList.remove('bg-emerald-500', 'text-white', 'font-semibold');
+      btn.classList.add('bg-white', 'dark:bg-neutral-700', 'text-gray-700', 'dark:text-white');
+    });
+    button.classList.add('bg-emerald-500', 'text-white', 'font-semibold');
+    button.classList.remove('bg-white', 'dark:bg-neutral-700', 'text-gray-700', 'dark:text-white');
+    tabContents.forEach(content => content.classList.add('hidden'));
+    document.getElementById(tabId).classList.remove('hidden');
+  });
 });
 
-// API Client
+/**
+ * API Client: Sends HTTP requests with configurable method, URL, headers, and body
+ * Displays formatted responses based on content type
+ * @async
+ * @returns {Promise<void>}
+ */
 async function sendRequest() {
   const method = document.getElementById('method').value;
   const url = document.getElementById('url').value.trim();
@@ -73,128 +80,142 @@ async function sendRequest() {
   }
 }
 
-// Chart
+/**
+ * Chart Configuration: CPU usage monitoring chart
+ * Real-time line chart showing CPU usage percentage over time
+ */
 const cpuChart = new Chart(ctxCpu, {
   type: 'line',
   data: {
-	labels: [],
-	datasets: [{
-	  label: 'CPU Usage',
-	  data: [],
-	  borderColor: 'rgba(255, 99, 132, 1)',
-	  borderWidth: 2,
-	  backgroundColor: 'rgba(255, 99, 132, 0.2)',
-	  tension: 0.1
-	}]
+    labels: [],
+    datasets: [{
+      label: 'CPU Usage',
+      data: [],
+      borderColor: 'rgba(255, 99, 132, 1)',
+      borderWidth: 2,
+      backgroundColor: 'rgba(255, 99, 132, 0.2)',
+      tension: 0.1
+    }]
   },
   options: {
-	responsive: true,
-	scales: {
-	  x: {
-		display: true,
-		title: {
-		  display: true,
-		  text: 'Time'
+    responsive: true,
+    scales: {
+      x: {
+        display: true,
+        title: {
+          display: true,
+          text: 'Time'
         }
-	  },
-	  y: {
+      },
+      y: {
         beginAtZero: true,
         display: true,
         title: {
           display: true,
           text: 'Usage (%)'
         }
-	  }
-	},
-	plugins: {
-	  legend: {
+      }
+    },
+    plugins: {
+      legend: {
         display: true,
         position: 'top'
-	  }
-	}
+      }
+    }
   }
 });
 
+/**
+ * Chart Configuration: RAM usage monitoring chart
+ * Real-time line chart showing memory usage percentage over time
+ */
 const ramChart = new Chart(ctxRam, {
   type: 'line',
   data: {
-	labels: [],
-	datasets: [{
-	  label: 'RAM Usage',
-	  data: [],
-	  borderColor: 'rgba(54, 162, 235, 1)',
-	  borderWidth: 2,
-	  backgroundColor: 'rgba(54, 162, 235, 0.2)',
-	  tension: 0.1
-	}]
+    labels: [],
+    datasets: [{
+      label: 'RAM Usage',
+      data: [],
+      borderColor: 'rgba(54, 162, 235, 1)',
+      borderWidth: 2,
+      backgroundColor: 'rgba(54, 162, 235, 0.2)',
+      tension: 0.1
+    }]
   },
   options: {
-	responsive: true,
-	scales: {
-	  x: {
+    responsive: true,
+    scales: {
+      x: {
         display: true,
         title: {
           display: true,
           text: 'Time'
         }
-	  },
-	  y: {
+      },
+      y: {
         beginAtZero: true,
         display: true,
         title: {
           display: true,
           text: 'Usage (%)'
         }
-	  }
-	},
-	plugins: {
-	  legend: {
+      }
+    },
+    plugins: {
+      legend: {
         display: true,
         position: 'top'
-	  }
-	}
+      }
+    }
   }
 });
 
+/**
+ * Chart Configuration: Disk usage monitoring chart
+ * Real-time line chart showing disk usage percentage over time
+ */
 const diskChart = new Chart(ctxDisk, {
   type: 'line',
   data: {
-	labels: [],
-	datasets: [{
-	  label: 'Disk Usage',
-	  data: [],
-	  borderColor: 'rgba(75, 192, 192, 1)',
-	  borderWidth: 2,
-	  backgroundColor: 'rgba(75, 192, 192, 0.2)',
-	  tension: 0.1
-	}]
+    labels: [],
+    datasets: [{
+      label: 'Disk Usage',
+      data: [],
+      borderColor: 'rgba(75, 192, 192, 1)',
+      borderWidth: 2,
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      tension: 0.1
+    }]
   },
   options: {
-	responsive: true,
-	scales: {
-	  x: {
+    responsive: true,
+    scales: {
+      x: {
         display: true,
         title: {
           display: true,
           text: 'Time'
         }
-	  },
-	  y: {
+      },
+      y: {
         beginAtZero: true,
         display: true,
         title: {
           display: true,
           text: 'Usage (%)'
         }
-	  }
-	},
-	plugins: {
-	  legend: {
+      }
+    },
+    plugins: {
+      legend: {
         display: true,
         position: 'top'
-	  }
-	}
+      }
+    }
   }
 });
 
+/**
+ * Updates all charts with new data every 500ms
+ */
 setInterval(updateCharts, 500);

@@ -13,6 +13,11 @@ let config = {
   WATCHER: false,
 };
 
+/**
+ * Loads watcher configuration from the JSON config file
+ * If the file doesn't exist, keeps default watcher configuration values
+ * Logs warning or error messages as appropriate
+ */
 function loadConfig() {
   try {
     if (!fs.existsSync(configPath)) {
@@ -27,12 +32,19 @@ function loadConfig() {
   }
 }
 
+// Initialize configuration on startup
 loadConfig();
 
+// Watch for configuration file changes and reload when modified
 chokidar.watch(configPath).on('change', () => {
   loadConfig();
 });
 
+/**
+ * Retrieves a specific watcher configuration value by key
+ * @param {string} watcherKey - The configuration key to look up
+ * @returns {*} The configuration value if found, null otherwise
+ */
 function getWATCHER(watcherKey) {
   if (!watcherKey) return null;
   return watcherKey in config ? config[watcherKey] : null;

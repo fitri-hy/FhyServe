@@ -2,6 +2,20 @@ const { parentPort, workerData } = require('worker_threads');
 const AdmZip = require('adm-zip');
 const path = require('path');
 
+/**
+ * Creates a zip archive of required resource and public_html folders
+ * 
+ * This function performs the following steps:
+ * 1. Reads folder information from workerData
+ * 2. Creates a new AdmZip instance
+ * 3. Adds required resource and public_html folders to the zip
+ * 4. Reports progress percentages to the parent thread
+ * 5. Writes the final zip file to the specified temporary path
+ * 
+ * @async
+ * @function zipFolders
+ * @throws {Error} If any part of the zip process fails
+ */
 async function zipFolders() {
   try {
     const { resourcePath, publicHtmlPath, requiredResourcesFolders, requiredPublicHtmlFolders, tempZipPath } = workerData;

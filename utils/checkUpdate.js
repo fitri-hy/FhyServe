@@ -1,6 +1,19 @@
 const { app, dialog, shell } = require('electron');
 const axios = require('axios');
 
+/**
+ * Checks for application updates by comparing the current version with the latest release on GitHub.
+ * 
+ * @async
+ * @function checkForUpdates
+ * @param {Electron.BrowserWindow} win - The Electron browser window to attach dialogs to
+ * @param {boolean} [silent=false] - If true, only shows dialog for available updates, not for errors or when already updated
+ * @returns {Promise<void>}
+ * @description
+ * This function fetches the latest release information from the GitHub repository,
+ * compares versions, and prompts the user to update if a newer version is available.
+ * The function handles downloading by redirecting the user to the appropriate download URL.
+ */
 async function checkForUpdates(win, silent = false) {
   const releasesUrl = 'https://api.github.com/repos/fitri-hy/FhyServe/releases/latest';
 
@@ -13,7 +26,7 @@ async function checkForUpdates(win, silent = false) {
 
     if (latestVersion && latestVersion !== currentVersion) {
       const exeAsset = latest.assets.find(asset => asset.name.endsWith('.exe'));
-	  const downloadUrl = exeAsset ? exeAsset.browser_download_url : null;
+      const downloadUrl = exeAsset ? exeAsset.browser_download_url : null;
 
       const result = await dialog.showMessageBox(win, {
         type: 'info',

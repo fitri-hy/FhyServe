@@ -18,7 +18,11 @@ const resourceFolders = [
 const publicHtmlFolders = [
   path.join('apache_web', 'phpmyadmin')
 ];
-
+/**
+ * Creates a modal progress window for displaying import status
+ * @param {BrowserWindow} parent - Parent window that will own this modal
+ * @returns {BrowserWindow} - The configured progress window instance
+ */
 function createProgressWindow(parent) {
   const win = new BrowserWindow({
     width: 350,
@@ -44,6 +48,20 @@ function createProgressWindow(parent) {
   return win;
 }
 
+/**
+ * Imports application resources and public_html folders from a zip file
+ * 
+ * This function performs the following steps:
+ * 1. Prompts the user to select a resource zip file
+ * 2. Extracts the zip to a temporary directory
+ * 3. Removes existing resource folders
+ * 4. Copies extracted resources to appropriate locations
+ * 5. Cleans up temporary files
+ * 
+ * @param {BrowserWindow} win - The parent Electron window
+ * @returns {Promise<void>} - Resolves when import completes or is cancelled
+ * @throws {Error} - If import process fails
+ */
 async function importResources(win) {
   let progressWin = null;
 
