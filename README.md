@@ -42,7 +42,7 @@
 - 💎 **Ruby**
 - 🧱 **CMS & Framework Auto Installer Package.**
 - 🛰️ **Local Tunels**
-- 🔁 PM2 Process Manager
+- 🔁 **PM2 Process Manager**
 
 #### CMS Package Included
 
