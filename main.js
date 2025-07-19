@@ -36,7 +36,7 @@ app.whenReady().then(() => {
     if (e.message === 'Resource download aborted') {
       console.log('Resource download aborted due to app quit.');
     } else {
-      console.error('Error resource download:', e);
+      console.error('Error during resource download:', e);
     }
   });
 
@@ -91,5 +91,5 @@ app.on('before-quit', async (event) => {
 });
 
 app.on('window-all-closed', () => {
-  app.quit();
+  if (process.platform !== 'darwin') app.quit();
 });
