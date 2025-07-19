@@ -1,7 +1,7 @@
 const axios = require('axios');
 const fs = require('fs-extra');
 const path = require('path');
-const AdmZip = require('adm-zip');
+const unzipper = require('unzipper');
 const { getCheckResource } = require('../utils/checkResource');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 
@@ -17,7 +17,7 @@ const publichtmlPath = isDevelopment()
   ? path.join(basePath, 'public_html', 'apache_web')
   : path.join(basePath, 'resources', 'public_html', 'apache_web');
 
-const zipUrl = 'https://github.com/fitri-hy/FhyServe/releases/download/1.0.7/resource-development.zip';
+const zipUrl = 'https://github.com/fitri-hy/FhyServe/releases/download/1.0.8/resource-development.zip';
 const zipTempPath = path.join(tempPath, 'resource-development.zip');
 
 const requiredResourcesFolders = [
@@ -46,16 +46,15 @@ async function getRemoteFileSize(url) {
 
 async function downloadZip(url, destPath, progressCallback, abortSignal) {
   await fs.ensureDir(path.dirname(destPath));
-
   const remoteSize = await getRemoteFileSize(url);
 
   if (await fs.pathExists(destPath)) {
     const stats = await fs.stat(destPath);
     if (remoteSize && stats.size === remoteSize) {
-      progressCallback && progressCallback({ status: 'download_skip', message: 'Zip already downloaded and valid, using cached file.' });
+      progressCallback?.({ status: 'download_skip', message: 'Zip already downloaded and valid, using cached file.' });
       return;
     } else {
-      progressCallback && progressCallback({ status: 'download_redundant', message: 'Cached zip incomplete or outdated, re-downloading...' });
+      progressCallback?.({ status: 'download_redundant', message: 'Cached zip incomplete or outdated, re-downloading...' });
       await fs.unlink(destPath);
     }
   }
@@ -67,7 +66,7 @@ async function downloadZip(url, destPath, progressCallback, abortSignal) {
     responseType: 'stream',
   });
 
-  const totalLength = response.headers['content-length'];
+  const totalLength = parseInt(response.headers['content-length'], 10);
   let downloaded = 0;
 
   return new Promise((resolve, reject) => {
@@ -79,7 +78,7 @@ async function downloadZip(url, destPath, progressCallback, abortSignal) {
     }
 
     response.data.on('data', (chunk) => {
-      if (abortSignal && abortSignal.aborted) {
+      if (abortSignal?.aborted) {
         writer.close();
         reject(new Error('Download aborted'));
         return;
@@ -95,61 +94,57 @@ async function downloadZip(url, destPath, progressCallback, abortSignal) {
     });
 
     response.data.pipe(writer);
-
     writer.on('finish', resolve);
     writer.on('error', reject);
   });
 }
 
+// ✅ Ekstrak per-folder dari ZIP secara streaming, RAM efisien
 async function extractFolderFromZipToTemp(zipPath, tempExtractPath, folderInZip) {
-  const zip = new AdmZip(zipPath);
-  const zipEntries = zip.getEntries();
-
   const prefix = folderInZip.endsWith('/') ? folderInZip : folderInZip + '/';
 
-  const entries = zipEntries.filter(e => e.entryName.startsWith(prefix));
+  return new Promise((resolve, reject) => {
+    fs.createReadStream(zipPath)
+      .pipe(unzipper.Parse())
+      .on('entry', async (entry) => {
+        const entryName = entry.path;
 
-  if (entries.length === 0) {
-    return false;
-  }
+        if (entryName.startsWith(prefix)) {
+          const relativePath = entryName.slice(prefix.length);
+          if (!relativePath) {
+            entry.autodrain();
+            return;
+          }
 
-  for (const entry of entries) {
-    const relativePath = entry.entryName.slice(prefix.length);
-    if (!relativePath) continue;
+          const targetPath = path.join(tempExtractPath, relativePath);
+          await fs.ensureDir(path.dirname(targetPath));
 
-    const targetPath = path.join(tempExtractPath, relativePath);
-
-    if (await fs.pathExists(targetPath)) continue;
-
-    if (entry.isDirectory) {
-      await fs.ensureDir(targetPath);
-    } else {
-      await fs.ensureDir(path.dirname(targetPath));
-      await fs.writeFile(targetPath, entry.getData());
-    }
-  }
-
-  return true;
-}
-
-async function copyFolder(src, dest) {
-  await fs.ensureDir(dest);
-  await fs.copy(src, dest, { overwrite: true, errorOnExist: false });
+          if (entry.type === 'Directory') {
+            await fs.ensureDir(targetPath);
+            entry.autodrain();
+          } else {
+            entry.pipe(fs.createWriteStream(targetPath));
+          }
+        } else {
+          entry.autodrain();
+        }
+      })
+      .on('close', () => resolve(true))
+      .on('error', reject);
+  });
 }
 
 async function ensureResources(progressCallback, abortSignal) {
   if (!CHECK_RESOURCE) {
-    progressCallback && progressCallback({ status: 'skip', message: 'Resource check disabled, skipping download/extract.' });
+    progressCallback?.({ status: 'skip', message: 'Resource check disabled, skipping download/extract.' });
     return;
   }
-  
+
   function checkAbort() {
-    if (abortSignal && abortSignal.aborted) {
-      throw new Error('Resource download aborted');
-    }
+    if (abortSignal?.aborted) throw new Error('Resource download aborted');
   }
 
-  let needExtractFolders = [];
+  const needExtractFolders = [];
 
   for (const folder of requiredResourcesFolders) {
     checkAbort();
@@ -168,36 +163,33 @@ async function ensureResources(progressCallback, abortSignal) {
   }
 
   if (needExtractFolders.length === 0) {
-    progressCallback && progressCallback({ status: 'skip', message: 'All required folders exist.' });
+    progressCallback?.({ status: 'skip', message: 'All required folders exist.' });
     return;
   }
 
-  progressCallback && progressCallback({ status: 'download_start', message: 'Preparing resources...' });
+  progressCallback?.({ status: 'download_start', message: 'Preparing resources...' });
   await downloadZip(zipUrl, zipTempPath, progressCallback, abortSignal);
-  progressCallback && progressCallback({ status: 'download_complete', message: 'Resources ready.' });
+  progressCallback?.({ status: 'download_complete', message: 'Resources ready.' });
 
   for (const item of needExtractFolders) {
     checkAbort();
-    if (item.type === 'resource') {
-      progressCallback && progressCallback({ status: 'extracting', message: `Extracting resources ${item.folder}. Please wait...` });
-      const targetPath = path.join(resourcePath, item.folder);
-      const folderInZip = `resources/${item.folder}`;
-      const success = await extractFolderFromZipToTemp(zipTempPath, targetPath, folderInZip);
-      if (!success) {
-        console.warn(`Resources ${item.folder} not found, skipping extract.`);
-      }
-    } else {
-      progressCallback && progressCallback({ status: 'extracting', message: `Extracting resources ${item.folder}. Please wait...` });
-      const targetPath = path.join(publichtmlPath, item.folder);
-      const folderInZip = `public_html/apache_web/${item.folder}`;
-      const success = await extractFolderFromZipToTemp(zipTempPath, targetPath, folderInZip);
-      if (!success) {
-        console.warn(`Resources ${item.folder} not found, skipping extract.`);
-      }
+    progressCallback?.({ status: 'extracting', message: `Extracting ${item.folder}...` });
+
+    const targetPath = item.type === 'resource'
+      ? path.join(resourcePath, item.folder)
+      : path.join(publichtmlPath, item.folder);
+
+    const folderInZip = item.type === 'resource'
+      ? `resources/${item.folder}`
+      : `public_html/apache_web/${item.folder}`;
+
+    const success = await extractFolderFromZipToTemp(zipTempPath, targetPath, folderInZip);
+    if (!success) {
+      console.warn(`Folder ${item.folder} not found in ZIP.`);
     }
   }
 
-  progressCallback && progressCallback({ status: 'done', message: 'Extraction finished.' });
+  progressCallback?.({ status: 'done', message: 'Extraction finished.' });
 }
 
 module.exports = { ensureResources };

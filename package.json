@@ -130,7 +130,7 @@
   "dependencies": {
     "@tailwindcss/typography": "^0.5.16",
     "abort-controller": "^3.0.0",
-    "adm-zip": "^0.5.16",
+    "archiver": "^7.0.1",
     "axios": "^1.10.0",
     "chokidar": "^4.0.3",
     "extract-zip": "^2.0.1",
