@@ -36,7 +36,7 @@ app.whenReady().then(() => {
     if (e.message === 'Resource download aborted') {
       console.log('Resource download aborted due to app quit.');
     } else {
-      console.error('Error during resource download:', e);
+      console.error('Error resource download:', e);
     }
   });
 
