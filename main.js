@@ -62,15 +62,13 @@ app.on('activate', () => {
   }
 });
 
-app.on('will-quit', async () => {
-  if (isAppClosing) return;
+app.on('before-quit', async (event) => {
   isAppClosing = true;
-
-  console.log('[INFO] Shutting down services...');
-
   if (resourceAbortController) {
     resourceAbortController.abort();
   }
+  
+  event.preventDefault();
 
   try {
     await stopApache();
@@ -82,11 +80,13 @@ app.on('will-quit', async () => {
     await stopRubyServer();
     await stopAllCronJobs();
     await stopCmd();
-    await stopAllTunnels();
+    await stopAllCronJobs();
+	await stopAllTunnels();
 
-    console.log('[INFO] All services stopped. App will now exit.');
+    app.exit(0);
   } catch (err) {
-    console.error('[ERROR] Failed during shutdown:', err);
+    console.error('Failed to stop services:', err);
+    app.exit(1);
   }
 });
 

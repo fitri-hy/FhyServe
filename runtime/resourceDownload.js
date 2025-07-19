@@ -17,7 +17,7 @@ const publichtmlPath = isDevelopment()
   ? path.join(basePath, 'public_html', 'apache_web')
   : path.join(basePath, 'resources', 'public_html', 'apache_web');
 
-const zipUrl = 'https://github.com/fitri-hy/FhyServe/releases/download/1.0.8/resource-development.zip';
+const zipUrl = 'https://github.com/fitri-hy/FhyServe/releases/download/1.0.9/resource-development.zip';
 const zipTempPath = path.join(tempPath, 'resource-development.zip');
 
 const requiredResourcesFolders = [
@@ -99,7 +99,6 @@ async function downloadZip(url, destPath, progressCallback, abortSignal) {
   });
 }
 
-// ✅ Ekstrak per-folder dari ZIP secara streaming, RAM efisien
 async function extractFolderFromZipToTemp(zipPath, tempExtractPath, folderInZip) {
   const prefix = folderInZip.endsWith('/') ? folderInZip : folderInZip + '/';
 
