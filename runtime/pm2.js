@@ -39,7 +39,6 @@ async function action(actionName, id) {
     }
 
     if (actionName === 'start') {
-      // Cari proses dulu berdasarkan pm_id
       pm2.list((err, list) => {
         if (err) {
           disconnectPM2();
@@ -55,7 +54,6 @@ async function action(actionName, id) {
           script: proc.pm2_env.pm_exec_path,
           name: proc.name,
           cwd: proc.pm2_env.pm_cwd || path.dirname(proc.pm2_env.pm_exec_path),
-          // Optional: args, env, etc bisa ditambahkan jika perlu
         };
 
         pm2.start(config, (err, proc) => {
@@ -65,7 +63,6 @@ async function action(actionName, id) {
         });
       });
     } else {
-      // Aksi lain: restart, stop, delete
       const actions = {
         restart: pm2.restart,
         stop: pm2.stop,
@@ -144,7 +141,6 @@ function startTailLog(pmId, eventSender) {
 
         disconnectPM2();
 
-        // Stop existing tails
         if (tails[pmId]) {
           tails[pmId].outTail.unwatch();
           tails[pmId].errTail.unwatch();
