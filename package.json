@@ -141,6 +141,7 @@
     "marked": "^15.0.12",
     "mysql2": "^3.14.1",
     "node-cron": "^4.1.1",
+    "p-limit": "^3.1.0",
     "pidusage": "^4.0.1",
     "pm2": "^6.0.8",
     "systeminformation": "^5.27.7",

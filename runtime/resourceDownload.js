@@ -1,7 +1,9 @@
 const axios = require('axios');
 const fs = require('fs-extra');
 const path = require('path');
+const { pipeline } = require('stream/promises');
 const unzipper = require('unzipper');
+const pLimit = require('p-limit');
 const { getCheckResource } = require('../utils/checkResource');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 
@@ -52,78 +54,92 @@ async function downloadZip(url, destPath, progressCallback, abortSignal) {
   if (await fs.pathExists(destPath)) {
     const stats = await fs.stat(destPath);
     if (remoteSize && stats.size === remoteSize) {
-      progressCallback && progressCallback({ status: 'download_skip', message: 'Zip already downloaded and valid, using cached file.' });
+      progressCallback?.({ status: 'download_skip', message: 'Zip already downloaded and valid, using cached file.' });
       return;
     } else {
-      progressCallback && progressCallback({ status: 'download_redundant', message: 'Cached zip incomplete or outdated, re-downloading...' });
+      progressCallback?.({ status: 'download_redundant', message: 'Cached zip incomplete or outdated, re-downloading...' });
       await fs.unlink(destPath);
     }
   }
 
-  const writer = fs.createWriteStream(destPath);
   const response = await axios({
     url,
     method: 'GET',
     responseType: 'stream',
+    signal: abortSignal,
   });
 
-  const totalLength = response.headers['content-length'];
+  const totalLength = parseInt(response.headers['content-length'] || '0', 10);
   let downloaded = 0;
 
-  return new Promise((resolve, reject) => {
-    if (abortSignal) {
-      abortSignal.addEventListener('abort', () => {
-        writer.close();
-        reject(new Error('Download aborted'));
+  const writeStream = fs.createWriteStream(destPath, { highWaterMark: 16 * 1024 });
+
+  response.data.on('data', (chunk) => {
+    downloaded += chunk.length;
+    if (progressCallback && totalLength) {
+      progressCallback({
+        status: 'download_progress',
+        message: `Downloading resources ${(downloaded / totalLength * 100).toFixed(2)}%. Please wait...`,
+        percent: downloaded / totalLength,
       });
     }
-
-    response.data.on('data', (chunk) => {
-      if (abortSignal && abortSignal.aborted) {
-        writer.close();
-        reject(new Error('Download aborted'));
-        return;
-      }
-      downloaded += chunk.length;
-      if (progressCallback && totalLength) {
-        progressCallback({
-          status: 'download_progress',
-          message: `Downloading resources ${(downloaded / totalLength * 100).toFixed(2)}%. Please wait...`,
-          percent: downloaded / totalLength,
-        });
-      }
-    });
-
-    response.data.pipe(writer);
-
-    writer.on('finish', resolve);
-    writer.on('error', reject);
   });
+
+  try {
+    await pipeline(response.data, writeStream);
+    progressCallback?.({ status: 'download_success', message: 'Download completed successfully.' });
+  } catch (err) {
+    if (!abortSignal?.aborted) {
+      console.error('Download failed:', err);
+    }
+    throw err;
+  }
 }
 
 async function extractFolderFromZipToTemp(zipPath, tempExtractPath, folderInZip) {
+  const limit = pLimit(3);
   return new Promise((resolve, reject) => {
-    fs.createReadStream(zipPath)
-      .pipe(unzipper.Parse())
-      .on('entry', async (entry) => {
-        const entryName = entry.path;
-        if (entryName.startsWith(folderInZip + '/')) {
-          const relativePath = entryName.slice(folderInZip.length + 1);
-          const targetPath = path.join(tempExtractPath, relativePath);
+    const stream = fs.createReadStream(zipPath).pipe(unzipper.Parse());
+    const promises = [];
 
-          if (entry.type === 'Directory') {
-            await fs.ensureDir(targetPath);
-            entry.autodrain();
-          } else {
-            await fs.ensureDir(path.dirname(targetPath));
-            entry.pipe(fs.createWriteStream(targetPath));
-          }
-        } else {
+    stream.on('entry', (entry) => {
+      const entryName = entry.path;
+
+      if (!entryName.startsWith(folderInZip + '/')) {
+        entry.autodrain();
+        return;
+      }
+
+      const relativePath = entryName.slice(folderInZip.length + 1);
+      const targetPath = path.join(tempExtractPath, relativePath);
+
+      const p = limit(async () => {
+        if (entry.type === 'Directory') {
+          await fs.ensureDir(targetPath);
           entry.autodrain();
+        } else {
+          await fs.ensureDir(path.dirname(targetPath));
+          await new Promise((res, rej) => {
+            const writeStream = fs.createWriteStream(targetPath, { highWaterMark: 16 * 1024 });
+            entry.pipe(writeStream);
+            writeStream.on('finish', res);
+            writeStream.on('error', rej);
+          });
         }
-      })
-      .on('close', () => resolve(true))
-      .on('error', reject);
+      });
+      promises.push(p);
+    });
+
+    stream.on('close', async () => {
+      try {
+        await Promise.all(promises);
+        resolve(true);
+      } catch (err) {
+        reject(err);
+      }
+    });
+
+    stream.on('error', reject);
   });
 }
 
@@ -134,17 +150,17 @@ async function copyFolder(src, dest) {
 
 async function ensureResources(progressCallback, abortSignal) {
   if (!CHECK_RESOURCE) {
-    progressCallback && progressCallback({ status: 'skip', message: 'Resource check disabled, skipping download/extract.' });
+    progressCallback?.({ status: 'skip', message: 'Resource check disabled, skipping download/extract.' });
     return;
   }
-  
+
   function checkAbort() {
-    if (abortSignal && abortSignal.aborted) {
+    if (abortSignal?.aborted) {
       throw new Error('Resource download aborted');
     }
   }
 
-  let needExtractFolders = [];
+  const needExtractFolders = [];
 
   for (const folder of requiredResourcesFolders) {
     checkAbort();
@@ -163,36 +179,36 @@ async function ensureResources(progressCallback, abortSignal) {
   }
 
   if (needExtractFolders.length === 0) {
-    progressCallback && progressCallback({ status: 'skip', message: 'All required folders exist.' });
+    progressCallback?.({ status: 'skip', message: 'All required folders exist.' });
     return;
   }
 
-  progressCallback && progressCallback({ status: 'download_start', message: 'Preparing resources...' });
+  progressCallback?.({ status: 'download_start', message: 'Preparing resources...' });
   await downloadZip(zipUrl, zipTempPath, progressCallback, abortSignal);
-  progressCallback && progressCallback({ status: 'download_complete', message: 'Resources ready.' });
+  progressCallback?.({ status: 'download_complete', message: 'Resources ready.' });
 
   for (const item of needExtractFolders) {
     checkAbort();
-    if (item.type === 'resource') {
-      progressCallback && progressCallback({ status: 'extracting', message: `Extracting resources ${item.folder}. Please wait...` });
-      const targetPath = path.join(resourcePath, item.folder);
-      const folderInZip = `resources/${item.folder}`;
-      const success = await extractFolderFromZipToTemp(zipTempPath, targetPath, folderInZip);
-      if (!success) {
-        console.warn(`Resources ${item.folder} not found, skipping extract.`);
-      }
-    } else {
-      progressCallback && progressCallback({ status: 'extracting', message: `Extracting resources ${item.folder}. Please wait...` });
-      const targetPath = path.join(publichtmlPath, item.folder);
-      const folderInZip = `public_html/apache_web/${item.folder}`;
-      const success = await extractFolderFromZipToTemp(zipTempPath, targetPath, folderInZip);
-      if (!success) {
-        console.warn(`Resources ${item.folder} not found, skipping extract.`);
-      }
+
+    progressCallback?.({ status: 'extracting', message: `Extracting ${item.folder}. Please wait...` });
+
+    const targetPath =
+      item.type === 'resource'
+        ? path.join(resourcePath, item.folder)
+        : path.join(publichtmlPath, item.folder);
+
+    const folderInZip =
+      item.type === 'resource'
+        ? `resource/${item.folder}`
+        : `public_html/apache_web/${item.folder}`;
+
+    const success = await extractFolderFromZipToTemp(zipTempPath, targetPath, folderInZip);
+    if (!success) {
+      console.warn(`Resources ${item.folder} not found or failed to extract.`);
     }
   }
 
-  progressCallback && progressCallback({ status: 'done', message: 'Extraction finished.' });
+  progressCallback?.({ status: 'done', message: 'Extraction finished.' });
 }
 
 module.exports = { ensureResources };
