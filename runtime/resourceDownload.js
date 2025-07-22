@@ -3,7 +3,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const { pipeline } = require('stream/promises');
 const unzipper = require('unzipper');
-const pLimit = require('p-limit');
 const { getCheckResource } = require('../utils/checkResource');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 
@@ -13,19 +12,34 @@ const basePath = getBasePath();
 const tempPath = isDevelopment()
   ? path.join(basePath, '.temp')
   : path.join(basePath, 'resources', '.temp');
-
-const resourcePath = path.join(basePath, 'resources');
+const resourcePath = isDevelopment()
+  ? path.join(basePath, 'resources')
+  : path.join(basePath, 'resources');
 const publichtmlPath = isDevelopment()
   ? path.join(basePath, 'public_html', 'apache_web')
   : path.join(basePath, 'resources', 'public_html', 'apache_web');
 
-const zipUrl = 'https://github.com/fitri-hy/FhyServe/releases/download/1.0.8/resource-development.zip';
-const zipTempPath = path.join(tempPath, 'resource-development.zip');
-
 const requiredResourcesFolders = [
-  'apache', 'composer', 'git', 'go', 'mysql', 'nginx', 'nodejs', 'php', 'php-fpm', 'python', 'ruby'
+  'apache', 'composer', 'git', 'go', 'mysql', 'nginx',
+  'nodejs', 'python', 'php', 'php-fpm', 'ruby'
 ];
+
 const requiredPublicHtmlFolders = ['phpmyadmin'];
+
+const partialResourceUrls = {
+  composer: 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/composer.zip',
+  apache: 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/apache.zip',
+  nginx: 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/nginx.zip',
+  phpmyadmin: 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/phpmyadmin.zip',
+  git: 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/git.zip',
+  ruby: 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/ruby.zip',
+  nodejs: 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/nodejs.zip',
+  python: 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/python.zip',
+  php: 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/php.zip',
+  'php-fpm': 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/php-fpm.zip',
+  go: 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/go.zip',
+  mysql: 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/mysql.zip',
+};
 
 async function checkFolderExists(baseDir, folderName) {
   try {
@@ -54,11 +68,11 @@ async function downloadZip(url, destPath, progressCallback, abortSignal) {
   if (await fs.pathExists(destPath)) {
     const stats = await fs.stat(destPath);
     if (remoteSize && stats.size === remoteSize) {
-      progressCallback?.({ status: 'download_skip', message: 'Zip already downloaded and valid, using cached file.' });
+      progressCallback?.({ status: 'download_skip', message: 'Cached zip already valid, skipping download.' });
       return;
     } else {
-      progressCallback?.({ status: 'download_redundant', message: 'Cached zip incomplete or outdated, re-downloading...' });
       await fs.unlink(destPath);
+      progressCallback?.({ status: 'download_redundant', message: 'Cached zip outdated, re-downloading...' });
     }
   }
 
@@ -72,14 +86,14 @@ async function downloadZip(url, destPath, progressCallback, abortSignal) {
   const totalLength = parseInt(response.headers['content-length'] || '0', 10);
   let downloaded = 0;
 
-  const writeStream = fs.createWriteStream(destPath, { highWaterMark: 16 * 1024 });
+  const writeStream = fs.createWriteStream(destPath, { highWaterMark: 64 * 1024 });
 
   response.data.on('data', (chunk) => {
     downloaded += chunk.length;
     if (progressCallback && totalLength) {
       progressCallback({
         status: 'download_progress',
-        message: `Downloading resources ${(downloaded / totalLength * 100).toFixed(2)}%. Please wait...`,
+        message: `Downloading... ${(downloaded / totalLength * 100).toFixed(2)}%`,
         percent: downloaded / totalLength,
       });
     }
@@ -87,7 +101,7 @@ async function downloadZip(url, destPath, progressCallback, abortSignal) {
 
   try {
     await pipeline(response.data, writeStream);
-    progressCallback?.({ status: 'download_success', message: 'Download completed successfully.' });
+    progressCallback?.({ status: 'download_success', message: 'Download completed.' });
   } catch (err) {
     if (!abortSignal?.aborted) {
       console.error('Download failed:', err);
@@ -96,119 +110,117 @@ async function downloadZip(url, destPath, progressCallback, abortSignal) {
   }
 }
 
-async function extractFolderFromZipToTemp(zipPath, tempExtractPath, folderInZip) {
-  const limit = pLimit(3);
+async function unzipStream(zipFilePath, targetFolderPath, abortSignal) {
+  await fs.ensureDir(targetFolderPath);
+
   return new Promise((resolve, reject) => {
-    const stream = fs.createReadStream(zipPath).pipe(unzipper.Parse());
-    const promises = [];
+    const readStream = fs.createReadStream(zipFilePath);
 
-    stream.on('entry', (entry) => {
-      const entryName = entry.path;
+    if (abortSignal) {
+      const onAbort = () => {
+        readStream.destroy(new Error('Extraction aborted'));
+        reject(new Error('Extraction aborted'));
+      };
+      abortSignal.addEventListener('abort', onAbort);
+      const cleanup = () => abortSignal.removeEventListener('abort', onAbort);
+      readStream.on('close', cleanup);
+      readStream.on('error', cleanup);
+    }
 
-      if (!entryName.startsWith(folderInZip + '/')) {
+    const parser = unzipper.Parse();
+
+    parser.on('entry', async (entry) => {
+      if (abortSignal?.aborted) {
         entry.autodrain();
         return;
       }
 
-      const relativePath = entryName.slice(folderInZip.length + 1);
-      const targetPath = path.join(tempExtractPath, relativePath);
-
-      const p = limit(async () => {
-        if (entry.type === 'Directory') {
-          await fs.ensureDir(targetPath);
-          entry.autodrain();
-        } else {
-          await fs.ensureDir(path.dirname(targetPath));
-          await new Promise((res, rej) => {
-            const writeStream = fs.createWriteStream(targetPath, { highWaterMark: 16 * 1024 });
-            entry.pipe(writeStream);
-            writeStream.on('finish', res);
-            writeStream.on('error', rej);
-          });
-        }
-      });
-      promises.push(p);
-    });
-
-    stream.on('close', async () => {
-      try {
-        await Promise.all(promises);
-        resolve(true);
-      } catch (err) {
-        reject(err);
+      const filePath = path.join(targetFolderPath, entry.path);
+      if (entry.type === 'Directory') {
+        await fs.ensureDir(filePath);
+        entry.autodrain();
+      } else {
+        await fs.ensureDir(path.dirname(filePath));
+        const writeStream = fs.createWriteStream(filePath, { highWaterMark: 64 * 1024 });
+        entry.pipe(writeStream);
+        await new Promise((res, rej) => {
+          writeStream.on('finish', res);
+          writeStream.on('error', rej);
+        });
       }
     });
 
-    stream.on('error', reject);
-  });
-}
+    parser.on('close', resolve);
+    parser.on('error', reject);
 
-async function copyFolder(src, dest) {
-  await fs.ensureDir(dest);
-  await fs.copy(src, dest, { overwrite: true, errorOnExist: false });
+    readStream.pipe(parser);
+  });
 }
 
 async function ensureResources(progressCallback, abortSignal) {
   if (!CHECK_RESOURCE) {
-    progressCallback?.({ status: 'skip', message: 'Resource check disabled, skipping download/extract.' });
+    progressCallback?.({ status: 'skip', message: 'Resource check disabled.' });
     return;
   }
 
-  function checkAbort() {
-    if (abortSignal?.aborted) {
-      throw new Error('Resource download aborted');
+  const foldersToCheck = [
+    ...requiredResourcesFolders.map(folder => ({ folder, type: 'resource' })),
+    ...requiredPublicHtmlFolders.map(folder => ({ folder, type: 'public_html' })),
+  ];
+
+  for (const { folder, type } of foldersToCheck) {
+    if (abortSignal?.aborted) throw new Error('Aborted');
+
+    const baseFolderPath = type === 'resource' ? resourcePath : publichtmlPath;
+    const targetFolderPath = path.join(baseFolderPath, folder);
+    const zipFilePath = path.join(tempPath, `${folder}.zip`);
+
+    const exists = await checkFolderExists(baseFolderPath, folder);
+    if (exists) {
+      progressCallback?.({ status: 'skip_folder', message: `${folder} already exists. Skipping.` });
+      continue;
+    }
+
+    const zipUrl = partialResourceUrls[folder];
+    if (!zipUrl) {
+      progressCallback?.({ status: 'error', message: `No URL found for ${folder}` });
+      continue;
+    }
+
+    try {
+      progressCallback?.({ status: 'download_start', message: `Downloading ${folder}...` });
+
+      await downloadZip(zipUrl, zipFilePath, progressCallback, abortSignal);
+      progressCallback?.({ status: 'downloaded', message: `${folder}.zip downloaded.` });
+
+      progressCallback?.({ status: 'extracting', message: `Extracting ${folder}...` });
+
+      await unzipStream(zipFilePath, targetFolderPath, abortSignal);
+
+      progressCallback?.({ status: 'extracted', message: `${folder} extracted.` });
+
+      await fs.remove(zipFilePath);
+      progressCallback?.({ status: 'cleanup_zip', message: `Removed ${folder}.zip after extraction.` });
+
+    } catch (err) {
+      progressCallback?.({ status: 'error', message: `Failed to process ${folder}: ${err.message}` });
+
+      try {
+        if (await fs.pathExists(zipFilePath)) {
+          await fs.remove(zipFilePath);
+          progressCallback?.({ status: 'cleanup', message: `Removed incomplete zip: ${folder}.zip` });
+        }
+        if (await fs.pathExists(targetFolderPath)) {
+          await fs.remove(targetFolderPath);
+          progressCallback?.({ status: 'cleanup', message: `Removed incomplete folder: ${folder}` });
+        }
+      } catch (cleanupErr) {
+        progressCallback?.({ status: 'error', message: `Cleanup failed for ${folder}: ${cleanupErr.message}` });
+      }
     }
   }
 
-  const needExtractFolders = [];
-
-  for (const folder of requiredResourcesFolders) {
-    checkAbort();
-    const exists = await checkFolderExists(resourcePath, folder);
-    if (!exists) {
-      needExtractFolders.push({ folder, type: 'resource' });
-    }
-  }
-
-  for (const folder of requiredPublicHtmlFolders) {
-    checkAbort();
-    const exists = await checkFolderExists(publichtmlPath, folder);
-    if (!exists) {
-      needExtractFolders.push({ folder, type: 'public_html' });
-    }
-  }
-
-  if (needExtractFolders.length === 0) {
-    progressCallback?.({ status: 'skip', message: 'All required folders exist.' });
-    return;
-  }
-
-  progressCallback?.({ status: 'download_start', message: 'Preparing resources...' });
-  await downloadZip(zipUrl, zipTempPath, progressCallback, abortSignal);
-  progressCallback?.({ status: 'download_complete', message: 'Resources ready.' });
-
-  for (const item of needExtractFolders) {
-    checkAbort();
-
-    progressCallback?.({ status: 'extracting', message: `Extracting ${item.folder}. Please wait...` });
-
-    const targetPath =
-      item.type === 'resource'
-        ? path.join(resourcePath, item.folder)
-        : path.join(publichtmlPath, item.folder);
-
-    const folderInZip =
-      item.type === 'resource'
-        ? `resource/${item.folder}`
-        : `public_html/apache_web/${item.folder}`;
-
-    const success = await extractFolderFromZipToTemp(zipTempPath, targetPath, folderInZip);
-    if (!success) {
-      console.warn(`Resources ${item.folder} not found or failed to extract.`);
-    }
-  }
-
-  progressCallback?.({ status: 'done', message: 'Extraction finished.' });
+  progressCallback?.({ status: 'done', message: 'All resources have been processed.' });
 }
 
 module.exports = { ensureResources };
