@@ -241,6 +241,7 @@ function setupIPC() {
     }
   });
   
+  /*
   // PM2
   ipcMain.handle('pm2-list', () => pm2runtime.list());
   ipcMain.handle('pm2-action', (event, action, id) => pm2runtime.action(action, id));
@@ -256,6 +257,7 @@ function setupIPC() {
   ipcMain.handle('pm2-logs', (event, pmId) => pm2runtime.getLogs(pmId));
   ipcMain.handle('pm2-start-tail-log', (event, pmId) => pm2runtime.startTailLog(pmId, event.sender));
   ipcMain.handle('pm2-stop-tail-log', (event, pmId) => pm2runtime.stopTailLog(pmId));
+  */
 }
 
 module.exports = { setupIPC };

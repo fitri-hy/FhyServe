@@ -839,7 +839,7 @@ window.addEventListener('DOMContentLoaded', () => {
   loadTunnels();
 });
 
-
+/*
 // PM2
 let selectedFilePathPM2 = null;
 let currentTailedPmIdPM2 = null;
@@ -1014,3 +1014,4 @@ closeLogModalBtnPM2.addEventListener('click', async () => {
 });
 
 refreshPM2();
+*/

@@ -130,6 +130,7 @@ contextBridge.exposeInMainWorld('tunnelAPI', {
   stopTunnel: (id) => ipcRenderer.invoke('stop-tunnel', id),
 });
 
+/*
 // PM2
 contextBridge.exposeInMainWorld('pm2API', {
   list: () => ipcRenderer.invoke('pm2-list'),
@@ -158,3 +159,4 @@ contextBridge.exposeInMainWorld('pm2API', {
     ipcRenderer.removeAllListeners('pm2-log-error');
   }
 });
+*/
