@@ -2,7 +2,7 @@ const { app, BrowserWindow } = require('electron');
 const { createWindow } = require('./screen/indexWindow');
 const { setupIPC } = require('./utils/ipc');
 const { stopAllTunnels } = require('./utils/tunnels');
-const { createMainMenu, checkForUpdates } = require('./screen/menu/mainMenu');
+const { createMainMenu } = require('./screen/menu/mainMenu');
 const { setApacheMain, stopApache } = require('./runtime/apache');
 const { setMysqlMain, stopMysql } = require('./runtime/mysql');
 const { setNginxMain, stopNginx } = require('./runtime/nginx');
@@ -30,7 +30,6 @@ app.whenReady().then(() => {
 
   setupIPC();
   createMainMenu(mainWindow);
-  checkForUpdates(mainWindow, true);
 });
 
 app.on('activate', () => {
