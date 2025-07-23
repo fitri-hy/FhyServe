@@ -1,3 +1,4 @@
+const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
@@ -9,6 +10,7 @@ const chokidar = require('chokidar');
 const { getBasePath, isDevelopment } = require('../utils/pathResource');
 const { getPORT } = require('../utils/port');
 const { getWATCHER } = require('../utils/watcher');
+const { rGo, ReLaunchIsFinish } = require('./resourceDownload');
 
 const BASE_PORT = getPORT('GOLANG_PORT');
 const CHOKIDAR = getWATCHER('WATCHER');
@@ -155,6 +157,30 @@ async function startProcess(projectName, scriptPath, port, cwd, isRestart = fals
 }
 
 async function startGoServer() {
+	
+  try {
+    const progressHandler = progress => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('resource-progress', progress);
+      }
+    };
+
+    const statuses = [];
+    statuses.push(await ReLaunchIsFinish(rGo, progressHandler));
+
+    if (statuses.includes('done')) {
+      progressHandler({ status: 'restarting', message: 'Restarting app after resource initialization...' });
+      setTimeout(() => {
+        app.relaunch();
+        app.exit(0);
+      }, 1000);
+      return;
+    }
+
+  } catch (err) {
+    console.error('Error during resource download:', err);
+  }
+	
   const subProjects = scanSubProjects();
   for (const proj of subProjects) {
     const scriptPath = proj === 'main'

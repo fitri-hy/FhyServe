@@ -1,3 +1,4 @@
+const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
@@ -8,6 +9,7 @@ const chokidar = require('chokidar');
 const { getBasePath, isDevelopment } = require('../utils/pathResource');
 const { getPORT } = require('../utils/port');
 const { getWATCHER } = require('../utils/watcher');
+const { rPython, ReLaunchIsFinish } = require('./resourceDownload');
 
 const BASE_PORT = getPORT('PYTHON_PORT');
 const CHOKIDAR = getWATCHER('WATCHER');
@@ -158,6 +160,7 @@ function getProjectNameFromPath(changedPath, baseDir) {
 }
 
 async function restartPythonProject(projectName) {
+  
   if (projectName === 'main') {
     const mainScript = path.join(htdocsPath, 'index.py');
     if (!fs.existsSync(mainScript)) return;
@@ -255,6 +258,30 @@ function watchPythonProjects() {
 }
 
 async function startPython() {
+	
+  try {
+    const progressHandler = progress => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('resource-progress', progress);
+      }
+    };
+
+    const statuses = [];
+    statuses.push(await ReLaunchIsFinish(rPython, progressHandler));
+
+    if (statuses.includes('done')) {
+      progressHandler({ status: 'restarting', message: 'Restarting app after resource initialization...' });
+      setTimeout(() => {
+        app.relaunch();
+        app.exit(0);
+      }, 1000);
+      return;
+    }
+
+  } catch (err) {
+    console.error('Error during resource download:', err);
+  }
+	
   const mainScript = path.join(htdocsPath, 'index.py');
   if (fs.existsSync(mainScript)) {
     let mainPort = extractPort(mainScript);

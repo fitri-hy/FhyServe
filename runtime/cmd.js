@@ -1,9 +1,11 @@
+const { app } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 const kill = require('tree-kill');
 const pidusage = require('pidusage');
 const { getBasePath, apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder, goOpenFolder, rubyOpenFolder } = require('../utils/pathResource');
 const { getENV } = require('../utils/env');
+const { rGit, rComposer, ReLaunchIsFinish } = require('./resourceDownload');
 
 const PATH_SYSTEM = getENV('PATH_SYSTEM');
 
@@ -35,7 +37,32 @@ function setCmdMain(window) {
   mainWindow = window;
 }
 
-function startCmd() {
+async function startCmd() {
+	
+  try {
+    const progressHandler = progress => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('resource-progress', progress);
+      }
+    };
+
+    const statuses = [];
+    statuses.push(await ReLaunchIsFinish(rGit, progressHandler));
+    statuses.push(await ReLaunchIsFinish(rComposer, progressHandler));
+
+    if (statuses.includes('done')) {
+      progressHandler({ status: 'restarting', message: 'Restarting app after resource initialization...' });
+      setTimeout(() => {
+        app.relaunch();
+        app.exit(0);
+      }, 1000);
+      return;
+    }
+
+  } catch (err) {
+    console.error('Error during resource download:', err);
+  }
+  
   if (cmdProcess) return;
 
   const systemPath = PATH_SYSTEM ? process.env.PATH || '' : '';

@@ -1,3 +1,4 @@
+const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
@@ -8,6 +9,7 @@ const chokidar = require('chokidar');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 const { getPORT } = require('../utils/port');
 const { getWATCHER } = require('../utils/watcher');
+const { rNode, ReLaunchIsFinish } = require('./resourceDownload');
 
 const BASE_PORT = getPORT('NODEJS_PORT');
 const CHOKIDAR = getWATCHER('WATCHER');
@@ -299,6 +301,30 @@ async function startProcess(projectName, scriptPath, port, cwd, isRestart = fals
 }
 
 async function startNodeServer() {
+	
+  try {
+    const progressHandler = progress => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('resource-progress', progress);
+      }
+    };
+
+    const statuses = [];
+    statuses.push(await ReLaunchIsFinish(rNode, progressHandler));
+
+    if (statuses.includes('done')) {
+      progressHandler({ status: 'restarting', message: 'Restarting app after resource initialization...' });
+      setTimeout(() => {
+        app.relaunch();
+        app.exit(0);
+      }, 1000);
+      return;
+    }
+
+  } catch (err) {
+    console.error('Error during resource download:', err);
+  }
+  
   for (const [projectName, { proc }] of Object.entries(processes)) {
     logToRenderer(formatLog(projectName, `Restart: stopping old process...`));
     await new Promise(resolve => {

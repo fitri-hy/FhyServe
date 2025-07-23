@@ -1,3 +1,4 @@
+const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
@@ -6,6 +7,7 @@ const pidusage = require('pidusage');
 const { spawn } = require('child_process');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 const { getPORT } = require('../utils/port');
+const { rApache, rPhp, rPhpMyAdmin, ReLaunchIsFinish } = require('./resourceDownload');
 
 const PORT = getPORT('APACHE_PORT');
 
@@ -222,6 +224,33 @@ function updateApacheConfig(port = PORT) {
 }
 
 async function startApache(port = PORT) {
+	
+  try {
+    const progressHandler = progress => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('resource-progress', progress);
+      }
+    };
+
+    const statuses = [];
+    statuses.push(await ReLaunchIsFinish(rApache, progressHandler));
+    statuses.push(await ReLaunchIsFinish(rPhp, progressHandler));
+    statuses.push(await ReLaunchIsFinish(rPhpMyAdmin, progressHandler));
+
+    if (statuses.includes('done')) {
+      progressHandler({ status: 'restarting', message: 'Restarting app after resource initialization...' });
+      setTimeout(() => {
+        app.relaunch();
+        app.exit(0);
+      }, 1000);
+      return;
+    }
+
+  } catch (err) {
+    console.error('Error during resource download:', err);
+  }
+
+
   if (apacheProcess) return;
 
   updateApacheConfig(port);

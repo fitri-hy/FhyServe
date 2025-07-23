@@ -1,3 +1,4 @@
+const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const net = require('net');
@@ -7,6 +8,7 @@ const { spawn, spawnSync, execSync } = require('child_process');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 const mysqlLib = require('mysql2/promise');
 const { getPORT } = require('../utils/port');
+const { rMysql, ReLaunchIsFinish } = require('./resourceDownload');
 
 const PORT = getPORT('MYSQL_PORT');
 
@@ -174,6 +176,30 @@ async function waitForMysqlReady(port = PORT, timeout = 7000) {
 }
 
 async function startMysql(port = PORT) {
+	
+  try {
+    const progressHandler = progress => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('resource-progress', progress);
+      }
+    };
+
+    const statuses = [];
+    statuses.push(await ReLaunchIsFinish(rMysql, progressHandler));
+
+    if (statuses.includes('done')) {
+      progressHandler({ status: 'restarting', message: 'Restarting app after resource initialization...' });
+      setTimeout(() => {
+        app.relaunch();
+        app.exit(0);
+      }, 1000);
+      return;
+    }
+
+  } catch (err) {
+    console.error('Error during resource download:', err);
+  }
+  
   if (mysqlProcess) return;
 
   if (!fs.existsSync(mysqldPath)) {

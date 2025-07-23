@@ -1,3 +1,4 @@
+const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
@@ -7,6 +8,7 @@ const find = require('find-process');
 const { exec, spawn } = require('child_process');
 const { isDevelopment, getBasePath } = require('../utils/pathResource');
 const { getPORT } = require('../utils/port');
+const { rNginx, rPhpFpm, ReLaunchIsFinish } = require('./resourceDownload');
 
 const PORT = getPORT('NGINX_PORT');
 const PHP_FPM_PORT = getPORT('PHP_FPM_PORT');
@@ -182,6 +184,31 @@ async function waitForNginxReady(port = PORT, timeout = 5000) {
 }
 
 async function startNginx(port = PORT) {
+	
+  try {
+    const progressHandler = progress => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('resource-progress', progress);
+      }
+    };
+
+    const statuses = [];
+    statuses.push(await ReLaunchIsFinish(rNginx, progressHandler));
+    statuses.push(await ReLaunchIsFinish(rPhpFpm, progressHandler));
+
+    if (statuses.includes('done')) {
+      progressHandler({ status: 'restarting', message: 'Restarting app after resource initialization...' });
+      setTimeout(() => {
+        app.relaunch();
+        app.exit(0);
+      }, 1000);
+      return;
+    }
+
+  } catch (err) {
+    console.error('Error during resource download:', err);
+  }
+  
   if (nginxProcess) return;
   
   if (!isDevelopment()) {
