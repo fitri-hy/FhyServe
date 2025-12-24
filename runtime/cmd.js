@@ -141,13 +141,21 @@ function sendCommand(command, isSQL = false) {
 
   let cmd = command.trim();
   let targetPath = null;
-  
+
+  if (process.platform === 'win32') {
+    if (cmd === 'ls') cmd = 'dir';
+    if (cmd === 'pwd') cmd = 'echo %CD%';
+    if (cmd === 'clear') cmd = 'cls';
+  } else {
+    if (cmd === 'clear') cmd = 'clear';
+  }
+
   if (cmd === 'cls' || cmd === 'clear') {
     mainWindow?.webContents.send('cmd-clear');
-    cmdProcess.stdin.write('echo %CD%\n');
+    cmdProcess.stdin.write(process.platform === 'win32' ? 'echo %CD%\n' : 'pwd\n');
     return;
   }
-  
+
   switch (cmd) {
     case 'go apache_web':
       targetPath = apacheOpenFolder();
@@ -167,7 +175,7 @@ function sendCommand(command, isSQL = false) {
     case 'go ruby_web':
       targetPath = rubyOpenFolder();
       break;
-	case 'go default':
+    case 'go default':
       const cdCommand = process.platform === 'win32'
         ? `cd /d "${basePath}"`
         : `cd "${basePath}"`;
@@ -184,12 +192,12 @@ function sendCommand(command, isSQL = false) {
     cmdProcess.stdin.write(cdCommand + '\n');
     return;
   }
-  
+
   if (isSQL && !cmd.endsWith(';')) {
     cmd += ';';
   }
 
-  cmdProcess.stdin.write(cmd + '\r\n');
+  cmdProcess.stdin.write(cmd + (process.platform === 'win32' ? '\r\n' : '\n'));
 }
 
 // Monitoring

@@ -292,17 +292,21 @@ const cmdStatusText = document.querySelector('#cmd-status');
 const cmdWrapper = document.querySelector('#cmd-wrapper');
 const cmdOutput = document.querySelector('#cmd-main');
 const cmdInput = document.querySelector('#cmd-input');
+const logging = document.querySelector('#logging code');
 
 cmdToggle.addEventListener('change', e => {
   if (e.target.checked) {
     window.cmdAPI.start();
   } else {
     window.cmdAPI.stop();
+    cmdOutput.textContent = '';
+    if (logging) logging.textContent = '';
   }
 });
 
 window.cmdAPI.onStatus(status => {
   cmdStatusText.textContent = status;
+
   if (status === 'RUNNING') {
     cmdStatusText.classList.add('text-green-500');
     cmdStatusText.classList.remove('text-rose-500');
@@ -311,6 +315,9 @@ window.cmdAPI.onStatus(status => {
     cmdStatusText.classList.add('text-rose-500');
     cmdStatusText.classList.remove('text-green-500');
     cmdToggle.checked = false;
+
+    cmdOutput.textContent = '';
+    if (logging) logging.textContent = '';
   }
 });
 
@@ -321,6 +328,7 @@ window.cmdAPI.onOutput(data => {
 
 window.cmdAPI.onClear(() => {
   cmdOutput.textContent = '';
+  if (logging) logging.textContent = '';
 });
 
 cmdInput.addEventListener('keydown', e => {
