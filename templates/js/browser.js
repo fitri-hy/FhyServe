@@ -1,3 +1,13 @@
+const ALLOWED_PROTOCOLS = ['http:', 'https:'];
+
+function sanitizeUrl(input) {
+  const url = new URL(input);
+  if (!ALLOWED_PROTOCOLS.includes(url.protocol)) {
+    throw new Error('Blocked protocol');
+  }
+  return url.href;
+}
+
 const $ = id => document.getElementById(id);
 const tabs = [], tabsContainer = $('tabs'), webviews = $('webviews-container');
 let activeTabId = null;
@@ -160,20 +170,22 @@ $('cancel-btn').onclick = () => {
 };
 $('open-btn').onclick = () => {
   try {
-    const url = new URL($('url-input').value.trim());
+    const safeUrl = sanitizeUrl($('url-input').value.trim());
+
     if (editingTabId) {
       const tab = tabs.find(t => t.id === editingTabId);
       if (tab) {
-        tab.webview.src = url.href;
+        tab.webview.src = safeUrl;
         saveTabs();
       }
       editingTabId = null;
     } else {
-      createTab(url.href);
+      createTab(safeUrl);
     }
+
     $('cancel-btn').click();
   } catch {
-    alert('Invalid URL');
+    alert('URL not allowed (http/https only)');
     $('url-input').focus();
   }
 };
