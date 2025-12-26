@@ -1,4 +1,4 @@
-<img src="./templates/images/ss.jpg"/>
+<img src="./templates/images/sss.jpg"/>
 
 <div align="center">
 
@@ -25,24 +25,25 @@
 
 ## ⚙️ Included Available
 
-- 🐘 **PHP & PHP-FPM** 
-- 🧰 **Apache**
-- 🚀 **NGINX**
-- 🟢 **Node.js**
-- 🐍 **Python**
-- 🐬 **MySQL**
-- 🗂 **phpMyAdmin**
-- 🐙 **Git**
-- 💻 **CMD**
-- ⏰ **Cron Job**
-- 📡 **Client API**
-- 📊 **Monitoring**
-- 📦 **Composer**
-- 🐭 **Go**
-- 💎 **Ruby**
-- 🧱 **CMS & Framework Auto Installer Package.**
-- 🛰️ **Local Tunels**
-- 🔁 **PM2 Process Manager**
+* 🐘 **PHP & PHP-FPM**
+* 🧰 **Apache**
+* 🚀 **NGINX**
+* 🟢 **Node.js**
+* 🐍 **Python**
+* 🐬 **MySQL**
+* 🗂 **phpMyAdmin**
+* 🐙 **Git**
+* 💻 **CMD**
+* ⏰ **Cron Job**
+* 📡 **Client API**
+* 📊 **Monitoring**
+* 📦 **Composer**
+* 🐭 **Go**
+* 💎 **Ruby**
+* 🗃 **File Browser**
+* 🧱 **CMS & Framework Auto Installer Package**
+* 🛰️ **Local Tunnels**
+
 
 #### CMS Package Included
 
