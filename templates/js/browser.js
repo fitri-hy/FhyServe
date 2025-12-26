@@ -3,6 +3,15 @@ const tabs = [], tabsContainer = $('tabs'), webviews = $('webviews-container');
 let activeTabId = null;
 let editingTabId = null;
 
+function safeHref(input) {
+  let s = (input || '').trim();
+  if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(s)) s = 'https://' + s;
+
+  const u = new URL(s);
+  if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error('Invalid protocol');
+  return u.href;
+}
+
 const updateTabLabels = () => tabs.forEach((t, i) => {
   t.label.textContent = `TAB-${i + 1}`;
   t.tab.classList.toggle('border-emerald-500', t.id === activeTabId);
@@ -41,12 +50,15 @@ function setActiveTab(id) {
 }
 
 const createTab = (url, customId) => {
+  const u = new URL(url);
+  if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error('Invalid protocol');
+
   const id = customId || 'tab-' + crypto.randomUUID();
   if (tabs.some(t => t.id === id)) return setActiveTab(id);
 
   const tab = document.createElement('div');
   tab.className = 'flex items-center gap-0.5 py-1 border-b-2 cursor-pointer';
-  
+
   const label = document.createElement('span');
   label.className = 'tab-label';
   label.textContent = 'Tab';
@@ -93,10 +105,7 @@ const createTab = (url, customId) => {
     webview.isDomReady = true;
     updateNavButtons();
 
-    if (activeTabId === id) {
-      setActiveTab(id);
-    }
-
+    if (activeTabId === id) setActiveTab(id);
     saveTabs();
   });
 
@@ -119,18 +128,18 @@ const createTab = (url, customId) => {
     e.stopPropagation();
     if (webview.canGoBack()) webview.goBack();
   };
+
   forwardBtn.onclick = e => {
     e.stopPropagation();
     if (webview.canGoForward()) webview.goForward();
   };
+
   reloadBtn.onclick = e => { e.stopPropagation(); webview.reload(); };
-  closeBtn.onclick = e => { e.stopPropagation(); closeTab(id) };
+  closeBtn.onclick = e => { e.stopPropagation(); closeTab(id); };
 
   updateTabLabels();
 
-  if (!customId) {
-    activeTabId = id; 
-  }
+  if (!customId) activeTabId = id;
 };
 
 const closeTab = id => {
@@ -146,31 +155,45 @@ const closeTab = id => {
 
 const loadTabs = () => {
   const saved = JSON.parse(localStorage.getItem('tabs') || '[]');
-  if (!saved.length) createTab('https://www.google.com');
-  else saved.forEach(t => createTab(t.url, t.id));
+
+  const safe = [];
+  for (const t of saved) {
+    try { safe.push({ id: t.id, url: safeHref(t.url) }); }
+    catch {  }
+  }
+
+  if (!safe.length) createTab('https://www.google.com');
+  else safe.forEach(t => createTab(t.url, t.id));
+
   const savedId = localStorage.getItem('activeTabId');
   const tab = tabs.find(t => t.id === savedId);
   tab ? setActiveTab(tab.id) : setActiveTab(tabs[0].id);
 };
 
-$('add-tab-btn').onclick = () => { $('url-input').value = ''; $('modal').classList.replace('hidden', 'flex'); $('url-input').focus(); };
+$('add-tab-btn').onclick = () => {
+  $('url-input').value = '';
+  $('modal').classList.replace('hidden', 'flex');
+  $('url-input').focus();
+};
+
 $('cancel-btn').onclick = () => {
   $('modal').classList.replace('flex', 'hidden');
   editingTabId = null;
 };
+
 $('open-btn').onclick = () => {
   try {
-    const url = new URL($('url-input').value.trim());
+    const href = safeHref($('url-input').value);
+
     if (editingTabId) {
       const tab = tabs.find(t => t.id === editingTabId);
-      if (tab) {
-        tab.webview.src = url.href;
-        saveTabs();
-      }
+      if (tab) tab.webview.src = href;
       editingTabId = null;
     } else {
-      createTab(url.href);
+      createTab(href);
     }
+
+    saveTabs();
     $('cancel-btn').click();
   } catch {
     alert('Invalid URL');
