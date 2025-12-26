@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { ipcMain, nativeTheme, shell, dialog } = require('electron');
+const { getBasePath, isDevelopment } = require('../utils/pathResource');
 const { startApache, stopApache } = require('../runtime/apache');
 const { startMysql, stopMysql } = require('../runtime/mysql');
 const { startNginx, stopNginx } = require('../runtime/nginx');
@@ -15,6 +16,7 @@ const { apacheOpenFolder, nginxOpenFolder, nodeOpenFolder, pythonOpenFolder, goO
 const { installCMS } = require('../runtime/autoInstaller');
 const pm2runtime = require('../runtime/pm2');
 const { createTunnel, deleteTunnel, getAllTunnels, startTunnel, stopTunnel, } = require('./tunnels');
+const { startFileBrowser, stopFileBrowser, setFileBrowserMain, getFileBrowserStats } = require('../runtime/fileBrowser');
 
 function setupIPC() {
   // Dark Mode
@@ -238,6 +240,34 @@ function setupIPC() {
       return { success: stopped };
     } catch (e) {
       return { success: false, message: e.message };
+    }
+  });
+  
+  // File Browser
+  ipcMain.on('file-browser-start', (event) => {
+    setFileBrowserMain(event.sender.getOwnerBrowserWindow());
+    startFileBrowser();
+  });
+
+  ipcMain.on('file-browser-stop', async (event) => {
+   await stopFileBrowser();
+  });
+
+  ipcMain.on('file-browser-get-stats', async (event) => {
+    const stats = await getFileBrowserStats();
+    event.sender.send('file-browser-stats', stats);
+  });
+
+  ipcMain.handle('open-filebrowser-folder', async () => {
+    try {
+      const basePath = getBasePath();
+      const folderPath = isDevelopment()
+        ? path.join(basePath, 'resources', 'filebrowser')  // lokasi db saat dev
+        : path.join(basePath, 'resources', 'filebrowser'); // lokasi db saat build
+      await shell.openPath(folderPath);
+      return { success: true };
+    } catch (err) {
+      return { success: false, message: err.message };
     }
   });
   

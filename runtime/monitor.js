@@ -7,6 +7,7 @@ const { getNodeStats } = require('./node');
 const { getPythonStats } = require('./python');
 const { getGoStats } = require('./go');
 const { getRubyStats } = require('./ruby');
+const { getFileBrowserStats } = require('./fileBrowser');
 const si = require('systeminformation');
 
 async function getServiceStats() {
@@ -66,6 +67,13 @@ async function getServiceStats() {
     result.push(ruby);
   } catch (err) {
     result.push({ name: 'Ruby', status: 'ERROR', error: err.message });
+  }
+
+  try {
+    const fb = await getFileBrowserStats();
+    result.push(fb);
+  } catch (err) {
+    result.push({ name: 'File Browser', status: 'ERROR', error: err.message });
   }
 
   return result;

@@ -130,6 +130,14 @@ contextBridge.exposeInMainWorld('tunnelAPI', {
   stopTunnel: (id) => ipcRenderer.invoke('stop-tunnel', id),
 });
 
+// File Browser
+contextBridge.exposeInMainWorld('fileBrowserAPI', {
+  start: () => ipcRenderer.send('file-browser-start'),
+  stop: () => ipcRenderer.send('file-browser-stop'),
+  onStatus: (callback) => ipcRenderer.on('file-browser-status', (_event, status) => callback(status)),
+  openFolder: () => ipcRenderer.invoke('open-filebrowser-folder'), // buka folder database
+});
+
 /*
 // PM2
 contextBridge.exposeInMainWorld('pm2API', {

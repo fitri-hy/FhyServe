@@ -12,5 +12,6 @@ resources/php/
 resources/php-fpm/
 resources/python/
 resources/ruby/
+resources/filebrowser/filebrowser.db
 public_html/apache_web/phpmyadmin/
 package-lock.json

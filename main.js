@@ -12,6 +12,7 @@ const { setGoMain, stopGoServer } = require('./runtime/go');
 const { setRubyMain, stopRubyServer } = require('./runtime/ruby');
 const { setCmdMain, stopCmd } = require('./runtime/cmd');
 const { setCronJobMain, stopAllCronJobs } = require('./runtime/cronjob');
+const { setFileBrowserMain, stopFileBrowser } = require('./runtime/fileBrowser');
 
 let mainWindow;
 
@@ -27,6 +28,7 @@ app.whenReady().then(() => {
   setRubyMain(mainWindow);
   setCmdMain(mainWindow);
   setCronJobMain(mainWindow);
+  setFileBrowserMain(mainWindow);
 
   setupIPC();
   createMainMenu(mainWindow);
@@ -59,6 +61,7 @@ app.on('before-quit', async (event) => {
     await stopCmd();
     await stopAllCronJobs();
 	await stopAllTunnels();
+    await stopFileBrowser();
 
     app.exit(0);
   } catch (err) {

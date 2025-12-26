@@ -55,6 +55,43 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// File Browser
+const fbStatus = document.getElementById('file-browser-status');
+const fbToggle = document.getElementById('fileBrowserToggle');
+const fbButton = document.getElementById('open-file-browser-folder');
+
+fbToggle.addEventListener('change', (e) => {
+  if (e.target.checked) {
+    window.fileBrowserAPI.start();
+  } else {
+    window.fileBrowserAPI.stop();
+  }
+});
+
+window.fileBrowserAPI.onStatus((status) => {
+  if (!status) return;
+
+  if (status === 'RUNNING') {
+    fbStatus.textContent = `RUNNING`;
+    fbStatus.classList.remove('text-rose-500', 'dark:text-rose-600');
+    fbStatus.classList.add('text-emerald-500', 'dark:text-emerald-600');
+    fbToggle.checked = true;
+  } else {
+    fbStatus.textContent = 'STOPPED';
+    fbStatus.classList.remove('text-emerald-500', 'dark:text-emerald-600');
+    fbStatus.classList.add('text-rose-500', 'dark:text-rose-600');
+    fbToggle.checked = false;
+  }
+});
+
+fbButton.addEventListener('click', async () => {
+  const result = await window.fileBrowserAPI.openFolder();
+  if (!result.success) {
+    alert('Failed to open folder: ' + result.message);
+  }
+});
+
+
 // Apache
 const statusText = document.getElementById('apache-status');
 const toggle = document.getElementById('apacheToggle');

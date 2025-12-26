@@ -185,6 +185,48 @@ function sendCommand(command, isSQL = false) {
       return;
   }
 
+if (cmd.toLowerCase().startsWith('fb -p ')) {
+  const parts = cmd.split(' ');
+  const newPassword = parts.slice(2).join(' ').trim();
+
+  if (!newPassword) {
+    mainWindow?.webContents.send('cmd-output', 'Error: Please provide a new password.\n');
+    return;
+  }
+
+  const fbExePath = path.join(basePath, 'resources', 'filebrowser', 'filebrowser.exe');
+  const dbPath = path.join(basePath, 'resources', 'filebrowser', 'filebrowser.db');
+
+  // panggil CLI dengan subcommand update
+  const fbProcess = spawn(fbExePath, [
+    'users', 'update', 'admin',
+    '-p', newPassword,
+    '--database', dbPath
+  ], {
+    shell: true,
+    stdio: 'pipe'
+  });
+
+  fbProcess.stdout.on('data', (data) => {
+    mainWindow?.webContents.send('cmd-output', data.toString());
+  });
+
+  fbProcess.stderr.on('data', (data) => {
+    mainWindow?.webContents.send('cmd-output', data.toString());
+  });
+
+  fbProcess.on('close', (code) => {
+    if (code === 0) {
+      mainWindow?.webContents.send('cmd-output', `Password changed successfully.\n`);
+    } else {
+      mainWindow?.webContents.send('cmd-output', `Failed to change password (code ${code}).\n`);
+    }
+  });
+
+  return;
+}
+
+  
   if (targetPath) {
     const cdCommand = process.platform === 'win32'
       ? `cd /d "${targetPath}"`
