@@ -16,6 +16,7 @@ function createBrowserWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       webviewTag: true,
+	  sandbox: true,
       preload: path.join(__dirname, '../utils/preload.js'),
     }
   });

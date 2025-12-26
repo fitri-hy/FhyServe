@@ -156,11 +156,22 @@ const closeTab = id => {
 
 const loadTabs = () => {
   const saved = JSON.parse(localStorage.getItem('tabs') || '[]');
-  if (!saved.length) createTab('https://www.google.com');
-  else saved.forEach(t => createTab(t.url, t.id));
+
+  if (!saved.length) {
+    createTab('https://www.google.com');
+  } else {
+    saved.forEach(t => {
+      try {
+        createTab(sanitizeUrl(t.url), t.id);
+      } catch {
+        // skip unsafe URL
+      }
+    });
+  }
+
   const savedId = localStorage.getItem('activeTabId');
   const tab = tabs.find(t => t.id === savedId);
-  tab ? setActiveTab(tab.id) : setActiveTab(tabs[0].id);
+  tab ? setActiveTab(tab.id) : tabs[0] && setActiveTab(tabs[0].id);
 };
 
 $('add-tab-btn').onclick = () => { $('url-input').value = ''; $('modal').classList.replace('hidden', 'flex'); $('url-input').focus(); };
