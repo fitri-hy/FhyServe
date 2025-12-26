@@ -1,35 +1,62 @@
 ## Welcome to FhyServe
 
-✨ **"Full Server Control, No Environment!"** ✨
+FhyServe is a portable web server and runtime platform that provides a local development environment based on self-contained resources. All server and runtime components run without global installation, without system dependencies, and without permanent modifications to the host operating system.
 
-**FhyServe** is a **portable runtime & web server platform** that prioritizes **resource portability** — all server and runtime components can run directly without global installation or permanent changes to the operating system. With FhyServe, developers can easily launch various **local server environments** quickly, flexibly, and efficiently, simply by carrying a complete ready-to-use resource package on any device. 🎒💻
+FhyServe is designed to address the issues of environment inconsistencies, repeated configurations, and system dependencies common in cross-device web application development. With its portable execution approach, each server resource can be run directly from the application directory.
 
-As a **portable multi-server runtime solution** 🚀, FhyServe combines popular server and runtime technologies into one easy-to-use, all-in-one package that you can take anywhere. This makes developing and testing web applications easier, while maintaining environment consistency without needing to reconfigure on each device. 🔧⚙️
-
----
-
-### ⚙️ Key Features
-
-FhyServe provides portable, ready-to-use runtime and server resources, including:
-
-* 🐘 **PHP & PHP-FPM**
-* 🧰 **Apache**
-* 🚀 **NGINX**
-* 🟢 **Node.js**
-* 🐍 **Python**
-* 🐬 **MySQL**
-* 🗂 **phpMyAdmin**
-* 🐙 **Git**
-* 💻 **CMD**
+The platform supports managing multiple runtime and server services within a single integrated package, enabling developers to build, test, and run web applications in a consistent environment across multiple machines without additional configuration.
 
 ---
 
-With **FhyServe**, you get **portable server & runtime resources** 🎯 that can be used immediately without complex installation or configuration on the operating system.
+# Architecture & Working Concept
 
-🌟 This solution is ideal for developers who prioritize:
+FhyServe uses the concept of an isolated portable runtime, where:
 
-* ⚡ **High mobility**
-* 🛠️ **Ease of use**
-* 🔄 **Environment consistency**
+- Each service runs as an independent resource
+- Paths, configurations, and dependencies are local to the application
+- Independent of the system PATH environment
+- Can be moved and run across multiple devices
 
-Start using **FhyServe** and enjoy the ease of managing local server environments with portable resources, high performance, and full control in your hands! 🤝✨
+This approach ensures that the server configuration, runtime version, and dependencies remain identical across all devices.
+
+---
+
+## Runtime & Server Components
+
+FhyServe integrates various server and runtime technologies into a single platform, including:
+
+- PHP & PHP-FPM — PHP application execution
+- Apache — HTTP web server
+- NGINX — reverse proxy & high-performance web server
+- Node.js — server-side JavaScript runtime
+- Python — scripting runtime & backend services
+- MySQL — relational database server
+- phpMyAdmin — web-based database management
+- Git — version control system
+- Command Line Interface (CMD) — runtime command control and execution
+
+---
+
+## Intended Use Cases
+
+FhyServe is intended for:
+
+- Local web application development and testing
+- Portable environments for cross-device work
+- Local non-production deployments
+- Training, demos, and sandbox development
+- Developers who need a quick setup without system installation
+
+---
+
+## Technical Advantages
+
+- No system installation
+- Consistent environment across devices
+- Centralized and portable configuration
+- Multi-server & multi-runtime One platform
+- Easy integration into development workflows
+
+---
+
+FhyServe provides complete control over local server environments with a portable, modular, and efficient approach, allowing developers to focus on application development without being distracted by the complexity of environment setup.
