@@ -197,7 +197,6 @@ if (cmd.toLowerCase().startsWith('fb -p ')) {
   const fbExePath = path.join(basePath, 'resources', 'filebrowser', 'filebrowser.exe');
   const dbPath = path.join(basePath, 'resources', 'filebrowser', 'filebrowser.db');
 
-  // panggil CLI dengan subcommand update
   const fbProcess = spawn(fbExePath, [
     'users', 'update', 'admin',
     '-p', newPassword,
