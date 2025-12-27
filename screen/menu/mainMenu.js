@@ -98,19 +98,26 @@ function createMainMenu(win) {
 		{
 		  label: 'About',
 		  click: async () => {
+			const appVersion = app.getVersion();
 			const result = await dialog.showMessageBox(win, {
 			  type: 'info',
-			  title: 'About',
-			  message: 'FhyServe is a portable multi-server runtime platform designed to simplify local web application development without the need for global installation. Allows you to run multiple environments.',
+			  title: 'About FhyServe',
+			  message: `FhyServe v${appVersion}
+
+FhyServe is a portable multi-server runtime platform designed to simplify local web application development without requiring global installation. 
+It allows you to run multiple environments easily.
+
+Visit our GitHub or Website for more information.`,
 			  buttons: ['Visit GitHub', 'Visit Website', 'Close'],
-			  defaultId: 0,
+			  defaultId: 2,
+			  cancelId: 2
 			});
 
 			if (result.response === 0) {
 			  shell.openExternal('https://github.com/fitri-hy');
 			} else if (result.response === 1) {
-              shell.openExternal('https://fhylabs.com');
-            }
+			  shell.openExternal('https://fhylabs.com');
+			}
 		  }
 		},
       ],
