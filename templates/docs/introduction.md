@@ -8,7 +8,7 @@ The platform supports managing multiple runtime and server services within a sin
 
 ---
 
-# Architecture & Working Concept
+## Architecture & Working Concept
 
 FhyServe uses the concept of an isolated portable runtime, where:
 

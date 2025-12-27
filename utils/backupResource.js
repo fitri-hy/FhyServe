@@ -16,7 +16,7 @@ const publicHtmlPath = isDevelopment()
   : path.join(basePath, 'resources', 'public_html');
 
 const requiredResourcesFolders = [
-  'apache', 'composer', 'git', 'go', 'mysql', 'nginx', 'nodejs', 'php', 'php-fpm', 'python', 'ruby'
+  'apache', 'composer', 'git', 'go', 'mysql', 'nginx', 'nodejs', 'php', 'php-fpm', 'python', 'ruby', 'filebrowser'
 ];
 
 const requiredPublicHtmlFolders = [
@@ -24,17 +24,16 @@ const requiredPublicHtmlFolders = [
 ];
 
 async function folderExistsCheck(base, folderList) {
-  const missing = [];
+  const existing = [];
 
   for (const folder of folderList) {
     const fullPath = path.join(base, folder);
-    const exists = await fs.pathExists(fullPath);
-    if (!exists) {
-      missing.push(path.posix.join(path.basename(base), folder));
+    if (await fs.pathExists(fullPath)) {
+      existing.push(folder);
     }
   }
 
-  return missing;
+  return existing;
 }
 
 function runBackupWorker(data, onProgress) {
@@ -91,15 +90,15 @@ function createProgressWindow(parent) {
 async function backupResources(win) {
   let progressWin = null;
   try {
-    const missingResource = await folderExistsCheck(resourcePath, requiredResourcesFolders);
-    const missingPublicHtml = await folderExistsCheck(publicHtmlPath, requiredPublicHtmlFolders);
-    const allMissing = [...missingResource, ...missingPublicHtml];
+    // Ambil hanya folder yang ada
+    const existingResources = await folderExistsCheck(resourcePath, requiredResourcesFolders);
+    const existingPublicHtml = await folderExistsCheck(publicHtmlPath, requiredPublicHtmlFolders);
 
-    if (allMissing.length > 0) {
+    if (existingResources.length === 0 && existingPublicHtml.length === 0) {
       await dialog.showMessageBox(win, {
-        type: 'error',
-        title: 'Backup Failed',
-        message: 'The following required folders are missing:\n\n' + allMissing.join('\n'),
+        type: 'info',
+        title: 'Nothing to Backup',
+        message: 'No folders found to backup.',
         buttons: ['OK']
       });
       return;
@@ -122,8 +121,8 @@ async function backupResources(win) {
     await runBackupWorker({
       resourcePath,
       publicHtmlPath,
-      requiredResourcesFolders,
-      requiredPublicHtmlFolders,
+      requiredResourcesFolders: existingResources,
+      requiredPublicHtmlFolders: existingPublicHtml,
       tempZipPath
     }, (percent) => {
       progressWin.webContents.send('main-progress', percent);
