@@ -10,15 +10,6 @@ const publicHtmlPath = isDevelopment()
   ? path.join(basePath, 'public_html')
   : path.join(basePath, 'resources', 'public_html');
 
-const resourceFolders = [
-  'apache', 'composer', 'git', 'go', 'mysql', 'nginx',
-  'nodejs', 'php', 'php-fpm', 'python', 'ruby'
-];
-
-const publicHtmlFolders = [
-  path.join('apache_web', 'phpmyadmin')
-];
-
 function createProgressWindow(parent) {
   const win = new BrowserWindow({
     width: 350,
@@ -67,46 +58,40 @@ async function importResources(win) {
     await extract(zipPath, { dir: tempExtractPath });
     progressWin.webContents.send('main-progress', 15);
 
-    for (const folder of resourceFolders) {
-      const dest = path.join(resourcePath, folder);
-      if (await fs.pathExists(dest)) {
-        await fs.remove(dest);
-      }
-    }
+    const resourceRoot = path.join(tempExtractPath, 'resource');
+    if (await fs.pathExists(resourceRoot)) {
+      const folders = await fs.readdir(resourceRoot);
+      for (let i = 0; i < folders.length; i++) {
+        const folder = folders[i];
+        const src = path.join(resourceRoot, folder);
+        const dest = path.join(resourcePath, folder);
 
-    for (const folder of publicHtmlFolders) {
-      const dest = path.join(publicHtmlPath, folder);
-      if (await fs.pathExists(dest)) {
-        await fs.remove(dest);
-      }
-    }
+        if (await fs.pathExists(dest)) {
+          await fs.remove(dest);
+        }
 
-    progressWin.webContents.send('main-progress', 30);
-
-    for (let i = 0; i < resourceFolders.length; i++) {
-      const folder = resourceFolders[i];
-      const src = path.join(tempExtractPath, 'resource', folder);
-      const dest = path.join(resourcePath, folder);
-
-      if (await fs.pathExists(src)) {
         await fs.copy(src, dest);
+        const percent = 15 + Math.round((i / folders.length) * 50);
+        progressWin.webContents.send('main-progress', percent);
       }
-
-      const percent = 30 + Math.round((i / (resourceFolders.length + publicHtmlFolders.length)) * 50);
-      progressWin.webContents.send('main-progress', percent);
     }
 
-    for (let j = 0; j < publicHtmlFolders.length; j++) {
-      const folder = publicHtmlFolders[j];
-      const src = path.join(tempExtractPath, 'public_html', folder);
-      const dest = path.join(publicHtmlPath, folder);
+    const publicHtmlRoot = path.join(tempExtractPath, 'public_html');
+    if (await fs.pathExists(publicHtmlRoot)) {
+      const folders = await fs.readdir(publicHtmlRoot);
+      for (let j = 0; j < folders.length; j++) {
+        const folder = folders[j];
+        const src = path.join(publicHtmlRoot, folder);
+        const dest = path.join(publicHtmlPath, folder);
 
-      if (await fs.pathExists(src)) {
+        if (await fs.pathExists(dest)) {
+          await fs.remove(dest);
+        }
+
         await fs.copy(src, dest);
+        const percent = 65 + Math.round((j / folders.length) * 30);
+        progressWin.webContents.send('main-progress', percent);
       }
-
-      const percent = 80 + Math.round((j / publicHtmlFolders.length) * 15);
-      progressWin.webContents.send('main-progress', percent);
     }
 
     await fs.remove(tempExtractPath);

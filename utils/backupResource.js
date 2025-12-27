@@ -1,76 +1,30 @@
 const fs = require('fs-extra');
 const path = require('path');
+const extract = require('extract-zip');
 const { dialog, BrowserWindow } = require('electron');
-const { Worker } = require('node:worker_threads');
 const { getBasePath, isDevelopment } = require('./pathResource');
 
 const basePath = getBasePath();
-
-const tempPath = isDevelopment()
-  ? path.join(basePath, '.temp')
-  : path.join(basePath, 'resources', '.temp');
-
 const resourcePath = path.join(basePath, 'resources');
 const publicHtmlPath = isDevelopment()
   ? path.join(basePath, 'public_html')
   : path.join(basePath, 'resources', 'public_html');
 
 const requiredResourcesFolders = [
-  'apache', 'composer', 'git', 'go', 'mysql', 'nginx', 'nodejs', 'php', 'php-fpm', 'python', 'ruby', 'filebrowser'
+  'apache', 'composer', 'git', 'go', 'mysql', 'nginx', 'nodejs', 'php',
+  'php-fpm', 'python', 'ruby', 'filebrowser'
 ];
-
-const requiredPublicHtmlFolders = [
-  path.join('apache_web', 'phpmyadmin')
-];
-
-async function folderExistsCheck(base, folderList) {
-  const existing = [];
-
-  for (const folder of folderList) {
-    const fullPath = path.join(base, folder);
-    if (await fs.pathExists(fullPath)) {
-      existing.push(folder);
-    }
-  }
-
-  return existing;
-}
-
-function runBackupWorker(data, onProgress) {
-  return new Promise((resolve, reject) => {
-    const worker = new Worker(path.join(__dirname, 'worker.js'), {
-      workerData: data,
-    });
-
-    worker.on('message', (msg) => {
-      if (msg.status === 'done') {
-        resolve();
-      } else if (msg.status === 'error') {
-        reject(new Error(msg.error));
-      } else if (msg.status === 'progress' && onProgress) {
-        onProgress(msg.percent);
-      }
-    });
-
-    worker.on('error', reject);
-
-    worker.on('exit', (code) => {
-      if (code !== 0) {
-        reject(new Error(`Worker stopped with exit code ${code}`));
-      }
-    });
-  });
-}
 
 function createProgressWindow(parent) {
-  const progressWin = new BrowserWindow({
+  const win = new BrowserWindow({
     width: 350,
     height: 200,
-    parent: parent,
+    parent,
     modal: true,
     resizable: false,
     minimizable: false,
     maximizable: false,
+    closable: true,
     autoHideMenuBar: true,
     frame: true,
     movable: false,
@@ -82,65 +36,84 @@ function createProgressWindow(parent) {
     }
   });
 
-  progressWin.loadFile(path.join(__dirname, '../templates/progress.html'));
-
-  return progressWin;
+  win.loadFile(path.join(__dirname, '../templates/progress.html'));
+  return win;
 }
 
-async function backupResources(win) {
+async function importResources(win) {
   let progressWin = null;
+
   try {
-    // Ambil hanya folder yang ada
-    const existingResources = await folderExistsCheck(resourcePath, requiredResourcesFolders);
-    const existingPublicHtml = await folderExistsCheck(publicHtmlPath, requiredPublicHtmlFolders);
-
-    if (existingResources.length === 0 && existingPublicHtml.length === 0) {
-      await dialog.showMessageBox(win, {
-        type: 'info',
-        title: 'Nothing to Backup',
-        message: 'No folders found to backup.',
-        buttons: ['OK']
-      });
-      return;
-    }
-
-    const { canceled, filePath } = await dialog.showSaveDialog(win, {
-      title: 'Save Backup Resource',
-      defaultPath: 'resource-development.zip',
-      filters: [{ name: 'Zip Files', extensions: ['zip'] }]
+    const { canceled, filePaths } = await dialog.showOpenDialog(win, {
+      title: 'Import Resource Zip',
+      filters: [{ name: 'Zip Files', extensions: ['zip'] }],
+      properties: ['openFile']
     });
 
-    if (canceled || !filePath) return;
+    if (canceled || filePaths.length === 0) return;
 
-    await fs.ensureDir(tempPath);
-
-    const tempZipPath = path.join(tempPath, 'temp-backup-resource.zip');
+    const zipPath = filePaths[0];
+    const tempExtractPath = path.join(basePath, '.temp_import');
 
     progressWin = createProgressWindow(win);
+    progressWin.webContents.send('main-progress', 5);
 
-    await runBackupWorker({
-      resourcePath,
-      publicHtmlPath,
-      requiredResourcesFolders: existingResources,
-      requiredPublicHtmlFolders: existingPublicHtml,
-      tempZipPath
-    }, (percent) => {
-      progressWin.webContents.send('main-progress', percent);
-    });
+    await fs.remove(tempExtractPath);
+    await fs.ensureDir(tempExtractPath);
+    await extract(zipPath, { dir: tempExtractPath });
+    progressWin.webContents.send('main-progress', 15);
 
-    await fs.copy(tempZipPath, filePath, { overwrite: true });
-    await fs.remove(tempZipPath);
+    const resourceRoot = path.join(tempExtractPath, 'resource');
+    if (await fs.pathExists(resourceRoot)) {
+      const foldersInZip = await fs.readdir(resourceRoot);
+      const foldersToImport = foldersInZip.filter(f => requiredResourcesFolders.includes(f));
+
+      for (let i = 0; i < foldersToImport.length; i++) {
+        const folder = foldersToImport[i];
+        const src = path.join(resourceRoot, folder);
+        const dest = path.join(resourcePath, folder);
+
+        if (await fs.pathExists(dest)) {
+          await fs.remove(dest);
+        }
+
+        await fs.copy(src, dest);
+        const percent = 15 + Math.round((i / foldersToImport.length) * 50);
+        progressWin.webContents.send('main-progress', percent);
+      }
+    }
+
+    const publicHtmlRoot = path.join(tempExtractPath, 'public_html');
+    if (await fs.pathExists(publicHtmlRoot)) {
+      const folders = await fs.readdir(publicHtmlRoot);
+      for (let j = 0; j < folders.length; j++) {
+        const folder = folders[j];
+        const src = path.join(publicHtmlRoot, folder);
+        const dest = path.join(publicHtmlPath, folder);
+
+        if (await fs.pathExists(dest)) {
+          await fs.remove(dest);
+        }
+
+        await fs.copy(src, dest);
+        const percent = 65 + Math.round((j / folders.length) * 30);
+        progressWin.webContents.send('main-progress', percent);
+      }
+    }
+
+    await fs.remove(tempExtractPath);
+    progressWin.webContents.send('main-progress', 100);
 
     await dialog.showMessageBox(win, {
       type: 'info',
-      title: 'Backup Complete',
-      message: 'Backup successfully saved!',
+      title: 'Import Complete',
+      message: 'Resources imported successfully.',
       buttons: ['OK']
     });
 
-  } catch (error) {
-    console.error('Backup failed:', error);
-    dialog.showErrorBox('Backup Failed', error.message);
+  } catch (err) {
+    console.error('Import failed:', err);
+    dialog.showErrorBox('Import Failed', err.message);
   } finally {
     if (progressWin && !progressWin.isDestroyed()) {
       progressWin.close();
@@ -149,5 +122,5 @@ async function backupResources(win) {
 }
 
 module.exports = {
-  backupResources
+  importResources
 };
