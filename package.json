@@ -129,7 +129,9 @@
       "oneClick": false,
       "perMachine": true,
       "allowToChangeInstallationDirectory": true
-    }
+    },
+    "cscLink": "signkeys/fhyabs_cert.pfx",
+    "cscKeyPassword": "fhylabs123"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.16",
