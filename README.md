@@ -84,7 +84,7 @@ Get the latest version of **FhyServe** via the following official link:
 
 ---
 
-## Install
+## ⚙️ Install
 
 ```
 npm install
@@ -96,7 +96,7 @@ npm run dev
 
 ---
 
-## Build
+## 🛠️ Build
 
 ```
 npm run build
@@ -104,7 +104,7 @@ npm run build
 
 ---
 
-## Generate Self-Signed Certificate (Testing Only)
+## 🔐 Generate Self-Signed Certificate (Testing Only)
 
 ```
 $cert = New-SelfSignedCertificate -Type CodeSigning -Subject "CN=FhyLabs Group" -KeyExportPolicy Exportable -CertStoreLocation "Cert:\CurrentUser\My"
