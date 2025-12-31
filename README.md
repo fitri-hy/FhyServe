@@ -80,6 +80,37 @@ Get the latest version of **FhyServe** via the following official link:
 | **Composer**   | Composer 2.8.9 |
 | **Go**         | Go 1.24.4 |
 | **Ruby**       | Ruby 3.4.4-2 |
+| **File Browser**       | File Browser 2.52.0 |
+
+---
+
+## Install
+
+```
+npm install
+npm start
+
+#or
+npm run dev
+```
+
+---
+
+## Build
+
+```
+npm run build
+```
+
+---
+
+## Generate Self-Signed Certificate (Testing Only)
+
+```
+$cert = New-SelfSignedCertificate -Type CodeSigning -Subject "CN=FhyLabs Group" -KeyExportPolicy Exportable -CertStoreLocation "Cert:\CurrentUser\My"
+$pwd = ConvertTo-SecureString -String "fhylabs123" -Force -AsPlainText
+Export-PfxCertificate -Cert $cert -FilePath ".\signkeys\fhyabs_cert.pfx" -Password $pwd
+```
 
 ---
 
