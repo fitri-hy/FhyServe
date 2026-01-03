@@ -28,6 +28,7 @@ const partialResourceUrls = {
   git: 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/git.zip',
   'php-fpm': 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/php-fpm.zip',
   phpmyadmin: 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/phpmyadmin.zip',
+  filebrowser: 'https://github.com/fitri-hy/FhyServe-resources/releases/download/1.0.0/filebrowser.zip',
 };
 
 async function checkFolderExists(baseDir, folderName) {
@@ -256,6 +257,7 @@ const rComposer = createResourceFunc('composer', resourcePath);
 const rGit = createResourceFunc('git', resourcePath);
 const rPhpFpm = createResourceFunc('php-fpm', resourcePath);
 const rPhpMyAdmin = createResourceFunc('phpmyadmin', publichtmlPath);
+const rFileBrowser = createResourceFunc('filebrowser', resourcePath);
 
 function restartApp(progressCallback) {
   progressCallback?.({
@@ -288,5 +290,6 @@ module.exports = {
   rGit,
   rPhpFpm,
   rPhpMyAdmin,
+  rFileBrowser,
   ReLaunchIsFinish,
 };
