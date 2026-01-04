@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Tray, Menu } = require('electron');
 const { createWindow } = require('./screen/indexWindow');
 const { setupIPC } = require('./utils/ipc');
 const { stopAllTunnels } = require('./utils/tunnels');
@@ -15,10 +15,46 @@ const { setCronJobMain, stopAllCronJobs } = require('./runtime/cronjob');
 const { setFileBrowserMain, stopFileBrowser } = require('./runtime/fileBrowser');
 
 let mainWindow;
+let tray;
+let isAppQuitting = false;
+
+const useTray = true;
+
+async function stopAllServices() {
+  try {
+    await stopApache();
+    await stopMysql();
+    await stopNginx();
+    await stopNodeServer();
+    await stopPython();
+    await stopGoServer();
+    await stopRubyServer();
+    await stopAllCronJobs();
+    await stopCmd();
+    await stopAllTunnels();
+    await stopFileBrowser();
+  } catch (err) {
+    console.error('Failed to stop services:', err);
+  }
+}
+
+function createTray() {
+  tray = new Tray('templates/images/icon.png');
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Open', click: () => mainWindow.show() },
+    { label: 'Quit', click: async () => {
+      isAppQuitting = true;
+      await stopAllServices();
+      app.exit(0);
+    }}
+  ]);
+  tray.setToolTip('FhyServe');
+  tray.setContextMenu(contextMenu);
+}
 
 app.whenReady().then(() => {
   mainWindow = createWindow();
-  
+
   setApacheMain(mainWindow);
   setMysqlMain(mainWindow);
   setNginxMain(mainWindow);
@@ -32,6 +68,17 @@ app.whenReady().then(() => {
 
   setupIPC();
   createMainMenu(mainWindow);
+
+  if (useTray) {
+    createTray();
+
+    mainWindow.on('close', (event) => {
+      if (!isAppQuitting) {
+        event.preventDefault();
+        mainWindow.hide();
+      }
+    });
+  }
 });
 
 app.on('activate', () => {
@@ -42,27 +89,18 @@ app.on('activate', () => {
 });
 
 app.on('before-quit', async (event) => {
-  isAppClosing = true;
-  if (resourceAbortController) {
+  if (useTray && !isAppQuitting) {
+    event.preventDefault();
+    mainWindow.hide();
+    return;
+  }
+
+  if (typeof resourceAbortController !== 'undefined') {
     resourceAbortController.abort();
   }
-  
-  event.preventDefault();
 
   try {
-    await stopApache();
-    await stopMysql();
-    await stopNginx();
-    await stopNodeServer();
-    await stopPython();
-    await stopGoServer();
-    await stopRubyServer();
-    await stopAllCronJobs();
-    await stopCmd();
-    await stopAllCronJobs();
-	await stopAllTunnels();
-    await stopFileBrowser();
-
+    await stopAllServices();
     app.exit(0);
   } catch (err) {
     console.error('Failed to stop services:', err);
@@ -71,5 +109,5 @@ app.on('before-quit', async (event) => {
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+  if (!useTray && process.platform !== 'darwin') app.quit();
 });
