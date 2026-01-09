@@ -1,3 +1,4 @@
+const path = require('path');
 const { app, BrowserWindow, Tray, Menu } = require('electron');
 const { createWindow } = require('./screen/indexWindow');
 const { setupIPC } = require('./utils/ipc');
@@ -39,7 +40,8 @@ async function stopAllServices() {
 }
 
 function createTray() {
-  tray = new Tray('templates/images/icon.png');
+  const iconPath = path.join(__dirname, 'templates/images/icon.png');
+  tray = new Tray(iconPath);
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Open', click: () => mainWindow.show() },
     { label: 'Quit', click: async () => {
