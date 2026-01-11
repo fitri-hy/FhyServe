@@ -1,4 +1,4 @@
-<img src="./templates/images/sss.jpg"/>
+<img src="./templates/images/sss.png"/>
 
 <div align="center">
 
