@@ -5,6 +5,7 @@ const { backupResources } = require('../../utils/backupResource');
 const { importResources } = require('../../utils/importResource');
 const { stopAllTunnels } = require('../../utils/tunnels');
 const { createDocsWindow } = require('../docsWindow');
+const { createDonateWindow } = require('../donateWindow');
 const { stopApache } = require('../../runtime/apache');
 const { stopMysql } = require('../../runtime/mysql');
 const { stopNginx } = require('../../runtime/nginx');
@@ -83,6 +84,12 @@ function createMainMenu(win) {
       ],
 	},
 	{
+	  label: 'Browser',
+	  click: () => {
+	    createBrowserWindow();
+	  },
+	},
+	{
 	  label: 'Documentation',
 	  click: () => {
 	    createDocsWindow();
@@ -123,9 +130,9 @@ Visit our GitHub or Website for more information.`,
       ],
     },
 	{
-	  label: 'Browser',
+	  label: 'Donate❤️',
 	  click: () => {
-	    createBrowserWindow();
+	    createDonateWindow();
 	  },
 	},
   ];
