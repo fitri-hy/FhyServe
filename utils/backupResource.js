@@ -12,7 +12,7 @@ const publicHtmlPath = isDevelopment()
 
 const requiredResourcesFolders = [
   'apache', 'composer', 'git', 'go', 'mysql', 'nginx',
-  'nodejs', 'php', 'php-fpm', 'python', 'ruby', 'filebrowser'
+  'nodejs', 'php', 'php-fpm', 'python', 'ruby', 'filebrowser', 'redis'
 ];
 
 function createProgressWindow(parent) {

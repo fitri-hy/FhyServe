@@ -135,7 +135,20 @@ contextBridge.exposeInMainWorld('fileBrowserAPI', {
   start: () => ipcRenderer.send('file-browser-start'),
   stop: () => ipcRenderer.send('file-browser-stop'),
   onStatus: (callback) => ipcRenderer.on('file-browser-status', (_event, status) => callback(status)),
-  openFolder: () => ipcRenderer.invoke('open-filebrowser-folder'), // buka folder database
+  checkResource: () => ipcRenderer.invoke('file-browser-check-resource'),
+  openFolder: () => ipcRenderer.invoke('open-filebrowser-folder'),
+});
+
+// Redis
+contextBridge.exposeInMainWorld('redisAPI', {
+  start: () => ipcRenderer.send('redis-start'),
+  stop: () => ipcRenderer.send('redis-stop'),
+  getStatus: () => ipcRenderer.send('redis-get-status'),
+  getStats: () => ipcRenderer.send('redis-get-stats'),
+  onStatus: callback => ipcRenderer.on('redis-status', (e, status) => callback(status)),
+  onStats: callback => ipcRenderer.on('redis-stats', (e, stats) => callback(stats)),
+  checkResource: () => ipcRenderer.invoke('redis-check-resource'),
+  openFolder: () => ipcRenderer.invoke('open-redis-folder')
 });
 
 /*

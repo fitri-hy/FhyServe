@@ -14,6 +14,7 @@ const { setRubyMain, stopRubyServer } = require('./runtime/ruby');
 const { setCmdMain, stopCmd } = require('./runtime/cmd');
 const { setCronJobMain, stopAllCronJobs } = require('./runtime/cronjob');
 const { setFileBrowserMain, stopFileBrowser } = require('./runtime/fileBrowser');
+const { setRedisMain, stopRedis } = require('./runtime/redis');
 
 let mainWindow;
 let tray;
@@ -34,6 +35,7 @@ async function stopAllServices() {
     await stopCmd();
     await stopAllTunnels();
     await stopFileBrowser();
+    await stopRedis();
   } catch (err) {
     console.error('Failed to stop services:', err);
   }
@@ -67,6 +69,7 @@ app.whenReady().then(() => {
   setCmdMain(mainWindow);
   setCronJobMain(mainWindow);
   setFileBrowserMain(mainWindow);
+  setRedisMain(mainWindow);
 
   setupIPC();
   createMainMenu(mainWindow);

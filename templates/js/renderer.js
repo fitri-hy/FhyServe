@@ -72,7 +72,7 @@ window.fileBrowserAPI.onStatus((status) => {
   if (!status) return;
 
   if (status === 'RUNNING') {
-    fbStatus.textContent = `RUNNING`;
+    fbStatus.textContent = 'RUNNING';
     fbStatus.classList.remove('text-rose-500', 'dark:text-rose-600');
     fbStatus.classList.add('text-emerald-500', 'dark:text-emerald-600');
     fbToggle.checked = true;
@@ -85,9 +85,15 @@ window.fileBrowserAPI.onStatus((status) => {
 });
 
 fbButton.addEventListener('click', async () => {
+  const resource = await window.fileBrowserAPI.checkResource();
+  if (!resource.exists) {
+    alert('The File Browser resource is not yet available. Please download it or wait for the initialization process to complete.');
+    return;
+  }
+
   const result = await window.fileBrowserAPI.openFolder();
   if (!result.success) {
-    alert('Failed to open folder: ' + result.message);
+    alert('Failed to open File Browser folder: ' + result.message);
   }
 });
 
@@ -878,11 +884,55 @@ window.addEventListener('DOMContentLoaded', () => {
     } else {
       alert('Failed to create tunnel: ' + res.message);
     }
-});
-
+  });
 
   loadTunnels();
 });
+
+// Redis
+const redisStatus = document.getElementById('redis-status');
+const redisToggle = document.getElementById('redisToggle');
+const redisButton = document.getElementById('open-redis-folder');
+
+if (redisToggle && redisStatus) {
+  redisToggle.addEventListener('change', e => {
+    if (e.target.checked) window.redisAPI.start();
+    else window.redisAPI.stop();
+  });
+
+  window.redisAPI.onStatus(status => {
+    if (!status) return;
+
+    if (status === 'RUNNING') {
+      redisStatus.textContent = 'RUNNING';
+      redisStatus.classList.remove('text-rose-500', 'dark:text-rose-600');
+      redisStatus.classList.add('text-emerald-500', 'dark:text-emerald-600');
+      redisToggle.checked = true;
+    } else {
+      redisStatus.textContent = 'STOPPED';
+      redisStatus.classList.remove('text-emerald-500', 'dark:text-emerald-600');
+      redisStatus.classList.add('text-rose-500', 'dark:text-rose-600');
+      redisToggle.checked = false;
+    }
+  });
+
+  window.redisAPI.getStatus();
+}
+
+if (redisButton) {
+  redisButton.addEventListener('click', async () => {
+    const resource = await window.redisAPI.checkResource();
+    if (!resource.exists) {
+      alert('Redis resources are not yet available. Please download them or wait for the initialization process to complete.');
+      return;
+    }
+
+    const result = await window.redisAPI.openFolder();
+    if (!result.success) {
+      alert('Failed to open Redis folder: ' + result.message);
+    }
+  });
+}
 
 /*
 // PM2

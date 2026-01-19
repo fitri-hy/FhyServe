@@ -17,6 +17,7 @@ const { installCMS } = require('../runtime/autoInstaller');
 const pm2runtime = require('../runtime/pm2');
 const { createTunnel, deleteTunnel, getAllTunnels, startTunnel, stopTunnel, } = require('./tunnels');
 const { startFileBrowser, stopFileBrowser, setFileBrowserMain, getFileBrowserStats } = require('../runtime/fileBrowser');
+const { startRedis, stopRedis, setRedisMain, getRedisStats } = require('../runtime/redis');
 
 function setupIPC() {
   // Dark Mode
@@ -257,13 +258,19 @@ function setupIPC() {
     const stats = await getFileBrowserStats();
     event.sender.send('file-browser-stats', stats);
   });
+  
+  ipcMain.handle('file-browser-check-resource', async () => {
+    const basePath = getBasePath();
+    const exePath = path.join(basePath, 'resources', 'filebrowser', 'filebrowser.exe');
+    return { exists: fs.existsSync(exePath) };
+  });
 
   ipcMain.handle('open-filebrowser-folder', async () => {
     try {
       const basePath = getBasePath();
       const folderPath = isDevelopment()
-        ? path.join(basePath, 'resources', 'filebrowser')  // lokasi db saat dev
-        : path.join(basePath, 'resources', 'filebrowser'); // lokasi db saat build
+        ? path.join(basePath, 'resources', 'filebrowser')
+        : path.join(basePath, 'resources', 'filebrowser');
       await shell.openPath(folderPath);
       return { success: true };
     } catch (err) {
@@ -271,6 +278,45 @@ function setupIPC() {
     }
   });
   
+  // Redis
+  ipcMain.on('redis-start', event => {
+    setRedisMain(event.sender.getOwnerBrowserWindow());
+    startRedis();
+  });
+
+  ipcMain.on('redis-stop', async event => {
+    await stopRedis();
+  });
+
+  ipcMain.on('redis-get-status', async event => {
+    const stats = await getRedisStats();
+    event.sender.send('redis-status', stats.status);
+  });
+
+  ipcMain.on('redis-get-stats', async event => {
+    const stats = await getRedisStats();
+    event.sender.send('redis-stats', stats);
+  });
+
+  ipcMain.handle('redis-check-resource', async () => {
+    const basePath = getBasePath();
+    const exePath = path.join(basePath, 'resources', 'redis', 'redis-server.exe');
+    return { exists: fs.existsSync(exePath) };
+  });
+
+  ipcMain.handle('open-redis-folder', async () => {
+    try {
+      const basePath = getBasePath();
+      const folderPath = isDevelopment()
+        ? path.join(basePath, 'resources', 'redis')
+        : path.join(basePath, 'resources', 'redis');
+      await shell.openPath(folderPath);
+      return { success: true };
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  });
+
   /*
   // PM2
   ipcMain.handle('pm2-list', () => pm2runtime.list());

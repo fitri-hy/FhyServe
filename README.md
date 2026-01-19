@@ -41,6 +41,7 @@
 * 🐭 **Go**
 * 💎 **Ruby**
 * 🗃 **File Browser**
+* 🟥 **Redis**
 * 🧱 **CMS & Framework Auto Installer Package**
 * 🛰️ **Local Tunnels**
 
@@ -81,6 +82,7 @@ Get the latest version of **FhyServe** via the following official link:
 | **Go**         | Go 1.24.4 |
 | **Ruby**       | Ruby 3.4.4-2 |
 | **File Browser**       | File Browser 2.52.0 |
+| **Redis**       | File Browser 5.0.14 |
 
 ---
 
