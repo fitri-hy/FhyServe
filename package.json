@@ -98,6 +98,10 @@
         "to": "filebrowser"
       },
       {
+        "from": "resources/redis",
+        "to": "redis"
+      },
+      {
         "from": "public_html",
         "to": "public_html"
       }
