@@ -82,7 +82,7 @@ Get the latest version of **FhyServe** via the following official link:
 | **Go**         | Go 1.24.4 |
 | **Ruby**       | Ruby 3.4.4-2 |
 | **File Browser**       | File Browser 2.52.0 |
-| **Redis**       | File Browser 5.0.14 |
+| **Redis**       | Redis 5.0.14 |
 
 ---
 
