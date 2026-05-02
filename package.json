@@ -19,7 +19,7 @@
     "runtime",
     "web-server"
   ],
-  "author": "FhyLabs Group",
+  "author": "FhyLabs Group <dummyemail@email.com>",
   "license": "MIT",
   "main": "main.js",
   "scripts": {
